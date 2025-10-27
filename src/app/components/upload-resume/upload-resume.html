@@ -1,0 +1,128 @@
+<div class="upload-section">
+  <!-- Header -->
+  <!-- <div class="upload-header">
+    <h1 class="upload-title">Resume Analysis</h1>
+    <p class="upload-subtitle">
+      Get AI-powered insights to improve your resume and land your dream job
+    </p>
+  </div> -->
+
+  <!-- Upload Card -->
+  <mat-card class="upload-card" [class.drag-over]="isDragOver">
+    <mat-card-content>
+      <div class="upload-content">
+        <!-- Upload Area -->
+        <div
+          class="upload-area"
+          (click)="fileInput.click()"
+          (drop)="onFileDropped($event)"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          [class.has-file]="fileName"
+        >
+          <input
+            type="file"
+            (change)="onFileSelected($event)"
+            accept=".pdf"
+            hidden
+            #fileInput
+          />
+
+          <!-- Initial State -->
+          <div class="upload-initial" *ngIf="!fileName && !loading">
+            <div class="upload-icon">
+              <mat-icon>cloud_upload</mat-icon>
+            </div>
+            <h3>Upload Your Resume</h3>
+            <p>Drag & drop your PDF file here or click to browse</p>
+            <div class="file-requirements">
+              <mat-icon>info</mat-icon>
+              <span>Supports PDF files up to 5MB</span>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div class="upload-loading" *ngIf="loading">
+            <mat-spinner diameter="48"></mat-spinner>
+            <h3>Analyzing Resume...</h3>
+            <p>Our AI is reviewing your resume for optimization opportunities</p>
+          </div>
+
+          <!-- File Selected State -->
+          <div class="upload-complete" *ngIf="fileName && !loading">
+            <div class="file-info">
+              <div class="file-icon">
+                <mat-icon>description</mat-icon>
+              </div>
+              <div class="file-details">
+                <h4>{{ fileName }}</h4>
+                <p>{{ fileSize }}</p>
+              </div>
+              <button
+                mat-icon-button
+                class="remove-btn"
+                (click)="resetFile(); $event.stopPropagation()"
+                matTooltip="Remove file"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <button
+              mat-stroked-button
+              color="primary"
+              class="reupload-btn"
+              (click)="fileInput.click(); $event.stopPropagation()"
+            >
+              <mat-icon>upload</mat-icon>
+              Upload Different File
+            </button>
+          </div>
+        </div>
+
+        <!-- Features Grid (only when no file) -->
+        <div class="features-section" *ngIf="!fileName">
+          <h4>What you'll get:</h4>
+          <div class="features-grid">
+            <div class="feature-item">
+              <mat-icon class="feature-icon">score</mat-icon>
+              <div>
+                <strong>Overall Score</strong>
+                <span>0–10 rating with detailed breakdown</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <mat-icon class="feature-icon">insights</mat-icon>
+              <div>
+                <strong>AI Insights</strong>
+                <span>Strengths and improvement areas</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <mat-icon class="feature-icon">tips_and_updates</mat-icon>
+              <div>
+                <strong>Actionable Tips</strong>
+                <span>Specific suggestions to improve</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <mat-icon class="feature-icon">key</mat-icon>
+              <div>
+                <strong>Keyword Optimization</strong>
+                <span>ATS-friendly keyword suggestions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Privacy Notice -->
+  <div class="privacy-notice">
+    <mat-icon>lock</mat-icon>
+    <div class="privacy-text">
+      <strong>Your data is secure</strong>
+      <span>We use enterprise-grade encryption and never share your resume with third parties.</span>
+    </div>
+  </div>
+</div>

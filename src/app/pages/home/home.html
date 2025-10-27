@@ -1,0 +1,174 @@
+<div class="home-container">
+  <!-- Top Navigation Bar -->
+  <header class="app-header">
+    <mat-toolbar class="toolbar">
+      <div class="toolbar-left">
+        <div class="logo">
+          <mat-icon class="logo-icon">auto_awesome</mat-icon>
+          <span class="logo-text">ResuRadar</span>
+        </div>
+        <nav class="nav-links">
+          <a class="nav-link" href="#" [class.active]="activeTab === 'home'">
+            <mat-icon>home</mat-icon>
+            <span>Home</span>
+          </a>
+          <a class="nav-link" href="#" [class.active]="activeTab === 'history'">
+            <mat-icon>history</mat-icon>
+            <span>History</span>
+          </a>
+          <a class="nav-link" href="#" [class.active]="activeTab === 'analytics'">
+            <mat-icon>insights</mat-icon>
+            <span>Analytics</span>
+          </a>
+        </nav>
+      </div>
+      <div class="toolbar-right">
+        <button *ngIf="!isLoggedIn" mat-stroked-button color="primary" class="upgrade-btn">
+          <mat-icon>workspace_premium</mat-icon>
+          Upgrade to Pro
+        </button>
+
+        <div *ngIf="isLoggedIn" class="user-profile">
+          <button mat-button [matMenuTriggerFor]="userMenu" class="profile-trigger">
+            <div class="avatar">{{ userInitials }}</div>
+            <mat-icon class="expand-icon">expand_more</mat-icon>
+          </button>
+        </div>
+
+        <button *ngIf="!isLoggedIn" mat-raised-button color="primary" class="login-btn">
+          <mat-icon>login</mat-icon>
+          Sign In
+        </button>
+      </div>
+    </mat-toolbar>
+
+    <!-- User Menu -->
+    <mat-menu #userMenu="matMenu" class="user-menu">
+      <!-- <div class="menu-header">
+        <div class="menu-user-info">
+          <h4 class="menu-user-name">{{ userName }}</h4>
+          <div class="menu-user-stats">
+            <span>{{ userResumeCount }} resumes</span>
+            <span>• Avg: {{ userScore | number:'1.1-1' }}/10</span>
+          </div>
+          <span class="premium-badge">✨ Premium Member</span>
+        </div>
+      </div>
+
+      <mat-divider class="menu-divider"></mat-divider> -->
+
+      <button mat-menu-item class="menu-item">
+        <mat-icon class="menu-item-icon">person</mat-icon>
+        <span>My Profile</span>
+      </button>
+      <button mat-menu-item class="menu-item">
+        <mat-icon class="menu-item-icon">folder</mat-icon>
+        <span>My Resumes</span>
+        <!-- <span class="menu-item-badge">{{ userResumeCount }}</span> -->
+      </button>
+      <button mat-menu-item class="menu-item">
+        <mat-icon class="menu-item-icon">settings</mat-icon>
+        <span>Settings</span>
+      </button>
+
+      <mat-divider class="menu-divider"></mat-divider>
+
+      <button mat-menu-item class="menu-item sign-out">
+        <mat-icon class="menu-item-icon">logout</mat-icon>
+        <span>Sign Out</span>
+      </button>
+    </mat-menu>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <section class="upload-section" *ngIf="!analysisData">
+      <div class="hero-content">
+        <h1>Optimize Your Resume with AI</h1>
+        <p class="hero-subtitle">
+          Get detailed feedback, score improvements, and professional suggestions to land your dream job.
+        </p>
+      </div>
+
+      <app-upload-resume (resumeAnalyzed)="onAnalysisComplete($event)"></app-upload-resume>
+
+      <!-- Previous Resumes -->
+      <!-- <div *ngIf="isLoggedIn && previousResumes.length > 0" class="previous-resumes">
+        <h2 class="section-title">Your Previous Resumes</h2>
+        <div class="resumes-grid">
+          <mat-card *ngFor="let resume of previousResumes" class="resume-card" (click)="loadPreviousResume(resume)"
+            [ngClass]="getScoreClass(resume.score)">
+            <div class="card-header">
+              <h3 class="resume-name">{{ resume.name }}</h3>
+              <div class="score-badge">
+                <span>{{ resume.score }}</span>/10
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="position">{{ resume.position }}</p>
+              <p class="date">{{ resume.date | date: 'MMM d, y' }}</p>
+            </div>
+            <mat-icon class="chevron">chevron_right</mat-icon>
+          </mat-card>
+        </div>
+      </div> -->
+    </section>
+
+    <!-- Analysis Results -->
+    <section *ngIf="analysisData" class="analysis-section">
+      <div class="results-header">
+        <button mat-stroked-button (click)="onNewAnalysis()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+          New Analysis
+        </button>
+        <div class="header-actions">
+          <button mat-stroked-button>
+            <mat-icon>download</mat-icon>
+            Export Report
+          </button>
+          <button mat-stroked-button>
+            <mat-icon>share</mat-icon>
+            Share
+          </button>
+        </div>
+      </div>
+      <app-analysis-result [data]="analysisData" [isProUser]="isLoggedIn"></app-analysis-result>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <mat-icon class="logo-icon">auto_awesome</mat-icon>
+          <span class="logo-text">ResuRadar</span>
+        </div>
+        <p>AI-powered resume optimization for modern professionals</p>
+      </div>
+      <div class="footer-links">
+        <div>
+          <h4>Product</h4>
+          <a href="#">Features</a>
+          <a href="#">Pricing</a>
+          <a href="#">Use Cases</a>
+        </div>
+        <div>
+          <h4>Resources</h4>
+          <a href="#">Help Center</a>
+          <a href="#">Blog</a>
+          <a href="#">Tutorials</a>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Careers</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 ResuRadar. All rights reserved.</p>
+    </div>
+  </footer>
+</div>

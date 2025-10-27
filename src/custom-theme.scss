@@ -1,0 +1,24 @@
+@use '@angular/material' as mat;
+
+// Define custom typography config
+$typography-config: mat.m2-define-typography-config(
+  $font-family: 'Poppins, Inter, sans-serif'
+);
+
+// Define palettes (using M2-prefixed built-in palettes and functions)
+$resuradar-primary-palette: mat.m2-define-palette(mat.$m2-indigo-palette, 900);
+$resuradar-accent-palette: mat.m2-define-palette(mat.$m2-cyan-palette, A400);
+$resuradar-warn-palette: mat.m2-define-palette(mat.$m2-orange-palette, 600);
+
+// Define light theme
+$resuradar-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $resuradar-primary-palette,
+    accent: $resuradar-accent-palette,
+    warn: $resuradar-warn-palette,
+  ),
+  typography: $typography-config,
+));
+
+// Apply the theme globally (using M2 theme mixin)
+@include mat.m2-theme($resuradar-theme);

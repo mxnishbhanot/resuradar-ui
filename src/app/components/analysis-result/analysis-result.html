@@ -1,0 +1,206 @@
+<div class="analysis-container" *ngIf="data">
+  <!-- Header with Score -->
+  <div class="analysis-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="main-title">Resume Analysis</h1>
+        <p class="subtitle">AI-powered comprehensive feedback report</p>
+      </div>
+      <div class="score-section">
+        <div class="score-display" [ngClass]="getScoreClass()">
+          <div class="score-circle">
+            <span class="score-value">{{ data.score }}</span>
+            <span class="score-out-of">/10</span>
+          </div>
+          <div class="score-label">{{ getScoreLabel() }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Left Column - Free Insights -->
+    <div class="left-column">
+      <!-- Executive Summary -->
+      <mat-card class="summary-card">
+        <div class="card-header">
+          <mat-icon class="header-icon">summarize</mat-icon>
+          <h2>Executive Summary</h2>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="card-content">
+          <p class="summary-text">{{ data.free_feedback.summary }}</p>
+        </div>
+      </mat-card>
+
+      <!-- Strengths -->
+      <mat-card class="insight-card strength-card">
+        <div class="card-header">
+          <div class="icon-container success">
+            <mat-icon>verified</mat-icon>
+          </div>
+          <h3>Your Strengths</h3>
+        </div>
+        <div class="card-content">
+          <ul class="insight-list">
+            <li *ngFor="let strength of data.free_feedback.strengths" class="insight-item">
+              <mat-icon class="item-icon success">check_circle</mat-icon>
+              <span>{{ strength }}</span>
+            </li>
+          </ul>
+        </div>
+      </mat-card>
+
+      <!-- Improvements -->
+      <mat-card class="insight-card improvement-card">
+        <div class="card-header">
+          <div class="icon-container warning">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <h3>Areas for Improvement</h3>
+        </div>
+        <div class="card-content">
+          <ul class="insight-list">
+            <li *ngFor="let improvement of data.free_feedback.improvements" class="insight-item">
+              <mat-icon class="item-icon warning">info</mat-icon>
+              <span>{{ improvement }}</span>
+            </li>
+          </ul>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Right Column - Premium Content -->
+    <div class="right-column">
+      <!-- Professional Level (Pro only) -->
+      <mat-card class="level-card" *ngIf="isProUser">
+        <div class="level-content">
+          <mat-icon class="level-icon">workspace_premium</mat-icon>
+          <div class="level-info">
+            <span class="level-label">Professional Level</span>
+            <h2 class="level-value">{{ data.premium_feedback.professional_level }}</h2>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Premium Locked State -->
+      <mat-card class="premium-lock-card" *ngIf="!isProUser">
+        <div class="lock-content">
+          <div class="lock-icon">
+            <mat-icon>lock</mat-icon>
+          </div>
+          <h3>Unlock Premium Analysis</h3>
+          <p class="lock-subtitle">
+            Get detailed insights, personalized recommendations, and actionable strategies to elevate your resume.
+          </p>
+          <button mat-raised-button color="primary" class="upgrade-btn">
+            <mat-icon>rocket_launch</mat-icon>
+            Upgrade to Pro
+          </button>
+          <div class="premium-features">
+            <div class="feature">
+              <mat-icon>check_circle</mat-icon>
+              <span>Detailed Suggestions</span>
+            </div>
+            <div class="feature">
+              <mat-icon>check_circle</mat-icon>
+              <span>Rewritten Examples</span>
+            </div>
+            <div class="feature">
+              <mat-icon>check_circle</mat-icon>
+              <span>Portfolio Tips</span>
+            </div>
+            <div class="feature">
+              <mat-icon>check_circle</mat-icon>
+              <span>Keyword Optimization</span>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Premium Unlocked Content -->
+      <ng-container *ngIf="isProUser">
+        <!-- Detailed Suggestions -->
+        <mat-card class="premium-card">
+          <div class="card-header">
+            <mat-icon class="header-icon">lightbulb</mat-icon>
+            <h3>Detailed Suggestions</h3>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            <div class="suggestions-list">
+              <div *ngFor="let suggestion of data.premium_feedback.detailed_suggestions; let i = index"
+                   class="suggestion-item">
+                <div class="suggestion-number">{{ i + 1 }}</div>
+                <p class="suggestion-text">{{ suggestion }}</p>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Rewritten Examples -->
+        <mat-card class="premium-card">
+          <div class="card-header">
+            <mat-icon class="header-icon">auto_fix_high</mat-icon>
+            <h3>Rewritten Examples</h3>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            <div class="rewrites-list">
+              <div *ngFor="let rewrite of data.premium_feedback.rewrites" class="rewrite-item">
+                <mat-icon class="quote-icon">format_quote</mat-icon>
+                <p class="rewrite-text">{{ rewrite }}</p>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Keywords -->
+        <mat-card class="premium-card">
+          <div class="card-header">
+            <mat-icon class="header-icon">tag</mat-icon>
+            <h3>Recommended Keywords</h3>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            <mat-chip-listbox class="keywords-list">
+              <mat-chip *ngFor="let keyword of data.premium_feedback.keywords"
+                       class="keyword-chip" color="primary" variant="outlined">
+                {{ keyword }}
+              </mat-chip>
+            </mat-chip-listbox>
+          </div>
+        </mat-card>
+
+        <!-- Portfolio Tips -->
+        <mat-card class="premium-card">
+          <div class="card-header">
+            <mat-icon class="header-icon">star</mat-icon>
+            <h3>Portfolio Enhancement</h3>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            <ul class="tips-list">
+              <li *ngFor="let tip of data.premium_feedback.portfolio_tips" class="tip-item">
+                <mat-icon class="tip-icon">arrow_right</mat-icon>
+                <span>{{ tip }}</span>
+              </li>
+            </ul>
+          </div>
+        </mat-card>
+
+        <!-- Success Banner -->
+        <mat-card class="success-banner">
+          <div class="banner-content">
+            <mat-icon class="celebration-icon">celebration</mat-icon>
+            <div class="banner-text">
+              <h3>You're All Set!</h3>
+              <p>Apply these insights to enhance your career opportunities</p>
+            </div>
+          </div>
+        </mat-card>
+      </ng-container>
+    </div>
+  </div>
+</div>
