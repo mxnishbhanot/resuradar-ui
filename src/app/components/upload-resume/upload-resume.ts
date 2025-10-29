@@ -6,7 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { ToastService } from '../../core/services/toast';
 
 @Component({
   selector: 'app-upload-resume',
@@ -18,7 +19,6 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatProgressSpinnerModule,
     MatCardModule,
     MatTooltipModule,
-    MatSnackBarModule
   ],
   templateUrl: './upload-resume.html',
   styleUrls: ['./upload-resume.scss']
@@ -32,8 +32,8 @@ export class UploadResume {
 
   constructor(
     private resumeService: ResumeService,
-    private snackBar: MatSnackBar
-  ) {}
+    private router: Router, private toast: ToastService
+  ) { }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -52,7 +52,8 @@ export class UploadResume {
       if (this.isValidFileType(file)) {
         this.processFile(file);
       } else {
-        this.showError('Please upload a PDF file');
+      this.toast.show('Please upload a PDF file)', 'warning');
+
       }
     }
   }
@@ -69,12 +70,12 @@ export class UploadResume {
 
   private processFile(file: File) {
     if (!this.isValidFileType(file)) {
-      this.showError('Please upload a PDF file (max 5MB)');
+      this.toast.show('Please upload a PDF file (max 5MB)', 'warning');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      this.showError('File size must be less than 5MB');
+      this.toast.show('File size must be less than 5MB', 'warning');
       return;
     }
 
@@ -85,13 +86,14 @@ export class UploadResume {
     this.resumeService.uploadResume(file).subscribe({
       next: (res) => {
         this.loading = false;
-        this.showSuccess('Resume analyzed successfully!');
-        this.resumeAnalyzed.emit(res.data);
+        this.toast.show('Resume analyzed successfully.', 'success');
+        this.resumeService.setLatestAnalysis(res.data);
+        this.router.navigate(['/home/analysis']);
       },
       error: (err) => {
         this.loading = false;
         console.error('Upload failed:', err);
-        this.showError('Analysis failed. Please try again.');
+        this.toast.show('Analysis failed. Please try again.', 'error');
         this.resetFile();
       }
     });
@@ -109,19 +111,6 @@ export class UploadResume {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  private showError(message: string) {
-    this.snackBar.open(message, 'Close', {
-      duration: 5000,
-      panelClass: ['error-snackbar']
-    });
-  }
-
-  private showSuccess(message: string) {
-    this.snackBar.open(message, 'Close', {
-      duration: 3000,
-      panelClass: ['success-snackbar']
-    });
-  }
 
   resetFile() {
     this.fileName = '';

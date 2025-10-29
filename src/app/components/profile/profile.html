@@ -1,0 +1,106 @@
+<div class="profile-container">
+  <!-- Header -->
+  <header class="profile-header">
+    <div class="header-content">
+      <div class="avatar-section">
+        <img
+          *ngIf="user.picture"
+          [src]="user.picture"
+          alt="Profile"
+          class="avatar-large"
+        />
+        <div *ngIf="!user.picture" class="avatar-placeholder">
+          {{ userInitials }}
+        </div>
+      </div>
+      <div class="user-info">
+        <h1 class="user-name">{{ user.name }}</h1>
+        <p class="user-email">{{ user.email }}</p>
+        <div class="user-meta">
+          <span>Member since {{ user.joinDate | date:'MMM y' }}</span>
+          <span class="premium-badge">✨ Premium Member</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats Overview -->
+  <mat-card class="stats-card">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-value">{{ user.resumeCount }}</div>
+        <div class="stat-label">Resumes Analyzed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ user.avgScore | number:'1.1-1' }}</div>
+        <div class="stat-label">Avg. Score /10</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ user.lastActive | date:'MMM d' }}</div>
+        <div class="stat-label">Last Active</div>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Account Details -->
+  <mat-card class="account-card">
+    <div class="card-header">
+      <mat-icon class="header-icon">person</mat-icon>
+      <h2>Account Information</h2>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="card-content">
+      <div class="info-row">
+        <span class="info-label">Full Name</span>
+        <span class="info-value">{{ user.name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Email Address</span>
+        <span class="info-value">{{ user.email }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Authentication</span>
+        <span class="info-value auth-method">
+          <mat-icon class="auth-icon">google</mat-icon>
+          Google Sign-In
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Account Status</span>
+        <span class="info-value premium-status">Premium</span>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Security & Actions -->
+  <mat-card class="actions-card">
+    <div class="card-header">
+      <mat-icon class="header-icon">security</mat-icon>
+      <h2>Security & Actions</h2>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="card-content">
+      <button mat-stroked-button class="action-btn" (click)="downloadData()">
+        <mat-icon>download</mat-icon>
+        Download My Data
+      </button>
+      <button mat-stroked-button class="action-btn" disabled>
+        <mat-icon>edit</mat-icon>
+        Edit Profile (Coming Soon)
+      </button>
+      <button mat-raised-button color="warn" class="signout-btn" (click)="signOut()">
+        <mat-icon>logout</mat-icon>
+        Sign Out
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Privacy Notice -->
+  <div class="privacy-notice">
+    <mat-icon>lock</mat-icon>
+    <div class="privacy-text">
+      <strong>Your data is private</strong>
+      <span>We never sell or share your information. All resumes are encrypted and auto-deleted after 30 days.</span>
+    </div>
+  </div>
+</div>

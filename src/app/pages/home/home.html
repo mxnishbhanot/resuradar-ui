@@ -8,34 +8,46 @@
           <span class="logo-text">ResuRadar</span>
         </div>
         <nav class="nav-links">
-          <a class="nav-link" href="#" [class.active]="activeTab === 'home'">
-            <mat-icon>home</mat-icon>
-            <span>Home</span>
-          </a>
-          <a class="nav-link" href="#" [class.active]="activeTab === 'history'">
-            <mat-icon>history</mat-icon>
-            <span>History</span>
-          </a>
-          <a class="nav-link" href="#" [class.active]="activeTab === 'analytics'">
-            <mat-icon>insights</mat-icon>
-            <span>Analytics</span>
-          </a>
+          <span class="nav-link" (click)="navigate('home')" [class.active]="activeTab === 'home'"
+            matTooltip="Analyze your resume">
+            <mat-icon>bar_chart</mat-icon>
+            <span>Score</span>
+          </span>
+          <span class="nav-link" (click)="navigate('scan')" [class.active]="activeTab === 'scan'"
+            matTooltip="Compare resume to JD">
+            <mat-icon>plagiarism</mat-icon>
+            <span>Scan</span>
+            <span class="coming-soon-badge">Coming Soon</span>
+          </span>
         </nav>
       </div>
       <div class="toolbar-right">
-        <button *ngIf="!isLoggedIn" mat-stroked-button color="primary" class="upgrade-btn">
-          <mat-icon>workspace_premium</mat-icon>
-          Upgrade to Pro
-        </button>
+        <span [matTooltip]="!googleAuth.isLoggedIn ? 'Sign in to upgrade' : ''" matTooltipPosition="above">
+          <button *ngIf="!user?.isPremium" mat-stroked-button color="primary" class="upgrade-btn" [disabled]="!googleAuth.isLoggedIn"
+            (click)="openUpgradeModal()">
+            <mat-icon>workspace_premium</mat-icon>
+            Upgrade to Pro
+          </button>
+          <button *ngIf="user?.isPremium" mat-stroked-button color="primary" class="upgrade-btn">
+            <mat-icon>workspace_premium</mat-icon>
+            Premium User
+          </button>
+        </span>
 
-        <div *ngIf="isLoggedIn" class="user-profile">
+
+        <div *ngIf="googleAuth.isLoggedIn" class="user-profile">
           <button mat-button [matMenuTriggerFor]="userMenu" class="profile-trigger">
-            <div class="avatar">{{ userInitials }}</div>
+            <div class="avatar-wrapper">
+              <img *ngIf="avatar; else defaultIcon" [src]="avatar" alt="Profile" class="avatar-image" />
+              <ng-template #defaultIcon>
+                <mat-icon class="avatar-icon">person</mat-icon>
+              </ng-template>
+            </div>
             <mat-icon class="expand-icon">expand_more</mat-icon>
           </button>
         </div>
 
-        <button *ngIf="!isLoggedIn" mat-raised-button color="primary" class="login-btn">
+        <button *ngIf="!googleAuth.isLoggedIn" mat-raised-button color="primary" class="login-btn" (click)="loginWithGoogle()">
           <mat-icon>login</mat-icon>
           Sign In
         </button>
@@ -57,7 +69,7 @@
 
       <mat-divider class="menu-divider"></mat-divider> -->
 
-      <button mat-menu-item class="menu-item">
+      <button mat-menu-item class="menu-item" (click)="navigate('profile')">
         <mat-icon class="menu-item-icon">person</mat-icon>
         <span>My Profile</span>
       </button>
@@ -73,7 +85,7 @@
 
       <mat-divider class="menu-divider"></mat-divider>
 
-      <button mat-menu-item class="menu-item sign-out">
+      <button mat-menu-item class="menu-item sign-out" (click)="googleAuth.logout()">
         <mat-icon class="menu-item-icon">logout</mat-icon>
         <span>Sign Out</span>
       </button>
@@ -82,58 +94,7 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <section class="upload-section" *ngIf="!analysisData">
-      <div class="hero-content">
-        <h1>Optimize Your Resume with AI</h1>
-        <p class="hero-subtitle">
-          Get detailed feedback, score improvements, and professional suggestions to land your dream job.
-        </p>
-      </div>
-
-      <app-upload-resume (resumeAnalyzed)="onAnalysisComplete($event)"></app-upload-resume>
-
-      <!-- Previous Resumes -->
-      <!-- <div *ngIf="isLoggedIn && previousResumes.length > 0" class="previous-resumes">
-        <h2 class="section-title">Your Previous Resumes</h2>
-        <div class="resumes-grid">
-          <mat-card *ngFor="let resume of previousResumes" class="resume-card" (click)="loadPreviousResume(resume)"
-            [ngClass]="getScoreClass(resume.score)">
-            <div class="card-header">
-              <h3 class="resume-name">{{ resume.name }}</h3>
-              <div class="score-badge">
-                <span>{{ resume.score }}</span>/10
-              </div>
-            </div>
-            <div class="card-body">
-              <p class="position">{{ resume.position }}</p>
-              <p class="date">{{ resume.date | date: 'MMM d, y' }}</p>
-            </div>
-            <mat-icon class="chevron">chevron_right</mat-icon>
-          </mat-card>
-        </div>
-      </div> -->
-    </section>
-
-    <!-- Analysis Results -->
-    <section *ngIf="analysisData" class="analysis-section">
-      <div class="results-header">
-        <button mat-stroked-button (click)="onNewAnalysis()" class="back-button">
-          <mat-icon>arrow_back</mat-icon>
-          New Analysis
-        </button>
-        <div class="header-actions">
-          <button mat-stroked-button>
-            <mat-icon>download</mat-icon>
-            Export Report
-          </button>
-          <button mat-stroked-button>
-            <mat-icon>share</mat-icon>
-            Share
-          </button>
-        </div>
-      </div>
-      <app-analysis-result [data]="analysisData" [isProUser]="isLoggedIn"></app-analysis-result>
-    </section>
+    <router-outlet></router-outlet>
   </main>
 
   <!-- Footer -->
@@ -172,3 +133,12 @@
     </div>
   </footer>
 </div>
+<sc-angular-loader
+  type="spinner"
+  class="dots-3"
+  color="#0891b2"
+  background="rgba(0,0,0,0.3)"
+  width="40px"
+  height="40px"
+>
+</sc-angular-loader>

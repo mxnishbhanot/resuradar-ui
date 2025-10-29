@@ -7,36 +7,42 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
-import { UploadResume } from '../../components/upload-resume/upload-resume';
-import { AnalysisResult } from '../../components/analysis-result/analysis-result';
 import { MatCardModule } from '@angular/material/card';
-
+import { Router, RouterOutlet } from '@angular/router';
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { GoogleAuthService } from '../../core/services/google-auth';
+import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
+import { MatDialog } from '@angular/material/dialog';
+import { UserService } from '../../core/services/user';
+import { ScAngularLoader } from 'sc-angular-loader';
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     CommonModule,
-    UploadResume,
-    AnalysisResult,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
     MatBadgeModule,
     MatDividerModule,
-    MatCardModule
+    MatCardModule,
+    RouterOutlet,
+    MatTooltipModule,
+    ScAngularLoader
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
 export class Home {
   analysisData: any = null;
-  isLoggedIn = true; // For demo purposes
   userName = 'Sarah Johnson';
   userInitials = 'SJ';
+  avatar = 'https://i.pravatar.cc/150?img=12';
   userResumeCount = 3;
   userScore = 7.2;
   activeTab = 'home';
+  user: any;
 
   // Mock data for previous resumes
   previousResumes = [
@@ -62,6 +68,29 @@ export class Home {
       position: 'Software Architect'
     }
   ];
+
+  constructor(private router: Router, public googleAuth: GoogleAuthService, public dialog: MatDialog, private userService: UserService) { }
+
+  ngOnInit() {
+    setTimeout(() => {
+      this.googleAuth.initialize('159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com');
+    }, 500);
+
+    this.googleAuth.loadUserFromStorage();
+    this.googleAuth.user$.subscribe((u) => {
+      this.userName = u ? u.name : 'Guest';
+      this.avatar = u ? u.picture : 'https://i.pravatar.cc/150?img=12';
+    }
+    )
+    this.userService.fetchCurrentUser().subscribe();
+
+    this.userService.user$.subscribe(user => {
+      console.log(user);
+
+      this.user = user;
+    });
+
+  }
 
   onAnalysisComplete(data: any) {
     console.log('Analysis complete:', data);
@@ -135,5 +164,21 @@ export class Home {
     if (score >= 8) return 'Excellent';
     if (score >= 6) return 'Good';
     return 'Needs Work';
+  }
+
+  navigate(navigateTo: string) {
+    this.router.navigate([`/home/${navigateTo}`]);
+  }
+
+  loginWithGoogle() {
+    this.googleAuth.signIn();
+  }
+
+  openUpgradeModal() {
+    this.dialog.open(UpgradePro, {
+      width: '100%',
+      maxWidth: '520px',
+      panelClass: 'upgrade-pro-dialog'
+    });
   }
 }

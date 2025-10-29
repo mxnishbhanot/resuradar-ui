@@ -1,0 +1,69 @@
+<div class="upgrade-container">
+  <div class="upgrade-card">
+    <!-- Logo -->
+    <div class="logo">
+      <mat-icon class="logo-icon">auto_awesome</mat-icon>
+      <span class="logo-text">ResuRadar</span>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <h1>Upgrade to Pro</h1>
+      <p>Unlock lifetime access with a one-time payment</p>
+    </div>
+
+    <!-- Plan Card -->
+    <mat-card class="plan-card">
+      <div class="plan-header">
+        <h2>Pro Plan</h2>
+        <div class="price">
+          <span class="amount">$10</span>
+          <span class="period">one-time</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <ul class="features-list">
+        <li>
+          <mat-icon class="feature-icon">check</mat-icon>
+          <span>Ad-free experience</span>
+        </li>
+        <li>
+          <mat-icon class="feature-icon">check</mat-icon>
+          <span>Lifetime access</span>
+        </li>
+        <li>
+          <mat-icon class="feature-icon">check</mat-icon>
+          <span>Full resume analysis</span>
+        </li>
+        <li>
+          <mat-icon class="feature-icon">check</mat-icon>
+          <span>Keyword optimization</span>
+        </li>
+        <li>
+          <mat-icon class="feature-icon">check</mat-icon>
+          <span>Priority support</span>
+        </li>
+      </ul>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="checkout-btn"
+        (click)="startCheckout()"
+        [disabled]="isLoading"
+      >
+        <mat-icon *ngIf="!isLoading">workspace_premium</mat-icon>
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+        <span>{{ isLoading ? 'Processing...' : 'Upgrade Now' }}</span>
+      </button>
+    </mat-card>
+
+    <!-- Trust Notice -->
+    <div class="trust-notice">
+      <mat-icon>lock</mat-icon>
+      <span>Payments secured by PhonePe • No recurring charges</span>
+    </div>
+  </div>
+</div>
