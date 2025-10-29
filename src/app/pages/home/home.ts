@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -15,6 +14,7 @@ import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../../core/services/user';
 import { ScAngularLoader } from 'sc-angular-loader';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -69,7 +69,12 @@ export class Home {
     }
   ];
 
-  constructor(private router: Router, public googleAuth: GoogleAuthService, public dialog: MatDialog, private userService: UserService) { }
+  constructor(
+    private router: Router,
+    public googleAuth: GoogleAuthService,
+    public dialog: MatDialog,
+    private userService: UserService
+  ) { }
 
   ngOnInit() {
     setTimeout(() => {
@@ -80,23 +85,20 @@ export class Home {
     this.googleAuth.user$.subscribe((u) => {
       this.userName = u ? u.name : 'Guest';
       this.avatar = u ? u.picture : 'https://i.pravatar.cc/150?img=12';
-    }
-    )
+    });
+
     this.userService.fetchCurrentUser().subscribe();
 
     this.userService.user$.subscribe(user => {
       console.log(user);
-
       this.user = user;
     });
-
   }
 
   onAnalysisComplete(data: any) {
     console.log('Analysis complete:', data);
     this.analysisData = data;
 
-    // Scroll to results after analysis
     setTimeout(() => {
       const resultsElement = document.querySelector('.analysis-section');
       if (resultsElement) {
@@ -110,7 +112,6 @@ export class Home {
   }
 
   loadPreviousResume(resume: any) {
-    // In a real app, this would load the actual resume data
     console.log('Loading previous resume:', resume);
     this.analysisData = {
       score: resume.score,
@@ -167,6 +168,7 @@ export class Home {
   }
 
   navigate(navigateTo: string) {
+    this.activeTab = navigateTo;
     this.router.navigate([`/home/${navigateTo}`]);
   }
 

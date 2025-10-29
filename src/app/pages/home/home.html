@@ -1,93 +1,162 @@
 <div class="home-container">
+  <!-- Animated Background -->
+  <div class="background-wrapper">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="mesh-overlay"></div>
+  </div>
+
   <!-- Top Navigation Bar -->
   <header class="app-header">
     <mat-toolbar class="toolbar">
       <div class="toolbar-left">
         <div class="logo">
-          <mat-icon class="logo-icon">auto_awesome</mat-icon>
-          <span class="logo-text">ResuRadar</span>
+          <div class="logo-icon-wrapper">
+            <mat-icon class="logo-icon">auto_awesome</mat-icon>
+            <div class="logo-glow"></div>
+          </div>
+          <span class="logo-text">
+            Resu<span class="logo-highlight">Radar</span>
+          </span>
         </div>
+
         <nav class="nav-links">
-          <span class="nav-link" (click)="navigate('home')" [class.active]="activeTab === 'home'"
-            matTooltip="Analyze your resume">
-            <mat-icon>bar_chart</mat-icon>
-            <span>Score</span>
-          </span>
-          <span class="nav-link" (click)="navigate('scan')" [class.active]="activeTab === 'scan'"
-            matTooltip="Compare resume to JD">
-            <mat-icon>plagiarism</mat-icon>
-            <span>Scan</span>
-            <span class="coming-soon-badge">Coming Soon</span>
-          </span>
+          <button
+            class="nav-link"
+            (click)="navigate('home')"
+            [class.active]="activeTab === 'home'"
+            matTooltip="Analyze your resume"
+            matTooltipPosition="below">
+            <div class="nav-link-content">
+              <mat-icon>insights</mat-icon>
+              <span>Score</span>
+            </div>
+            <div class="nav-link-indicator"></div>
+          </button>
+
+          <button
+            class="nav-link"
+            (click)="navigate('scan')"
+            [class.active]="activeTab === 'scan'"
+            [disabled]="true"
+            matTooltip="Compare resume to JD"
+            matTooltipPosition="below">
+            <div class="nav-link-content">
+              <mat-icon>document_scanner</mat-icon>
+              <span>Scan</span>
+              <span class="coming-soon-badge">
+                <span class="badge-shimmer"></span>
+                Soon
+              </span>
+            </div>
+            <div class="nav-link-indicator"></div>
+          </button>
         </nav>
       </div>
+
       <div class="toolbar-right">
-        <span [matTooltip]="!googleAuth.isLoggedIn ? 'Sign in to upgrade' : ''" matTooltipPosition="above">
-          <button *ngIf="!user?.isPremium" mat-stroked-button color="primary" class="upgrade-btn" [disabled]="!googleAuth.isLoggedIn"
+        <span [matTooltip]="!googleAuth.isLoggedIn ? 'Sign in to upgrade' : ''" matTooltipPosition="below">
+          <button
+            *ngIf="!user?.isPremium"
+            mat-flat-button
+            class="upgrade-btn"
+            [disabled]="!googleAuth.isLoggedIn"
             (click)="openUpgradeModal()">
+            <span class="btn-shine"></span>
             <mat-icon>workspace_premium</mat-icon>
-            Upgrade to Pro
+            <span>Upgrade to Pro</span>
           </button>
-          <button *ngIf="user?.isPremium" mat-stroked-button color="primary" class="upgrade-btn">
+
+          <button
+            *ngIf="user?.isPremium"
+            mat-flat-button
+            class="premium-btn">
             <mat-icon>workspace_premium</mat-icon>
-            Premium User
+            <span>Pro Member</span>
           </button>
         </span>
-
 
         <div *ngIf="googleAuth.isLoggedIn" class="user-profile">
           <button mat-button [matMenuTriggerFor]="userMenu" class="profile-trigger">
             <div class="avatar-wrapper">
               <img *ngIf="avatar; else defaultIcon" [src]="avatar" alt="Profile" class="avatar-image" />
               <ng-template #defaultIcon>
-                <mat-icon class="avatar-icon">person</mat-icon>
+                <div class="avatar-icon">
+                  <mat-icon>person</mat-icon>
+                </div>
               </ng-template>
+              <div class="avatar-status"></div>
             </div>
             <mat-icon class="expand-icon">expand_more</mat-icon>
           </button>
         </div>
 
-        <button *ngIf="!googleAuth.isLoggedIn" mat-raised-button color="primary" class="login-btn" (click)="loginWithGoogle()">
+        <button
+          *ngIf="!googleAuth.isLoggedIn"
+          mat-flat-button
+          class="login-btn"
+          (click)="loginWithGoogle()">
           <mat-icon>login</mat-icon>
-          Sign In
+          <span>Sign In</span>
         </button>
       </div>
     </mat-toolbar>
 
     <!-- User Menu -->
-    <mat-menu #userMenu="matMenu" class="user-menu">
-      <!-- <div class="menu-header">
+    <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
+      <div class="menu-header">
+        <div class="avatar-wrapper large">
+          <img *ngIf="avatar" [src]="avatar" alt="Profile" class="avatar-image" />
+          <div class="avatar-status"></div>
+        </div>
         <div class="menu-user-info">
-          <h4 class="menu-user-name">{{ userName }}</h4>
-          <div class="menu-user-stats">
-            <span>{{ userResumeCount }} resumes</span>
-            <span>• Avg: {{ userScore | number:'1.1-1' }}/10</span>
-          </div>
-          <span class="premium-badge">✨ Premium Member</span>
+          <p class="menu-user-name">{{ userName }}</p>
+          <!-- <p class="menu-user-stats">
+            <mat-icon class="stats-icon">description</mat-icon>
+            {{ userResumeCount }} resumes analyzed
+          </p> -->
+          <span *ngIf="user?.isPremium" class="premium-badge">
+            <mat-icon>workspace_premium</mat-icon>
+            Pro Member
+          </span>
         </div>
       </div>
 
-      <mat-divider class="menu-divider"></mat-divider> -->
+      <mat-divider class="menu-divider"></mat-divider>
 
       <button mat-menu-item class="menu-item" (click)="navigate('profile')">
-        <mat-icon class="menu-item-icon">person</mat-icon>
-        <span>My Profile</span>
+        <div class="menu-item-icon">
+          <mat-icon>person_outline</mat-icon>
+        </div>
+        <span class="menu-item-text">My Profile</span>
+        <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
       </button>
+
       <button mat-menu-item class="menu-item">
-        <mat-icon class="menu-item-icon">folder</mat-icon>
-        <span>My Resumes</span>
-        <!-- <span class="menu-item-badge">{{ userResumeCount }}</span> -->
+        <div class="menu-item-icon">
+          <mat-icon>folder_open</mat-icon>
+        </div>
+        <span class="menu-item-text">My Resumes</span>
+        <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
+        <span class="menu-item-badge">{{ userResumeCount }}</span>
       </button>
-      <button mat-menu-item class="menu-item">
-        <mat-icon class="menu-item-icon">settings</mat-icon>
+
+      <!-- <button mat-menu-item class="menu-item">
+        <div class="menu-item-icon">
+          <mat-icon>tune</mat-icon>
+        </div>
         <span>Settings</span>
-      </button>
+        <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
+      </button> -->
 
       <mat-divider class="menu-divider"></mat-divider>
 
       <button mat-menu-item class="menu-item sign-out" (click)="googleAuth.logout()">
-        <mat-icon class="menu-item-icon">logout</mat-icon>
-        <span>Sign Out</span>
+        <div class="menu-item-icon">
+          <mat-icon>logout</mat-icon>
+        </div>
+        <span class="menu-item-text">Sign Out</span>
       </button>
     </mat-menu>
   </header>
@@ -99,37 +168,68 @@
 
   <!-- Footer -->
   <footer class="app-footer">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="logo">
-          <mat-icon class="logo-icon">auto_awesome</mat-icon>
-          <span class="logo-text">ResuRadar</span>
+    <div class="footer-content">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo">
+            <div class="logo-icon-wrapper">
+              <mat-icon class="logo-icon">auto_awesome</mat-icon>
+            </div>
+            <span class="logo-text">
+              Resu<span class="logo-highlight">Radar</span>
+            </span>
+          </div>
+          <p class="footer-tagline">AI-powered resume optimization for ambitious professionals</p>
+          <div class="social-links">
+            <button mat-icon-button class="social-btn">
+              <mat-icon>language</mat-icon>
+            </button>
+            <button mat-icon-button class="social-btn">
+              <mat-icon>link</mat-icon>
+            </button>
+            <button mat-icon-button class="social-btn">
+              <mat-icon>rss_feed</mat-icon>
+            </button>
+          </div>
         </div>
-        <p>AI-powered resume optimization for modern professionals</p>
+
+        <div class="footer-links-wrapper">
+          <div class="footer-section">
+            <h4>Product</h4>
+            <a href="#">Features</a>
+            <a href="#">Pricing</a>
+            <a href="#">Use Cases</a>
+            <a href="#">Integrations</a>
+          </div>
+
+          <div class="footer-section">
+            <h4>Resources</h4>
+            <a href="#">Help Center</a>
+            <a href="#">Blog</a>
+            <a href="#">Tutorials</a>
+            <a href="#">Documentation</a>
+          </div>
+
+          <div class="footer-section">
+            <h4>Company</h4>
+            <a href="#">About Us</a>
+            <a href="#">Careers</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
+          </div>
+        </div>
       </div>
-      <div class="footer-links">
-        <div>
-          <h4>Product</h4>
-          <a href="#">Features</a>
-          <a href="#">Pricing</a>
-          <a href="#">Use Cases</a>
-        </div>
-        <div>
-          <h4>Resources</h4>
-          <a href="#">Help Center</a>
-          <a href="#">Blog</a>
-          <a href="#">Tutorials</a>
-        </div>
-        <div>
-          <h4>Company</h4>
-          <a href="#">About</a>
-          <a href="#">Careers</a>
-          <a href="#">Contact</a>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 ResuRadar. All rights reserved.</p>
+        <div class="footer-bottom-links">
+          <a href="#">Terms of Service</a>
+          <span class="separator">•</span>
+          <a href="#">Privacy</a>
+          <span class="separator">•</span>
+          <a href="#">Cookies</a>
         </div>
       </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2025 ResuRadar. All rights reserved.</p>
     </div>
   </footer>
 </div>
