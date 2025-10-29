@@ -1,3 +1,10 @@
+// Design System Variables (from Home)
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$card-bg: rgba(255, 255, 255, 0.95);
+$text-primary: #1a1f36;
+$text-secondary: #5d6b82;
+$text-muted: #8f9bb3;
+
 .upgrade-container {
   display: flex;
   justify-content: center;
@@ -5,12 +12,15 @@
 }
 
 .upgrade-card {
-  background: white;
+  background: $card-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 48px 40px;
   width: 100%;
   max-width: 520px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(102, 126, 234, 0.1);
   text-align: center;
 }
 
@@ -22,28 +32,43 @@
   margin-bottom: 32px;
 
   .logo-icon {
-    font-size: 32px;
+    font-size: 24px;
     width: 32px;
     height: 32px;
-    color: #1e40af;
+    color: #667eea;
+    background: $primary-gradient;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
   }
 
   .logo-text {
+    display: inline-block;
     font-size: 1.75rem;
     font-weight: 700;
-    color: #0f172a;
+    color: $text-primary;
+    font-family: "Inter", "Roboto", sans-serif;
+    background: $primary-gradient;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
   }
 }
 
 .header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #0f172a;
+  color: $text-primary;
   margin-bottom: 8px;
+  font-family: 'Inter', 'Roboto', sans-serif;
 }
 
 .header p {
-  color: #475569;
+  color: $text-secondary;
   font-size: 1.125rem;
   margin-bottom: 32px;
 }
@@ -51,8 +76,12 @@
 .plan-card {
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  background: $card-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   padding: 32px;
   margin-bottom: 24px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .plan-header {
@@ -63,8 +92,9 @@
 
   h2 {
     font-size: 1.5rem;
-    color: #0f172a;
+    color: $text-primary;
     margin: 0;
+    font-family: 'Inter', 'Roboto', sans-serif;
   }
 
   .price {
@@ -73,12 +103,12 @@
     .amount {
       font-size: 2rem;
       font-weight: 700;
-      color: #0f172a;
+      color: $text-primary;
     }
 
     .period {
       font-size: 0.875rem;
-      color: #64748b;
+      color: $text-muted;
     }
   }
 }
@@ -94,7 +124,7 @@
     align-items: flex-start;
     gap: 12px;
     margin-bottom: 16px;
-    color: #1e293b;
+    color: $text-primary;
   }
 
   .feature-icon {
@@ -117,6 +147,22 @@
   justify-content: center;
   gap: 12px;
   cursor: pointer;
+  background: $primary-gradient;
+  color: white;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  }
 
   mat-spinner {
     color: white;
@@ -128,13 +174,14 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: #64748b;
+  color: $text-muted;
   font-size: 0.875rem;
 
   mat-icon {
     font-size: 18px;
     width: 18px;
     height: 18px;
+    color: #667eea;
   }
 }
 

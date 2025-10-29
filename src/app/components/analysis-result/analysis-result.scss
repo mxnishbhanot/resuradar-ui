@@ -1,16 +1,42 @@
+// Design System Variables (from Home)
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+$accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+$dark-bg: #0a0e27;
+$card-bg: rgba(255, 255, 255, 0.95);
+$text-primary: #1a1f36;
+$text-secondary: #5d6b82;
+$text-muted: #8f9bb3;
+
+// Reuse animations
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 .analysis-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px 64px;
+  animation: slide-in 0.6s ease-out;
 }
 
 .analysis-header {
-  background: white;
+  background: $card-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 32px;
   margin-bottom: 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .header-content {
@@ -24,16 +50,22 @@
   flex: 1;
 
   .main-title {
+    display: inline-block;
     font-size: 2.25rem;
     font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 8px;
-    font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif;
+    margin-bottom: 12px;
+    font-family: "Inter", "Roboto", sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
   }
 
   .subtitle {
     font-size: 1.125rem;
-    color: #475569;
+    color: $text-secondary;
     line-height: 1.6;
   }
 }
@@ -60,30 +92,33 @@
   justify-content: center;
   font-weight: 700;
   position: relative;
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
   background: white;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  border: 4px solid transparent;
 
   .score-value {
     font-size: 2.5rem;
-    color: #0f172a;
-    padding-top: 10px
+    color: $text-primary;
+    padding-top: 10px;
   }
 
   .score-out-of {
     font-size: 1rem;
-    color: #64748b;
-    padding-top: 10px
+    color: $text-muted;
+    padding-top: 10px;
   }
 }
 
 .score-display.score-excellent .score-circle {
-  border: 4px solid #10b981;
+  border-color: #10b981;
 }
+
 .score-display.score-good .score-circle {
-  border: 4px solid #06b6d4;
+  border-color: #667eea;
 }
+
 .score-display.score-needs-work .score-circle {
-  border: 4px solid #ef4444;
+  border-color: #ef4444;
 }
 
 .score-label {
@@ -92,9 +127,17 @@
   text-align: center;
 }
 
-.score-excellent .score-label { color: #10b981; }
-.score-good .score-label { color: #06b6d4; }
-.score-needs-work .score-label { color: #ef4444; }
+.score-excellent .score-label {
+  color: #10b981;
+}
+
+.score-good .score-label {
+  color: #667eea;
+}
+
+.score-needs-work .score-label {
+  color: #ef4444;
+}
 
 .content-grid {
   display: grid;
@@ -112,12 +155,15 @@
 /* Shared Card Styles */
 mat-card {
   border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  background: white;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  background: $card-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   transition: box-shadow 0.3s ease;
+  border: 1px solid rgba(102, 126, 234, 0.1);
 
   &:hover {
-    box-shadow: 0 6px 24px rgba(6, 182, 212, 0.15);
+    box-shadow: 0 6px 32px rgba(102, 126, 234, 0.2);
   }
 }
 
@@ -127,17 +173,19 @@ mat-card {
   gap: 12px;
   padding: 20px 24px 16px;
 
-  h2, h3 {
+  h2,
+  h3 {
     margin: 0;
-    color: #0f172a;
+    color: $text-primary;
     font-weight: 600;
+    font-family: 'Inter', 'Roboto', sans-serif;
   }
 
   .header-icon {
     font-size: 24px;
     width: 24px;
     height: 24px;
-    color: #06b6d4;
+    color: #667eea;
   }
 }
 
@@ -146,7 +194,7 @@ mat-card {
 }
 
 .summary-text {
-  color: #334155;
+  color: $text-primary;
   line-height: 1.6;
   margin: 0;
   margin-top: 12px;
@@ -167,13 +215,13 @@ mat-card {
   }
 
   .success {
-    background: #f0fdf4;
+    background: rgba(16, 185, 129, 0.1);
     color: #10b981;
   }
 
   .warning {
-    background: #f0f9ff;
-    color: #06b6d4;
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
   }
 
   .insight-list {
@@ -187,7 +235,7 @@ mat-card {
     align-items: flex-start;
     gap: 12px;
     margin-bottom: 12px;
-    color: #334155;
+    color: $text-primary;
   }
 
   .item-icon {
@@ -195,6 +243,7 @@ mat-card {
     width: 20px;
     height: 20px;
     margin-top: 2px;
+    color: inherit;
   }
 }
 
@@ -210,19 +259,20 @@ mat-card {
     font-size: 32px;
     width: 32px;
     height: 32px;
-    color: #06b6d4;
+    color: #667eea;
   }
 
   .level-info {
     .level-label {
       font-size: 0.875rem;
-      color: #64748b;
+      color: $text-muted;
       display: block;
     }
+
     .level-value {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #0f172a;
+      color: $text-primary;
       margin: 0;
     }
   }
@@ -232,21 +282,23 @@ mat-card {
 .premium-lock-card {
   text-align: center;
   padding: 32px;
+  background: rgba(102, 126, 234, 0.05);
 
   .lock-icon {
     font-size: 48px;
-    color: #cbd5e1;
+    color: rgba(102, 126, 234, 0.3);
     margin-bottom: 16px;
   }
 
   h3 {
     font-size: 1.5rem;
-    color: #0f172a;
+    color: $text-primary;
     margin-bottom: 12px;
+    font-family: 'Inter', 'Roboto', sans-serif;
   }
 
   .lock-subtitle {
-    color: #475569;
+    color: $text-secondary;
     margin-bottom: 24px;
     font-size: 1rem;
     line-height: 1.6;
@@ -257,6 +309,19 @@ mat-card {
     font-weight: 600;
     border-radius: 12px;
     padding: 0 24px;
+    background: $primary-gradient;
+    color: white;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+    }
   }
 
   .premium-features {
@@ -271,7 +336,7 @@ mat-card {
     align-items: center;
     gap: 8px;
     font-size: 0.9375rem;
-    color: #334155;
+    color: $text-primary;
 
     mat-icon {
       color: #10b981;
@@ -298,8 +363,8 @@ mat-card {
 .suggestion-number {
   width: 28px;
   height: 28px;
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: rgba(102, 126, 234, 0.15);
+  color: #667eea;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -310,7 +375,7 @@ mat-card {
 
 .suggestion-text {
   margin: 0;
-  color: #334155;
+  color: $text-primary;
   flex: 1;
 }
 
@@ -325,12 +390,12 @@ mat-card {
   display: flex;
   gap: 12px;
   padding: 12px 16px;
-  background: #f8fafc;
+  background: rgba(102, 126, 234, 0.06);
   border-radius: 14px;
 }
 
 .quote-icon {
-  color: #06b6d4;
+  color: #667eea;
   font-size: 20px;
   width: 20px;
   height: 20px;
@@ -339,7 +404,7 @@ mat-card {
 
 .rewrite-text {
   margin: 0;
-  color: #1e293b;
+  color: $text-primary;
 }
 
 .keywords-list {
@@ -351,6 +416,8 @@ mat-card {
 
 .keyword-chip {
   font-weight: 600;
+  color: #667eea;
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .tips-list {
@@ -365,11 +432,11 @@ mat-card {
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 12px;
-  color: #334155;
+  color: $text-primary;
 }
 
 .tip-icon {
-  color: #06b6d4;
+  color: #667eea;
   font-size: 20px;
   width: 20px;
   height: 20px;
@@ -377,9 +444,9 @@ mat-card {
 }
 
 .success-banner {
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
   border: none;
-  color: #0c4a6e;
+  color: $text-primary;
 
   .banner-content {
     display: flex;
@@ -392,17 +459,18 @@ mat-card {
     font-size: 32px;
     width: 32px;
     height: 32px;
-    color: #06b6d4;
+    color: #667eea;
   }
 
   h3 {
     margin: 0;
     font-size: 1.25rem;
+    font-family: 'Inter', 'Roboto', sans-serif;
   }
 
   p {
     margin: 0;
-    color: #374151;
+    color: $text-secondary;
   }
 }
 
