@@ -60,26 +60,50 @@ body {
 }
 
 
+// Design System Variables (from Home)
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$card-bg: rgba(255, 255, 255, 0.95);
+$text-primary: #1a1f36;
+$text-secondary: #5d6b82;
+$text-muted: #8f9bb3;
+
+// Semantic colors aligned with theme
+$success-color: #10b981;     // green-500
+$warning-color: #f59e0b;     // amber-500
+$error-color: #ef4444;       // red-500
+
 .snackbar-warning {
-  background: #fff3cd;
-  /* light yellow */
-  color: #856404;
-  /* dark gold text */
-  border-left: 4px solid #ffc107;
-  /* accent border */
-  font-weight: 500;
+  background: rgba(245, 158, 11, 0.12); // amber-500 @ 12%
+  color: $warning-color;
+  border-left: 4px solid $warning-color;
+  font-weight: 600;
   font-size: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: 'Inter', 'Roboto', sans-serif;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .snackbar-success {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border-left: 4px solid #4caf50;
+  background: rgba(16, 185, 129, 0.12); // emerald-500 @ 12%
+  color: $success-color;
+  border-left: 4px solid $success-color;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .snackbar-error {
-  background: #fdecea;
-  color: #c62828;
-  border-left: 4px solid #f44336;
+  background: rgba(239, 68, 68, 0.12); // red-500 @ 12%
+  color: $error-color;
+  border-left: 4px solid $error-color;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
