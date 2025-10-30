@@ -9,13 +9,64 @@ declare const google: any;
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthService {
   private client: any;
-   private userSubject = new BehaviorSubject<any>(null);
+  private userSubject = new BehaviorSubject<any>(null);
   user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  // 1️⃣ Initialize Google OAuth client
+  // 1️⃣ Initialize Google OAuth client + auto prompt setup
   initialize(clientId: string) {
+    // Prevent re-initializing
+    if (this.client) return;
+
+    // Skip auto popup if already logged in
+    const alreadyLoggedIn = !!localStorage.getItem('auth_token');
+    if (alreadyLoggedIn) {
+      console.log('User already logged in, skipping auto popup');
+      return;
+    }
+
+    // Load One Tap / auto sign-in script
+    const startGsi = () => {
+      google.accounts.id.initialize({
+        client_id: clientId,
+        auto_select: true,
+        callback: (response: any) => this.handleAutoSignIn(response),
+        cancel_on_tap_outside: true,
+      });
+
+      // Prevent repeated popup spam: check a short-lived flag
+      const lastPromptTime = localStorage.getItem('gsi_last_prompt');
+      const shouldPrompt =
+        !lastPromptTime ||
+        Date.now() - Number(lastPromptTime) > 6 * 60 * 60 * 1000; // every 6h max
+
+      if (shouldPrompt) {
+        console.log('Showing Google One Tap prompt');
+        google.accounts.id.prompt((notification: any) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log('User dismissed One Tap or it was not shown');
+          }
+        });
+        localStorage.setItem('gsi_last_prompt', Date.now().toString());
+      } else {
+        console.log('Skipping One Tap (recently shown)');
+      }
+    };
+
+    // Load GSI script if not loaded
+    if (!(window as any).google) {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = startGsi;
+      document.head.appendChild(script);
+    } else {
+      startGsi();
+    }
+
+    // Initialize your existing OAuth token client (manual sign-in)
     this.client = google.accounts.oauth2.initTokenClient({
       client_id: clientId,
       scope: 'email profile openid',
@@ -23,7 +74,8 @@ export class GoogleAuthService {
     });
   }
 
-  // 2️⃣ Trigger Google sign-in popup
+
+  // 2️⃣ Manual sign-in (your existing working flow)
   signIn() {
     if (!this.client) {
       console.error('Google client not initialized.');
@@ -32,11 +84,10 @@ export class GoogleAuthService {
     this.client.requestAccessToken();
   }
 
-  // 3️⃣ Handle Google token response
+  // 3️⃣ Handle manual sign-in (existing logic)
   private handleGoogleResponse(response: any) {
     console.log('Google access token:', response.access_token);
 
-    // Send the Google token to your backend for verification
     this.http
       .post<{ token: string; user: any }>(
         `${environment.apiUrl}/auth/google`,
@@ -45,7 +96,6 @@ export class GoogleAuthService {
       .pipe(
         tap((res) => {
           console.log('App JWT:', res.token);
-          // Save JWT & user in local storage
           localStorage.setItem('auth_token', res.token);
           localStorage.setItem('user', JSON.stringify(res.user));
           this.setUser(res.user);
@@ -57,18 +107,42 @@ export class GoogleAuthService {
       });
   }
 
-  // 4️⃣ Helper functions
+  // 4️⃣ Handle auto One Tap login callback
+  private handleAutoSignIn(response: any) {
+    if (!response?.credential) return;
+    console.log('Auto sign-in credential received');
+
+    this.http
+      .post<{ token: string; user: any }>(
+        `${environment.apiUrl}/auth/google`,
+        { idToken: response.credential }
+      )
+      .pipe(
+        tap((res) => {
+          localStorage.setItem('auth_token', res.token);
+          localStorage.setItem('user', JSON.stringify(res.user));
+          this.setUser(res.user);
+        })
+      )
+      .subscribe({
+        next: () => console.log('Auto sign-in successful'),
+        error: (err) => console.error('Auto sign-in failed:', err),
+      });
+  }
+
+  // 5️⃣ Helpers
   logout() {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     this.userSubject.next(null);
+    if (google?.accounts?.id) google.accounts.id.disableAutoSelect();
   }
 
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('auth_token');
   }
 
-   setUser(user: any) {
+  setUser(user: any) {
     this.userSubject.next(user);
     localStorage.setItem('user', JSON.stringify(user));
   }

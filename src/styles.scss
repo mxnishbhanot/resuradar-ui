@@ -59,51 +59,17 @@ body {
   }
 }
 
+.custom-snackbar-panel {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  .mat-mdc-snackbar-surface{
+    padding-right: 0px !important;
+    border-radius: 20px !important;
 
-// Design System Variables (from Home)
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$card-bg: rgba(255, 255, 255, 0.95);
-$text-primary: #1a1f36;
-$text-secondary: #5d6b82;
-$text-muted: #8f9bb3;
-
-// Semantic colors aligned with theme
-$success-color: #10b981;     // green-500
-$warning-color: #f59e0b;     // amber-500
-$error-color: #ef4444;       // red-500
-
-.snackbar-warning {
-  background: rgba(245, 158, 11, 0.12); // amber-500 @ 12%
-  color: $warning-color;
-  border-left: 4px solid $warning-color;
-  font-weight: 600;
-  font-size: 14px;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+    .mdc-snackbar__label{
+      padding: 0 !important;
+    }
+  }
 }
 
-.snackbar-success {
-  background: rgba(16, 185, 129, 0.12); // emerald-500 @ 12%
-  color: $success-color;
-  border-left: 4px solid $success-color;
-  font-weight: 600;
-  font-size: 14px;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.snackbar-error {
-  background: rgba(239, 68, 68, 0.12); // red-500 @ 12%
-  color: $error-color;
-  border-left: 4px solid $error-color;
-  font-weight: 600;
-  font-size: 14px;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}

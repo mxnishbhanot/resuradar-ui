@@ -1,13 +1,14 @@
+// upload-resume.component.ts
 import { Component, EventEmitter, Output } from '@angular/core';
 import { ResumeService } from '../../core/services/resume';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { ToastService } from '../../core/services/toast';
+import { GoogleAuthService } from '../../core/services/google-auth';
 
 @Component({
   selector: 'app-upload-resume',
@@ -16,7 +17,6 @@ import { ToastService } from '../../core/services/toast';
     CommonModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule,
     MatCardModule,
     MatTooltipModule,
   ],
@@ -32,13 +32,18 @@ export class UploadResume {
 
   constructor(
     private resumeService: ResumeService,
-    private router: Router, private toast: ToastService
+    private router: Router,
+    private toast: ToastService,
+    public googleAuth: GoogleAuthService
   ) { }
+
+  get isLoggedIn(): boolean {
+    return this.googleAuth.isLoggedIn;
+  }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;
-
     this.processFile(file);
   }
 
@@ -52,15 +57,16 @@ export class UploadResume {
       if (this.isValidFileType(file)) {
         this.processFile(file);
       } else {
-      this.toast.show('Please upload a PDF file)', 'warning');
-
+        this.toast.warning('Please upload a PDF file');
       }
     }
   }
 
   onDragOver(event: DragEvent) {
     event.preventDefault();
-    this.isDragOver = true;
+    if (this.isLoggedIn) {
+      this.isDragOver = true;
+    }
   }
 
   onDragLeave(event: DragEvent) {
@@ -69,13 +75,15 @@ export class UploadResume {
   }
 
   private processFile(file: File) {
+    if (!this.isLoggedIn) return;
+
     if (!this.isValidFileType(file)) {
-      this.toast.show('Please upload a PDF file (max 5MB)', 'warning');
+      this.toast.warning('Please upload a PDF file (max 5MB)');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      this.toast.show('File size must be less than 5MB', 'warning');
+      this.toast.warning('File size must be less than 5MB');
       return;
     }
 
@@ -86,14 +94,14 @@ export class UploadResume {
     this.resumeService.uploadResume(file).subscribe({
       next: (res) => {
         this.loading = false;
-        this.toast.show('Resume analyzed successfully.', 'success');
+        this.toast.success('Resume analyzed successfully.');
         this.resumeService.setLatestAnalysis(res.data);
         this.router.navigate(['/home/analysis']);
       },
       error: (err) => {
         this.loading = false;
         console.error('Upload failed:', err);
-        this.toast.show('Analysis failed. Please try again.', 'error');
+        this.toast.error('Analysis failed. Please try again.');
         this.resetFile();
       }
     });
@@ -111,13 +119,13 @@ export class UploadResume {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-
   resetFile() {
     this.fileName = '';
     this.fileSize = '';
   }
 
-  getFileIcon(): string {
-    return this.loading ? 'hourglass_empty' : 'description';
+  openLogin(event?: Event) {
+    if (event) event.stopPropagation();
+    this.googleAuth.signIn();
   }
 }

@@ -1,22 +1,23 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { CustomSnackbarComponent, CustomSnackBarData } from '../../shared/components/snackbar/snackbar';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  constructor(private snackBar: MatSnackBar) { }
+  constructor(private snackBar: MatSnackBar) {}
 
-  show(
-    message: string,
-    type: 'success' | 'error' | 'warning' = 'success',
-    duration: number = 4000
-  ): void {
-    const config: MatSnackBarConfig = {
-      duration,
-      horizontalPosition: 'right',
+  open(message: string, type: CustomSnackBarData['type'] = 'info') {
+    this.snackBar.openFromComponent(CustomSnackbarComponent, {
+      data: { message, type },
+      duration: 4000,
+      horizontalPosition: 'end',
       verticalPosition: 'top',
-      panelClass: [`snackbar-${type}`],
-    };
-
-    this.snackBar.open(message, '×', config);
+      panelClass: ['custom-snackbar-panel']
+    });
   }
+
+  success(message: string) { this.open(message, 'success'); }
+  error(message: string) { this.open(message, 'error'); }
+  info(message: string) { this.open(message, 'info'); }
+  warning(message: string) { this.open(message, 'warning'); }
 }

@@ -48,7 +48,7 @@ export class UpgradePro implements OnInit {
     const amount = 1000;  // Example: ₹10 in paise
 
     if (!(window as any).PhonePeCheckout) {
-      this.toast.show('⚠️ Payment system not loaded. Please refresh and try again', 'warning');
+      this.toast.warning('Payment system not loaded. Please refresh and try again');
       return;
     }
     this.paymentService.initiatePayment({ orderId, amount }).subscribe({
@@ -56,31 +56,30 @@ export class UpgradePro implements OnInit {
         this.close();
         const callback = (response: string) => {
           if (response === 'USER_CANCEL') {
-            this.toast.show('⚠️ Payment cancelled by user', 'warning');
-
+            this.toast.info('Payment cancelled by user');
           } else if (response === 'CONCLUDED') {
             // Verify on backend
             this.paymentService.verifyPayment(orderId).subscribe({
               next: (verifyRes: any) => {
                 if (verifyRes.success && verifyRes.data.status === 'COMPLETED') {
 
-                  this.toast.show(`✅ Payment successful! Transaction ID: ${verifyRes.data.transactionId}`, 'success');
+                  this.toast.success(`Payment successful! Transaction ID: ${verifyRes.data.transactionId}`);
                   this.userService.fetchCurrentUser().subscribe();
                   this.router.navigate(['/home/upload', { txId: verifyRes.data.transactionId }]);
                 } else if (verifyRes.data.status === 'PENDING') {
-                  this.toast.show('⏳ Payment is processing. Please wait...', 'warning');
+                  this.toast.warning('Payment is processing. Please wait...');
                 } else {
-                  this.toast.show(`❌ Payment failed: ${verifyRes.data.errorCode || 'Unknown error'}`, 'error');
+                  this.toast.error(`Payment failed: ${verifyRes.data.errorCode || 'Unknown error'}`);
                 }
               },
               error: (err) => {
                 console.error('Verification failed:', err);
-                this.toast.show('❌ Verification failed. Please contact support.', 'error');
+                this.toast.error('Verification failed. Please contact support.');
               }
             });
           } else {
             console.error('Payment error:', response);
-            this.toast.show('❌ Payment failed. Please try again.', 'error');
+            this.toast.error('Payment failed. Please try again.');
           }
         };
 
@@ -92,7 +91,7 @@ export class UpgradePro implements OnInit {
       },
       error: (err) => {
         console.error('Failed to initiate payment:', err);
-        this.toast.show('❌ Failed to start payment. Please try again.', 'error');
+        this.toast.error('Failed to start payment. Please try again.');
       }
     });
   }

@@ -87,10 +87,9 @@ export class Home {
       this.avatar = u ? u.picture : 'https://i.pravatar.cc/150?img=12';
     });
 
-    this.userService.fetchCurrentUser().subscribe();
-
     this.userService.user$.subscribe(user => {
       console.log(user);
+      this.user = user;
       this.user = user;
     });
   }

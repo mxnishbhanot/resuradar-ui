@@ -133,13 +133,13 @@
         <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
       </button>
 
-      <button mat-menu-item class="menu-item">
+      <button mat-menu-item class="menu-item" (click)="navigate('history')">
         <div class="menu-item-icon">
           <mat-icon>folder_open</mat-icon>
         </div>
         <span class="menu-item-text">My Resumes</span>
         <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
-        <span class="menu-item-badge">{{ userResumeCount }}</span>
+        <span class="menu-item-badge">{{ user?.resumeCount }}</span>
       </button>
 
       <!-- <button mat-menu-item class="menu-item">

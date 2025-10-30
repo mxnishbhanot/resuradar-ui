@@ -3,7 +3,7 @@
   <div class="upload-header">
     <h1 class="upload-title">Optimize Your Resume with AI</h1>
     <p class="upload-subtitle">
-       Get detailed feedback, score improvements, and professional suggestions to land your dream job
+      Get detailed feedback, score improvements, and professional suggestions to land your dream job
     </p>
   </div>
 
@@ -14,7 +14,8 @@
         <!-- Upload Area -->
         <div
           class="upload-area"
-          (click)="fileInput.click()"
+          [class.disabled]="!isLoggedIn"
+          (click)="isLoggedIn ? fileInput.click() : openLogin($event)"
           (drop)="onFileDropped($event)"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
@@ -33,17 +34,26 @@
             <div class="upload-icon">
               <mat-icon>cloud_upload</mat-icon>
             </div>
-            <h3>Upload Your Resume</h3>
-            <p>Drag & drop your PDF file here or click to browse</p>
-            <div class="file-requirements">
+            <h3 *ngIf="isLoggedIn">Upload Your Resume</h3>
+            <h3 *ngIf="!isLoggedIn">Sign In to Upload</h3>
+            <p *ngIf="isLoggedIn">Drag & drop your PDF file here or click to browse</p>
+            <p *ngIf="!isLoggedIn">Please sign in to analyze your resume with AI</p>
+            <div class="file-requirements" *ngIf="isLoggedIn">
               <mat-icon>info</mat-icon>
               <span>Supports PDF files up to 5MB</span>
             </div>
+            <button
+              *ngIf="!isLoggedIn"
+              mat-flat-button
+              class="signin-btn"
+              (click)="openLogin($event)">
+              <mat-icon>login</mat-icon>
+              Sign In with Google
+            </button>
           </div>
 
           <!-- Loading State -->
           <div class="upload-loading" *ngIf="loading">
-            <!-- <mat-spinner diameter="48"></mat-spinner> -->
             <h3>Analyzing Resume...</h3>
             <p>Our AI is reviewing your resume for optimization opportunities</p>
           </div>
@@ -79,8 +89,8 @@
           </div>
         </div>
 
-        <!-- Features Grid (only when no file) -->
-        <div class="features-section" *ngIf="!fileName">
+        <!-- Features Grid (only when no file & logged in) -->
+        <div class="features-section" *ngIf="!fileName && isLoggedIn">
           <h4>What you'll get:</h4>
           <div class="features-grid">
             <div class="feature-item">

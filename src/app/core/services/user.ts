@@ -8,7 +8,10 @@ export interface UserProfile {
   name: string;
   email: string;
   isPremium: boolean;
-  joinedAt?: string;
+  joinedDate?: any;
+  resumeCount?: number;
+  picture: string;
+
 }
 
 @Injectable({

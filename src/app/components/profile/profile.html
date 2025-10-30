@@ -17,7 +17,7 @@
         <h1 class="user-name">{{ user.name }}</h1>
         <p class="user-email">{{ user.email }}</p>
         <div class="user-meta">
-          <span>Member since {{ user.joinDate | date:'MMM y' }}</span>
+          <span>Member since {{ user.joinedDate | date:'MMM y' }}</span>
           <span class="premium-badge">✨ Premium Member</span>
         </div>
       </div>
@@ -28,16 +28,8 @@
   <mat-card class="stats-card">
     <div class="stats-grid">
       <div class="stat-item">
-        <div class="stat-value">{{ user.resumeCount }}</div>
+        <div class="stat-value" (click)="navigate()">{{ user.resumeCount }}</div>
         <div class="stat-label">Resumes Analyzed</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value">{{ user.avgScore | number:'1.1-1' }}</div>
-        <div class="stat-label">Avg. Score /10</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value">{{ user.lastActive | date:'MMM d' }}</div>
-        <div class="stat-label">Last Active</div>
       </div>
     </div>
   </mat-card>
@@ -65,33 +57,6 @@
           Google Sign-In
         </span>
       </div>
-      <div class="info-row">
-        <span class="info-label">Account Status</span>
-        <span class="info-value premium-status">Premium</span>
-      </div>
-    </div>
-  </mat-card>
-
-  <!-- Security & Actions -->
-  <mat-card class="actions-card">
-    <div class="card-header">
-      <mat-icon class="header-icon">security</mat-icon>
-      <h2>Security & Actions</h2>
-    </div>
-    <mat-divider></mat-divider>
-    <div class="card-content">
-      <button mat-stroked-button class="action-btn" (click)="downloadData()">
-        <mat-icon>download</mat-icon>
-        Download My Data
-      </button>
-      <button mat-stroked-button class="action-btn" disabled>
-        <mat-icon>edit</mat-icon>
-        Edit Profile (Coming Soon)
-      </button>
-      <button mat-raised-button color="warn" class="signout-btn" (click)="signOut()">
-        <mat-icon>logout</mat-icon>
-        Sign Out
-      </button>
     </div>
   </mat-card>
 
@@ -103,4 +68,11 @@
       <span>We never sell or share your information. All resumes are encrypted and auto-deleted after 30 days.</span>
     </div>
   </div>
+
+  <div class="sign-out-section">
+  <button mat-stroked-button class="sign-out-btn" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Sign Out
+  </button>
+</div>
 </div>
