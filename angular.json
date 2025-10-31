@@ -29,7 +29,7 @@
               {
                 "glob": "_redirects",
                 "input": "src",
-                "output": "./"
+                "output": ""
               }
             ],
             "styles": ["src/styles.scss", "src/custom-theme.scss"]
