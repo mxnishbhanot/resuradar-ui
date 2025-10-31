@@ -198,7 +198,9 @@ $text-muted: #8f9bb3;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: $primary-gradient;
+      background: linear-gradient(135deg,
+          rgba(102, 126, 234, 0.15) 0%,
+          rgba(118, 75, 162, 0.34) 100%);
       border-radius: 12px;
       box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
 
