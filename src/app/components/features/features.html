@@ -1,0 +1,109 @@
+<!-- Hero Section -->
+<section class="features-hero">
+  <div class="hero-background">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="mesh-overlay"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">ResuRadar — Intelligent Resume Analysis</h1>
+      <p class="hero-subtitle">
+        Instant AI feedback to improve your resume and match it to real jobs.<br />
+        Try up to <strong>{{ freeLimit }}</strong> free analyses — Google sign-in required.
+      </p>
+
+      <div class="hero-cta">
+        <button mat-raised-button class="cta-primary" routerLink="{{ ctaRoute }}">
+          <mat-icon>auto_awesome</mat-icon>
+          Try {{ freeLimit }} Free Analyses
+        </button>
+
+        <button mat-stroked-button class="cta-ghost" (click)="openUpgradeModal()">
+          <mat-icon>workspace_premium</mat-icon>
+          Upgrade — {{ premiumPrice }} Lifetime
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Grid -->
+<section class="features-section">
+  <div class="container">
+    <div class="features-grid">
+      <!-- Executive summary -->
+      <mat-card class="feature-card free">
+        <div class="card-icon free">
+          <mat-icon>summarize</mat-icon>
+        </div>
+        <h3>Executive Summary</h3>
+        <p>Concise overview of your resume: strengths, improvement areas, and actionable next steps.</p>
+      </mat-card>
+
+      <!-- ATS Score -->
+      <mat-card class="feature-card free">
+        <div class="card-icon free">
+          <mat-icon>score</mat-icon>
+        </div>
+        <h3>ATS Score (0–10)</h3>
+        <p>A simple, interpretable score showing ATS & recruiter friendliness with category breakdown.</p>
+      </mat-card>
+
+      <!-- Actionable tips -->
+      <mat-card class="feature-card free">
+        <div class="card-icon free">
+          <mat-icon>tips_and_updates</mat-icon>
+        </div>
+        <h3>Actionable Suggestions</h3>
+        <p>Specific, copy-paste suggestions to improve bullets, summary, and keywords.</p>
+      </mat-card>
+
+      <!-- REVAMPED Premium Card -->
+      <mat-card class="feature-card premium-upgrade">
+        <div class="premium-header">
+          <div class="premium-icon">
+            <mat-icon>workspace_premium</mat-icon>
+          </div>
+          <h3>Go Premium</h3>
+          <div class="premium-tag">Lifetime Access</div>
+        </div>
+        <p class="premium-subtitle">Unlock the full power of ResuRadar with unlimited, expert-level insights.</p>
+        <ul class="premium-features">
+          <li><mat-icon>check</mat-icon> Unlimited resume uploads</li>
+          <li><mat-icon>check</mat-icon> Professional Level detection</li>
+          <li><mat-icon>check</mat-icon> Role-tailored detailed suggestions</li>
+          <li><mat-icon>check</mat-icon> Rewritten bullet examples</li>
+          <li><mat-icon>check</mat-icon> ATS keyword optimization</li>
+          <li><mat-icon>check</mat-icon> Portfolio enhancement tips</li>
+        </ul>
+        <button mat-raised-button class="premium-cta" routerLink="/pricing">
+          <mat-icon>rocket_launch</mat-icon>
+          Upgrade Now — {{ premiumPrice }}
+        </button>
+      </mat-card>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Footer -->
+<!-- <section class="faq-cta">
+  <div class="container">
+    <div class="faq-content">
+      <p>
+        Free users: sign in with Google to upload ({{ freeLimit }} free uploads).<br />
+        Premium users enjoy unlimited usage.
+      </p>
+      <div class="cta-row">
+        <button mat-raised-button class="cta-primary" routerLink="{{ ctaRoute }}">
+          <mat-icon>description</mat-icon>
+          Analyze My Resume
+        </button>
+        <button mat-stroked-button class="cta-ghost" routerLink="/pricing">
+          <mat-icon>workspace_premium</mat-icon>
+          Get Lifetime Premium — {{ premiumPrice }}
+        </button>
+      </div>
+    </div>
+  </div>
+</section> -->

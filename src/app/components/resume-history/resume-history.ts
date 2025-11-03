@@ -44,11 +44,11 @@ export class ResumeHistory {
 
   viewResume(resume: ResumeItem) {
     this.resumeService.setLatestAnalysis(resume.analysis);
-    this.router.navigate(['/home/analysis']);
+    this.router.navigate(['/analysis']);
   }
 
   goToUpload() {
-    this.router.navigate(['/home']);
+    this.router.navigate(['']);
   }
 
   goBack() {

@@ -41,7 +41,7 @@ export class AnalysisResult implements OnInit {
     this.data = this.resumeService.getLatestAnalysis();
 
     if (!this.data) {
-      this.router.navigate(['/home/upload']);
+      this.router.navigate(['/upload']);
     }
 
     this.userService.fetchCurrentUser().subscribe();

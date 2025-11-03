@@ -65,7 +65,7 @@ export class UpgradePro implements OnInit {
 
                   this.toast.success(`Payment successful! Transaction ID: ${verifyRes.data.transactionId}`);
                   this.userService.fetchCurrentUser().subscribe();
-                  this.router.navigate(['/home/upload', { txId: verifyRes.data.transactionId }]);
+                  this.router.navigate(['/upload', { txId: verifyRes.data.transactionId }]);
                 } else if (verifyRes.data.status === 'PENDING') {
                   this.toast.warning('Payment is processing. Please wait...');
                 } else {

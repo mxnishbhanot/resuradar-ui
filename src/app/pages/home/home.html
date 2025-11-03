@@ -181,41 +181,41 @@
           </div>
           <p class="footer-tagline">AI-powered resume optimization for ambitious professionals</p>
           <div class="social-links">
-            <button mat-icon-button class="social-btn">
+            <button mat-icon-button class="social-btn" (click)="exteranlLink('site')">
               <mat-icon>language</mat-icon>
             </button>
-            <button mat-icon-button class="social-btn">
+            <button mat-icon-button class="social-btn" (click)="exteranlLink('linkedin')">
               <mat-icon>link</mat-icon>
             </button>
-            <button mat-icon-button class="social-btn">
+            <!-- <button mat-icon-button class="social-btn">
               <mat-icon>rss_feed</mat-icon>
-            </button>
+            </button> -->
           </div>
         </div>
 
         <div class="footer-links-wrapper">
           <div class="footer-section">
             <h4>Product</h4>
-            <a href="#">Features</a>
+            <a routerLink="/features">Features</a>
             <a href="#">Pricing</a>
-            <a href="#">Use Cases</a>
-            <a href="#">Integrations</a>
+            <!-- <a href="#">Use Cases</a>
+            <a href="#">Integrations</a> -->
           </div>
 
           <div class="footer-section">
             <h4>Resources</h4>
-            <a href="#">Help Center</a>
-            <a href="#">Blog</a>
+            <a routerLink="/help-center">Help Center</a>
+            <!-- <a href="#">Blog</a>
             <a href="#">Tutorials</a>
-            <a href="#">Documentation</a>
+            <a href="#">Documentation</a> -->
           </div>
 
           <div class="footer-section">
             <h4>Company</h4>
-            <a href="#">About Us</a>
-            <a href="#">Careers</a>
+            <a routerLink="/about-us">About Us</a>
+            <!-- <a href="#">Careers</a> -->
             <a href="#">Contact</a>
-            <a href="#">Privacy Policy</a>
+            <a routerLink="/privacy-policy">Privacy Policy</a>
           </div>
         </div>
       </div>

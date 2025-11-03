@@ -96,7 +96,7 @@ export class UploadResume {
         this.loading = false;
         this.toast.success('Resume analyzed successfully.');
         this.resumeService.setLatestAnalysis(res.data);
-        this.router.navigate(['/home/analysis']);
+        this.router.navigate(['/analysis']);
       },
       error: (err) => {
         this.loading = false;

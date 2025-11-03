@@ -7,7 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatCardModule } from '@angular/material/card';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, RouterLinkWithHref, RouterModule, NavigationEnd } from '@angular/router';
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../../core/services/user';
 import { ScAngularLoader } from 'sc-angular-loader';
 import { MatRippleModule } from '@angular/material/core'
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -31,8 +32,10 @@ import { MatRippleModule } from '@angular/material/core'
     RouterOutlet,
     MatTooltipModule,
     ScAngularLoader,
-    MatRippleModule
-  ],
+    MatRippleModule,
+    RouterLinkWithHref,
+    RouterModule
+],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
@@ -94,6 +97,12 @@ export class Home {
       this.user = user;
       this.user = user;
     });
+
+     this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      });
   }
 
   onAnalysisComplete(data: any) {
@@ -170,7 +179,7 @@ export class Home {
 
   navigate(navigateTo: string) {
     this.activeTab = navigateTo;
-    this.router.navigate([`/home/${navigateTo}`]);
+    this.router.navigate([`/${navigateTo}`]);
   }
 
   loginWithGoogle() {
@@ -183,5 +192,13 @@ export class Home {
       maxWidth: '520px',
       panelClass: 'upgrade-pro-dialog'
     });
+  }
+
+  exteranlLink(type: string) {
+    if (type === 'site') {
+      window.open('https://resuradar.in', '_blank');
+    } else if (type === 'linkedin') {
+      window.open('https://www.linkedin.com/in/manish-kumar-031124226/', '_blank');
+    }
   }
 }

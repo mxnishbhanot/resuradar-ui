@@ -73,11 +73,11 @@ export class Profile implements OnInit {
   navigate() {
     // Implement navigation to resume history page
     console.log('Navigating to resume history...');
-    this.router.navigate(['/home/history']);
+    this.router.navigate(['/history']);
   }
 
   logout() {
     this.googleAuth.logout();
-    this.router.navigate(['/home/upload']);
+    this.router.navigate(['/upload']);
   }
 }

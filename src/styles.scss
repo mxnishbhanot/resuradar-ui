@@ -12,6 +12,7 @@ html {
       typography: Roboto,
       density: 0,
     ));
+  scroll-behavior: smooth;
 }
 
 body {
@@ -63,11 +64,12 @@ body {
   padding: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
-  .mat-mdc-snackbar-surface{
+
+  .mat-mdc-snackbar-surface {
     padding-right: 0px !important;
     border-radius: 20px !important;
 
-    .mdc-snackbar__label{
+    .mdc-snackbar__label {
       padding: 0 !important;
     }
   }
@@ -77,4 +79,3 @@ body {
 .mat-mdc-button-ripple {
   display: none !important;
 }
-
