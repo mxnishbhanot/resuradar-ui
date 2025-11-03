@@ -14,6 +14,7 @@ import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from '../../core/services/user';
 import { ScAngularLoader } from 'sc-angular-loader';
+import { MatRippleModule } from '@angular/material/core'
 
 @Component({
   selector: 'app-home',
@@ -29,7 +30,8 @@ import { ScAngularLoader } from 'sc-angular-loader';
     MatCardModule,
     RouterOutlet,
     MatTooltipModule,
-    ScAngularLoader
+    ScAngularLoader,
+    MatRippleModule
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
@@ -73,7 +75,7 @@ export class Home {
     private router: Router,
     public googleAuth: GoogleAuthService,
     public dialog: MatDialog,
-    private userService: UserService
+    private userService: UserService,
   ) { }
 
   ngOnInit() {

@@ -9,10 +9,10 @@ import { GoogleAuthService } from '../../core/services/google-auth';
 
 interface ResumeItem {
   id: string;
-  fileName: string;
-  analyzedAt: string; // ISO string
+  filename: string;
+  createdAt: string;
   score: number;
-  position?: string;
+  analysis?: any;
 }
 
 @Component({
@@ -22,34 +22,19 @@ interface ResumeItem {
   styleUrl: './resume-history.scss',
 })
 export class ResumeHistory {
+  resumes: ResumeItem[] = [];
   private router = inject(Router);
   private location = inject(Location);
   private resumeService = inject(ResumeService);
 
-  // Mock data — replace with real API if available
-  resumes: ResumeItem[] = [
-    {
-      id: '1',
-      fileName: 'Senior_Developer_Resume.pdf',
-      analyzedAt: '2025-04-10T10:00:00Z',
-      score: 8.2,
-      position: 'Senior Full Stack Developer'
-    },
-    {
-      id: '2',
-      fileName: 'Tech_Lead_Resume_v2.pdf',
-      analyzedAt: '2025-03-22T14:30:00Z',
-      score: 6.5,
-      position: 'Technical Lead'
-    },
-    {
-      id: '3',
-      fileName: 'Updated_Portfolio_Resume.pdf',
-      analyzedAt: '2025-02-15T09:15:00Z',
-      score: 7.8,
-      position: 'Software Architect'
-    }
-  ];
+  ngOnInit() {
+    this.resumeService.getResumeHistory().subscribe((result) => {
+      console.log('Resume history from API:', result);
+      this.resumes = result.data;
+      // You can replace the mock data with the fetched data here if the API is available
+    });
+  }
+
 
   getScoreClass(score: number): string {
     if (score >= 8) return 'score-excellent';
@@ -58,22 +43,7 @@ export class ResumeHistory {
   }
 
   viewResume(resume: ResumeItem) {
-    const mockAnalysis = {
-      score: resume.score,
-      free_feedback: {
-        summary: `Previously analyzed for ${resume.position || 'a role'}.`,
-        strengths: ["Strong experience", "Clear structure"],
-        improvements: ["Add more metrics", "Refine summary"]
-      },
-      premium_feedback: {
-        professional_level: "Senior Level",
-        detailed_suggestions: ["Quantify achievements"],
-        rewrites: ["Improved bullet points"],
-        portfolio_tips: ["Add GitHub link"],
-        keywords: ["Leadership", "Architecture"]
-      }
-    };
-    this.resumeService.setLatestAnalysis(mockAnalysis);
+    this.resumeService.setLatestAnalysis(resume.analysis);
     this.router.navigate(['/home/analysis']);
   }
 

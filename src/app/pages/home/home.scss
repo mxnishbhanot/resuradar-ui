@@ -452,10 +452,6 @@ $text-muted: #8f9bb3;
       padding: 4px 12px 4px 4px;
       border-radius: 24px;
       transition: all 0.3s ease;
-
-      &:hover {
-        background: rgba(102, 126, 234, 0.08);
-      }
     }
 
     .avatar-wrapper {
@@ -513,10 +509,11 @@ $text-muted: #8f9bb3;
       height: 20px;
       color: $text-secondary;
       transition: transform 0.3s ease;
+      display: none;
     }
 
     .profile-trigger:hover .expand-icon {
-      transform: rotate(180deg);
+      // transform: rotate(180deg);
     }
   }
 }
@@ -769,7 +766,9 @@ $text-muted: #8f9bb3;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: $primary-gradient;
+        background: linear-gradient(135deg,
+            rgba(102, 126, 234, 0.15) 0%,
+            rgba(118, 75, 162, 0.34) 100%);
         border-radius: 12px;
         box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
 

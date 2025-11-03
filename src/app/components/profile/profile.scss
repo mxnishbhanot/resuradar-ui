@@ -5,6 +5,8 @@ $text-primary: #1a1f36;
 $text-secondary: #5d6b82;
 $text-muted: #8f9bb3;
 $premium-gold: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+$standard-gray: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+
 
 .profile-container {
   max-width: 800px;
@@ -97,6 +99,20 @@ $premium-gold: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
       font-size: 0.8125rem;
       letter-spacing: 0.3px;
     }
+
+    .standard-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: $standard-gray;
+      color: #2f3640;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8125rem;
+      letter-spacing: 0.3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
   }
 }
 
@@ -122,6 +138,7 @@ $premium-gold: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
 }
 
 .stat-item {
+  cursor: pointer;
   text-align: center;
 
   .stat-value {
@@ -227,6 +244,7 @@ $premium-gold: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
       display: block;
       margin-bottom: 4px;
     }
+
     span {
       color: $text-secondary;
       font-size: 0.9375rem;
@@ -241,6 +259,7 @@ $premium-gold: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

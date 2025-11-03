@@ -18,7 +18,8 @@
         <p class="user-email">{{ user.email }}</p>
         <div class="user-meta">
           <span>Member since {{ user.joinedDate | date:'MMM y' }}</span>
-          <span class="premium-badge">✨ Premium Member</span>
+          <span *ngIf="!user.isPremium" class="standard-badge">Standard User</span>
+          <span *ngIf="user.isPremium"class="premium-badge">Premium User</span>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { UserProfile } from './../../core/services/user';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,7 +25,8 @@ export class Profile implements OnInit {
     picture: 'https://i.pravatar.cc/150?img=12', // Replace with Google profile pic URL
     resumeCount: 7,
     lastActive: new Date(),
-    joinedDate: new Date()
+    joinedDate: new Date(),
+    isPremium: false
   };
   constructor(private userService: UserService, private router: Router, private googleAuth: GoogleAuthService) { }
 
@@ -38,6 +40,7 @@ export class Profile implements OnInit {
           name: user.name,
           email: user.email,
           picture: user.picture,
+          isPremium: user.isPremium,
           joinedDate: new Date(user?.joinedDate) ?? '',
           resumeCount: user.resumeCount || 0,
           lastActive: new Date(),

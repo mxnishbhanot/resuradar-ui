@@ -73,3 +73,8 @@ body {
   }
 }
 
+.mat-mdc-button-persistent-ripple,
+.mat-mdc-button-ripple {
+  display: none !important;
+}
+

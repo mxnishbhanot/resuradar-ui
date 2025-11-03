@@ -13,8 +13,8 @@
         <mat-card *ngFor="let resume of resumes" class="resume-card">
           <div class="card-content">
             <div class="resume-info">
-              <h3 class="file-name">{{ resume.fileName }}</h3>
-              <p class="analyzed-date">{{ resume.analyzedAt | date:'MMM d, y' }}</p>
+              <h3 class="file-name">{{ resume.filename }}</h3>
+              <p class="analyzed-date">{{ resume.createdAt | date:'MMM d, y' }}</p>
             </div>
             <div class="score-badge" [ngClass]="getScoreClass(resume.score)">
               {{ resume.score }}/10
@@ -32,12 +32,12 @@
       <!-- Empty State -->
       <ng-template #noHistory>
         <div class="empty-state">
-          <mat-icon class="empty-icon">description</mat-icon>
+          <!-- <mat-icon class="empty-icon">description</mat-icon> -->
           <h3>No resume history</h3>
           <p>You haven’t analyzed any resumes yet.</p>
-          <button mat-raised-button color="primary" (click)="goToUpload()">
+          <!-- <button mat-raised-button color="primary" (click)="goToUpload()">
             Upload Your First Resume
-          </button>
+          </button> -->
         </div>
       </ng-template>
     </div>
