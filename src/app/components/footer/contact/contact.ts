@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { UserService } from '../../core/services/user';
-import { ToastService } from '../../core/services/toast';
+import { UserService } from '../../../core/services/user';
+import { ToastService } from '../../../core/services/toast';
 
 @Component({
   selector: 'app-contact',

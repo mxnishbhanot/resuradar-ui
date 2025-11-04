@@ -14,6 +14,11 @@ export const routes: Routes = [
           import('./components/upload-resume/upload-resume').then((m) => m.UploadResume),
       },
       {
+        path: 'scan',
+        loadComponent: () =>
+          import('./components/scan-resume/scan-resume').then((m) => m.ScanResume),
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./components/profile/profile').then((m) => m.Profile),
@@ -24,6 +29,11 @@ export const routes: Routes = [
           import('./components/analysis-result/analysis-result').then((m) => m.AnalysisResult),
       },
       {
+        path: 'match-results',
+        loadComponent: () =>
+          import('./components/match-results/match-results').then((m) => m.MatchResults),
+      },
+      {
         path: 'history',
         loadComponent: () =>
           import('./components/resume-history/resume-history').then((m) => m.ResumeHistory),
@@ -31,42 +41,42 @@ export const routes: Routes = [
       {
         path: 'features',
         loadComponent: () =>
-          import('./components/features/features').then((m) => m.Features),
+          import('./components/footer/features/features').then((m) => m.Features),
       },
       {
         path: 'about-us',
         loadComponent: () =>
-          import('./components/about/about').then((m) => m.About),
+          import('./components/footer/about/about').then((m) => m.About),
       },
       {
         path: 'help-center',
         loadComponent: () =>
-          import('./components/help-center/help-center').then((m) => m.HelpCenter),
+          import('./components/footer/help-center/help-center').then((m) => m.HelpCenter),
       },
       {
         path: 'privacy-policy',
         loadComponent: () =>
-          import('./components/privacy-policy/privacy-policy').then((m) => m.PrivacyPolicy),
+          import('./components/footer/privacy-policy/privacy-policy').then((m) => m.PrivacyPolicy),
       },
       {
         path: 'tutorial',
         loadComponent: () =>
-          import('./components/tutorial/tutorial').then((m) => m.Tutorial),
+          import('./components/footer/tutorial/tutorial').then((m) => m.Tutorial),
       },
       {
         path: 'terms-of-service',
         loadComponent: () =>
-          import('./components/terms-of-service/terms-of-service').then((m) => m.TermsOfService),
+          import('./components/footer/terms-of-service/terms-of-service').then((m) => m.TermsOfService),
       },
       {
         path: 'contact',
         loadComponent: () =>
-          import('./components/contact/contact').then(m => m.Contact),
+          import('./components/footer/contact/contact').then(m => m.Contact),
       },
       {
         path: 'pricing',
         loadComponent: () =>
-          import('./components/pricing/pricing').then(m => m.Pricing),
+          import('./components/footer/pricing/pricing').then(m => m.Pricing),
       }
     ],
   },

@@ -33,8 +33,6 @@ export class Profile implements OnInit {
   ngOnInit() {
     this.userService.fetchCurrentUser().subscribe();
     this.userService.user$.subscribe(user => {
-      console.log(user);
-
       if (user) {
         this.user = {
           name: user.name,
@@ -62,7 +60,7 @@ export class Profile implements OnInit {
 
   signOut() {
     // Implement your Google Sign-Out logic here
-    console.log('Signing out...');
+    // console.log('Signing out...');
     // e.g., this.authService.signOut();
   }
 
@@ -72,7 +70,7 @@ export class Profile implements OnInit {
 
   navigate() {
     // Implement navigation to resume history page
-    console.log('Navigating to resume history...');
+    // console.log('Navigating to resume history...');
     this.router.navigate(['/history']);
   }
 

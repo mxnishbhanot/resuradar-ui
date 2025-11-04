@@ -1,0 +1,280 @@
+// Design system variables from Home
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$card-bg: rgba(255, 255, 255, 0.95);
+$text-primary: #1a1f36;
+$text-secondary: #5d6b82;
+$text-muted: #8f9bb3;
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scan-section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px;
+  animation: slide-in 0.6s ease-out;
+}
+
+.scan-header {
+  text-align: center;
+  margin-bottom: 32px;
+  .scan-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+  .scan-subtitle {
+    font-size: 1.125rem;
+    color: $text-secondary;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+}
+
+.scan-card {
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  background: $card-bg;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  &:hover {
+    box-shadow: 0 6px 32px rgba(102, 126, 234, 0.2);
+  }
+}
+
+.scan-content {
+  padding: 32px;
+}
+
+.scan-area {
+  border: 2px dashed rgba(102, 126, 234, 0.3);
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: rgba(255, 255, 255, 0.6);
+  position: relative;
+  margin-bottom: 32px;
+
+  &.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: rgba(248, 250, 252, 0.8);
+    border-color: rgba(203, 213, 225, 0.5);
+    &:hover { box-shadow: none; }
+  }
+
+  &.drag-over {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.08);
+    box-shadow: inset 0 0 0 2px rgba(102, 126, 234, 0.2);
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 16px 0 8px;
+  }
+
+  p {
+    color: $text-secondary;
+    margin-bottom: 24px;
+  }
+
+  .upload-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 50%;
+    margin-bottom: 16px;
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #667eea;
+    }
+  }
+
+  .file-requirements {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: $text-muted;
+    font-size: 0.875rem;
+    margin-top: 16px;
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: #667eea;
+    }
+  }
+
+  .signin-btn {
+    margin-top: 20px;
+    background: $primary-gradient;
+    color: white;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0 24px;
+    height: 44px;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    mat-icon { margin-right: 8px; }
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+    }
+  }
+}
+
+.file-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  .file-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(102, 126, 234, 0.06);
+    padding: 12px 20px;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 400px;
+  }
+  .file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(102, 126, 234, 0.15);
+    border-radius: 10px;
+    mat-icon { color: #667eea; }
+  }
+  .file-details {
+    flex: 1;
+    text-align: left;
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    p {
+      font-size: 0.875rem;
+      color: $text-secondary;
+      margin: 4px 0 0;
+    }
+  }
+  .remove-btn { color: #ef4444; margin-left: auto; }
+  .reupload-btn {
+    color: #667eea;
+    border-color: #667eea;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0 20px;
+    background: transparent;
+    &:hover { background: rgba(102, 126, 234, 0.08); }
+    mat-icon { margin-right: 8px; }
+  }
+}
+
+.scan-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  h3 { font-size: 1.25rem; color: $text-primary; }
+  p { color: $text-secondary; }
+}
+
+.jd-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.jd-input-field {
+  width: 100%;
+  .mat-mdc-form-field-subscript-wrapper {
+    justify-content: flex-end;
+  }
+  mat-hint {
+    color: $text-muted;
+    font-size: 0.875rem;
+  }
+}
+
+.analyze-btn {
+  margin: auto;
+  background: $primary-gradient;
+  color: white;
+  font-weight: 600;
+  height: 52px;
+  border-radius: 14px;
+  align-self: flex-start;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  mat-icon { margin-right: 10px; }
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.privacy-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding: 16px 24px;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 14px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  mat-icon {
+    color: #667eea;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+  .privacy-text {
+    strong { color: $text-primary; display: block; }
+    span { color: $text-secondary; font-size: 0.9375rem; }
+  }
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .scan-content { padding: 24px 16px; }
+  .scan-title { font-size: 1.875rem; }
+  .analyze-btn { width: 100%; align-self: stretch; }
+}

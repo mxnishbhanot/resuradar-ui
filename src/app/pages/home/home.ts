@@ -7,7 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatCardModule } from '@angular/material/card';
-import { Router, RouterOutlet, RouterLinkWithHref, RouterModule, NavigationEnd } from '@angular/router';
+import { Router, RouterOutlet, RouterLinkWithHref, RouterModule, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
@@ -46,40 +46,15 @@ export class Home {
   avatar = 'https://i.pravatar.cc/150?img=12';
   userResumeCount = 3;
   userScore = 7.2;
-  activeTab = 'home';
+  activeTab = 'upload';
   user: any;
-
-  // Mock data for previous resumes
-  previousResumes = [
-    {
-      id: 1,
-      name: 'Senior_Developer_Resume.pdf',
-      date: '2024-01-15',
-      score: 7.8,
-      position: 'Senior Full Stack Developer'
-    },
-    {
-      id: 2,
-      name: 'Tech_Lead_Resume_v2.pdf',
-      date: '2024-01-08',
-      score: 6.5,
-      position: 'Technical Lead'
-    },
-    {
-      id: 3,
-      name: 'Updated_Portfolio_Resume.pdf',
-      date: '2024-01-01',
-      score: 8.2,
-      position: 'Software Architect'
-    }
-  ];
 
   constructor(
     private router: Router,
     public googleAuth: GoogleAuthService,
     public dialog: MatDialog,
     private userService: UserService,
-  ) { }
+  ) {}
 
   ngOnInit() {
     setTimeout(() => {
@@ -90,6 +65,10 @@ export class Home {
     this.googleAuth.user$.subscribe((u) => {
       this.userName = u ? u.name : 'Guest';
       this.avatar = u ? u.picture : 'https://i.pravatar.cc/150?img=12';
+
+      if (u) {
+        this.userService.fetchCurrentUser().subscribe();
+      }
     });
 
     this.userService.user$.subscribe(user => {
@@ -103,11 +82,12 @@ export class Home {
       .subscribe(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
       });
+
+      localStorage.getItem('activeTab') ? this.activeTab = localStorage.getItem('activeTab')! : this.activeTab = 'upload';
   }
 
 
   navigate(navigateTo: string) {
-    this.activeTab = navigateTo;
     this.router.navigate([`/${navigateTo}`]);
   }
 
@@ -129,5 +109,10 @@ export class Home {
     } else if (type === 'linkedin') {
       window.open('https://www.linkedin.com/in/manish-kumar-031124226/', '_blank');
     }
+  }
+
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+    localStorage.setItem('activeTab', tab);
   }
 }

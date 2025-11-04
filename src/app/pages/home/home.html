@@ -24,8 +24,8 @@
         <nav class="nav-links">
           <button
             class="nav-link"
-            (click)="navigate('home')"
-            [class.active]="activeTab === 'home'"
+            (click)="navigate('upload'); setActiveTab('upload')"
+            [class.active]="activeTab === 'upload'"
             matTooltip="Analyze your resume"
             matTooltipPosition="below">
             <div class="nav-link-content">
@@ -36,9 +36,9 @@
           </button>
           <button
             class="nav-link"
-            (click)="navigate('scan')"
+            (click)="navigate('scan'); setActiveTab('scan')"
             [class.active]="activeTab === 'scan'"
-            matTooltip="Analyze your resume"
+            matTooltip="Compare resume to JD"
             matTooltipPosition="below">
             <div class="nav-link-content">
               <mat-icon>document_scanner</mat-icon>
@@ -52,7 +52,7 @@
             (click)="navigate('create')"
             [class.active]="activeTab === 'create'"
             [disabled]="true"
-            matTooltip="Compare resume to JD"
+            matTooltip="Create resumes (Coming Soon)"
             matTooltipPosition="below">
             <div class="nav-link-content">
               <mat-icon>description</mat-icon>

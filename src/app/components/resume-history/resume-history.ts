@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { ResumeService } from '../../core/services/resume';
 import { GoogleAuthService } from '../../core/services/google-auth';
+import { MatChipsModule } from '@angular/material/chips';
 
 interface ResumeItem {
   id: string;
@@ -13,11 +14,12 @@ interface ResumeItem {
   createdAt: string;
   score: number;
   analysis?: any;
+  type: string;
 }
 
 @Component({
   selector: 'app-resume-history',
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
   templateUrl: './resume-history.html',
   styleUrl: './resume-history.scss',
 })
@@ -29,9 +31,7 @@ export class ResumeHistory {
 
   ngOnInit() {
     this.resumeService.getResumeHistory().subscribe((result) => {
-      console.log('Resume history from API:', result);
       this.resumes = result.data;
-      // You can replace the mock data with the fetched data here if the API is available
     });
   }
 
@@ -43,6 +43,11 @@ export class ResumeHistory {
   }
 
   viewResume(resume: ResumeItem) {
+    if(resume.type === 'job_match') {
+      this.resumeService.setLatestMatchAnalysis(resume.analysis);
+      this.router.navigate(['/match-results']);
+      return;
+    }
     this.resumeService.setLatestAnalysis(resume.analysis);
     this.router.navigate(['/analysis']);
   }

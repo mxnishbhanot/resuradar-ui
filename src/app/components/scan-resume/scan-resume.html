@@ -1,0 +1,131 @@
+<div class="scan-section">
+  <!-- Header -->
+  <div class="scan-header">
+    <h1 class="scan-title">Match Resume to Job Description</h1>
+    <p class="scan-subtitle">
+      Upload your resume and paste a job description to get an AI-powered match score and tailored suggestions.
+    </p>
+  </div>
+
+  <!-- Scan Card -->
+  <mat-card class="scan-card" [class.drag-over]="isDragOver">
+    <mat-card-content>
+      <div class="scan-content">
+        <!-- Upload & Input Area -->
+        <div
+          class="scan-area"
+          [class.disabled]="!isLoggedIn"
+          (click)="isLoggedIn && !hasFile ? fileInput.click() : openLogin($event)"
+          (drop)="onFileDropped($event)"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+        >
+          <input
+            type="file"
+            (change)="onFileSelected($event)"
+            accept=".pdf"
+            hidden
+            #fileInput
+          />
+
+          <!-- Initial State -->
+          <div class="scan-initial" *ngIf="!hasFile && !loading">
+            <div class="upload-icon">
+              <mat-icon>cloud_upload</mat-icon>
+            </div>
+            <h3 *ngIf="isLoggedIn">Upload Your Resume</h3>
+            <h3 *ngIf="!isLoggedIn">Sign In to Scan</h3>
+            <p *ngIf="isLoggedIn">Drag & drop your PDF resume or click to browse</p>
+            <p *ngIf="!isLoggedIn">Sign in to unlock JD matching</p>
+            <div class="file-requirements" *ngIf="isLoggedIn">
+              <mat-icon>info</mat-icon>
+              <span>PDF only • Max 5MB</span>
+            </div>
+            <button
+              *ngIf="!isLoggedIn"
+              mat-flat-button
+              class="signin-btn"
+              (click)="openLogin($event)">
+              <mat-icon>login</mat-icon>
+              Sign In with Google
+            </button>
+          </div>
+
+          <!-- File Selected -->
+          <div class="file-selected" *ngIf="hasFile && !loading">
+            <div class="file-info">
+              <div class="file-icon">
+                <mat-icon>description</mat-icon>
+              </div>
+              <div class="file-details">
+                <h4>{{ fileName }}</h4>
+                <p>{{ fileSize }}</p>
+              </div>
+              <button
+                mat-icon-button
+                class="remove-btn"
+                (click)="resetFile(); $event.stopPropagation()"
+                matTooltip="Remove file"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <button
+              mat-stroked-button
+              color="primary"
+              class="reupload-btn"
+              (click)="fileInput.click(); $event.stopPropagation()"
+            >
+              <mat-icon>upload</mat-icon>
+              Change Resume
+            </button>
+          </div>
+
+          <!-- Loading -->
+          <div class="scan-loading" *ngIf="loading">
+            <h3>Analyzing Match...</h3>
+            <p>We’re comparing your resume to the job description</p>
+          </div>
+        </div>
+
+        <!-- Job Description Input (visible only when file is uploaded) -->
+        <div class="jd-section" *ngIf="hasFile && !loading">
+          <mat-form-field class="jd-input-field" appearance="outline">
+            <mat-label>Job Description</mat-label>
+            <textarea
+              matInput
+              [(ngModel)]="jobDescription"
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="4"
+              cdkAutosizeMaxRows="8"
+              maxlength="2500"
+              placeholder="Paste the full job description here..."
+              required
+            ></textarea>
+            <mat-hint align="end">{{ wordCount }}/500 words</mat-hint>
+            <mat-error *ngIf="jdError">Job description is required</mat-error>
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            class="analyze-btn"
+            [disabled]="!canAnalyze"
+            (click)="analyzeMatch()"
+          >
+            <mat-icon>document_scanner</mat-icon>
+            Analyze Match
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Privacy Notice -->
+  <div class="privacy-notice">
+    <mat-icon>lock</mat-icon>
+    <div class="privacy-text">
+      <strong>Your data is secure</strong>
+      <span>We never store or share your resume or job descriptions.</span>
+    </div>
+  </div>
+</div>

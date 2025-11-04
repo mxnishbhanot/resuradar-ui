@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { SafeUrlPipe } from '../../shared/utils/safe-url-pipe';
+import { SafeUrlPipe } from '../../../shared/utils/safe-url-pipe';
 import { MatCard } from '@angular/material/card';
 
 @Component({

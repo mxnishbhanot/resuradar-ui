@@ -51,26 +51,22 @@ export class AnalysisResult implements OnInit {
   }
 
   getScoreClass(): string {
-    if (this.data.score >= 8) return 'score-excellent';
-    if (this.data.score >= 6) return 'score-good';
+    if (this.data.score >= 80) return 'score-excellent';
+    if (this.data.score >= 60) return 'score-good';
     return 'score-needs-work';
   }
 
   getScoreLabel(): string {
-    if (this.data.score >= 8) return 'Excellent';
-    if (this.data.score >= 6) return 'Good';
+    if (this.data.score >= 80) return 'Excellent';
+    if (this.data.score >= 60) return 'Good';
     return 'Needs Improvement';
   }
 
-  getScorePercentage(): number {
-    return (this.data.score / 10) * 100;
+  openUpgradeModal() {
+    this.dialog.open(UpgradePro, {
+      width: '100%',
+      maxWidth: '520px',
+      panelClass: 'upgrade-pro-dialog'
+    });
   }
-
-    openUpgradeModal() {
-      this.dialog.open(UpgradePro, {
-        width: '100%',
-        maxWidth: '520px',
-        panelClass: 'upgrade-pro-dialog'
-      });
-    }
 }

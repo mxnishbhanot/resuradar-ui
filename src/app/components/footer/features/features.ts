@@ -4,8 +4,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
-import { UpgradePro } from '../upgrade-pro/upgrade-pro';
 import { MatDialog } from '@angular/material/dialog';
+import { UpgradePro } from '../../upgrade-pro/upgrade-pro';
 
 @Component({
   selector: 'app-features',

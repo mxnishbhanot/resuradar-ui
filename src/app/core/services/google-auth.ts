@@ -79,6 +79,7 @@ export class GoogleAuthService {
   signIn() {
     if (!this.client) {
       console.error('Google client not initialized.');
+      this.initialize('159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com');
       return;
     }
     this.client.requestAccessToken();
@@ -134,6 +135,7 @@ export class GoogleAuthService {
   logout() {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('activeTab');
     this.userSubject.next(null);
     if (google?.accounts?.id) google.accounts.id.disableAutoSelect();
   }
