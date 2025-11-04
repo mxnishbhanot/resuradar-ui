@@ -48,6 +48,26 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/privacy-policy/privacy-policy').then((m) => m.PrivacyPolicy),
       },
+      {
+        path: 'tutorial',
+        loadComponent: () =>
+          import('./components/tutorial/tutorial').then((m) => m.Tutorial),
+      },
+      {
+        path: 'terms-of-service',
+        loadComponent: () =>
+          import('./components/terms-of-service/terms-of-service').then((m) => m.TermsOfService),
+      },
+      {
+        path: 'contact',
+        loadComponent: () =>
+          import('./components/contact/contact').then(m => m.Contact),
+      },
+      {
+        path: 'pricing',
+        loadComponent: () =>
+          import('./components/pricing/pricing').then(m => m.Pricing),
+      }
     ],
   },
   { path: '**', redirectTo: 'upload' },

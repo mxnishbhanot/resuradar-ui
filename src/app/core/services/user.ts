@@ -22,7 +22,7 @@ export class UserService {
   private userSubject = new BehaviorSubject<UserProfile | null>(null);
   user$ = this.userSubject.asObservable(); // public observable for components
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** Utility: build headers with auth token */
   private getAuthHeaders(): HttpHeaders {
@@ -58,4 +58,10 @@ export class UserService {
   clearUser() {
     this.userSubject.next(null);
   }
+
+  sendContact(payload: any): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/contact`, payload);
+  }
+
+
 }

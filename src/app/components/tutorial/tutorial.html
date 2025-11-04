@@ -1,0 +1,45 @@
+<!-- Hero with Background -->
+<section class="tutorial-hero">
+  <div class="hero-background">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="mesh-overlay"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">How to Use ResuRadar</h1>
+      <p class="hero-subtitle">
+        Watch this quick video to see how our AI-powered resume analyzer helps you stand out in seconds.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section class="tutorial-content">
+  <div class="container">
+    <mat-card class="content-card">
+      <!-- Video -->
+      <div class="video-wrapper">
+        <iframe
+          [src]="videoUrl | safeUrl"
+          title="ResuRadar Tutorial"
+          frameborder="0"
+          allowfullscreen
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+        </iframe>
+      </div>
+
+      <!-- Steps -->
+      <div class="steps-section">
+        <h2>Step-by-Step Guide</h2>
+        <ol class="steps-list">
+          <li><strong>Upload:</strong> Choose your resume (PDF or DOCX format).</li>
+          <li><strong>Analyze:</strong> Our AI reviews your strengths and areas to improve.</li>
+          <li><strong>Compare:</strong> Match your resume with job descriptions to boost your ATS score.</li>
+          <li><strong>Upgrade:</strong> Get professional-level insights, rewrites, and keyword recommendations.</li>
+        </ol>
+      </div>
+    </mat-card>
+  </div>
+</section>

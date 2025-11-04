@@ -1,0 +1,60 @@
+<!-- Hero Section -->
+<section class="pricing-hero">
+  <div class="hero-background">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="mesh-overlay"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">Simple, Transparent Pricing</h1>
+      <p class="hero-subtitle">No hidden fees. Cancel anytime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Grid -->
+<section class="pricing-content">
+  <div class="container">
+    <div class="pricing-grid">
+      <mat-card
+        *ngFor="let plan of plans"
+        class="plan-card"
+        [class.highlight]="plan.highlight"
+        [class.coming-soon]="plan.comingSoon"
+      >
+        <h3 class="plan-name">{{ plan.name }}</h3>
+        <p class="plan-price">{{ plan.price }}</p>
+        <p class="plan-cycle" *ngIf="plan.cycle">{{ plan.cycle }}</p>
+
+        <ul class="features-list">
+          <li *ngFor="let f of plan.features">
+            <mat-icon class="feature-icon">check</mat-icon>
+            {{ f }}
+          </li>
+        </ul>
+
+        <button
+          *ngIf="!plan.comingSoon"
+          mat-raised-button
+          class="plan-cta"
+          [class.highlight-cta]="plan.highlight"
+          (click)="selectPlan(plan)"
+        >
+          {{ plan.type === 'free' ? 'Get Started' : 'Subscribe' }}
+        </button>
+
+        <div *ngIf="plan.comingSoon" class="coming-soon-badge">
+          <span class="badge-shimmer"></span>
+          🚧 Coming Soon
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Legacy Note -->
+    <div class="legacy-note">
+      <mat-icon>info</mat-icon>
+      <p>Users who purchased lifetime access before Feb 2026 retain full Premium benefits.</p>
+    </div>
+  </div>
+</section>

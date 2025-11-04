@@ -9,6 +9,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { ToastService } from '../../core/services/toast';
 import { GoogleAuthService } from '../../core/services/google-auth';
+import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
+import { UpgradePro } from '../upgrade-pro/upgrade-pro';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-upload-resume',
@@ -34,7 +37,8 @@ export class UploadResume {
     private resumeService: ResumeService,
     private router: Router,
     private toast: ToastService,
-    public googleAuth: GoogleAuthService
+    public googleAuth: GoogleAuthService,
+    private dialog: MatDialog
   ) { }
 
   get isLoggedIn(): boolean {
@@ -100,9 +104,31 @@ export class UploadResume {
       },
       error: (err) => {
         this.loading = false;
-        console.error('Upload failed:', err);
-        this.toast.error('Analysis failed. Please try again.');
-        this.resetFile();
+        if (err.status === 403) {
+          const message = err.error?.message || 'You’ve used all your free analyses.';
+          const modalRef = this.dialog.open(QuotaExhaustedModal, {
+            data: { message },
+            width: '100%',
+            maxWidth: '520px',
+            panelClass: 'quota-modal-dialog'
+          });
+
+          modalRef.afterClosed().subscribe((result: any) => {
+            if (result === 'upgrade') {
+              // Open your existing upgrade popup
+              this.dialog.open(UpgradePro, {
+                width: '100%',
+                maxWidth: '520px',
+                panelClass: 'upgrade-pro-dialog'
+              });
+            }
+          });
+          this.resetFile();
+        } else {
+          console.error('Upload failed:', err);
+          this.toast.error('Analysis failed. Please try again.');
+          this.resetFile();
+        }
       }
     });
   }
