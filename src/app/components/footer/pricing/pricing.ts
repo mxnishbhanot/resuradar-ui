@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+// pricing.component.ts
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { UserService } from '../../../core/services/user';
 
 @Component({
   selector: 'app-pricing',
@@ -13,6 +15,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./pricing.scss']
 })
 export class Pricing {
+  private userService = inject(UserService);
+  user: any = null;
+
   plans = [
     {
       name: 'Free',
@@ -55,26 +60,30 @@ export class Pricing {
       highlight: false,
       comingSoon: true,
       features: [
-        'Everything in Pro',
-        // 'Multi-seat licensing',
-        // 'Admin dashboard',
-        // 'Usage analytics',
-        // 'Dedicated support'
+        'Everything in Pro'
       ]
     }
   ];
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {
+    // Subscribe to user state
+    this.userService.user$.subscribe(user => {
+      this.user = user;
+    });
+  }
+
+  get isPro(): boolean {
+    return this.user?.isPremium === true;
+  }
 
   selectPlan(plan: any) {
     if (plan.type === 'free') {
-      // Redirect to upload
-      window.location.href = '/upload';
       this.router.navigate(['/upload']);
-    } else if (plan.type === 'pro') {
-      // Open Stripe checkout or upgrade modal
+    } else if (plan.type === 'pro' && !this.isPro) {
+      // Only allow upgrade if not already Pro
       alert('Redirecting to secure checkout...');
-      // In real app: this.stripeService.redirectToCheckout();
+      // TODO: integrate payment flow
     }
+    // If already Pro, do nothing (button won't appear)
   }
 }

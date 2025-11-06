@@ -8,12 +8,27 @@ $text-muted: #8f9bb3;
 
 // Reuse animations
 @keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(3deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-15px) rotate(3deg);
+  }
 }
+
 @keyframes slide-in {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // Hero Section
@@ -40,6 +55,7 @@ $text-muted: #8f9bb3;
   filter: blur(60px);
   opacity: 0.4;
   animation: float 20s ease-in-out infinite;
+
   &.orb-1 {
     width: 400px;
     height: 400px;
@@ -48,6 +64,7 @@ $text-muted: #8f9bb3;
     left: -100px;
     animation-delay: 0s;
   }
+
   &.orb-2 {
     width: 350px;
     height: 350px;
@@ -123,9 +140,11 @@ $text-muted: #8f9bb3;
   height: 52px;
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
   transition: all 0.3s ease;
+
   mat-icon {
     margin-right: 10px;
   }
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 28px rgba(102, 126, 234, 0.5);
@@ -141,9 +160,11 @@ $text-muted: #8f9bb3;
   height: 52px;
   background: transparent;
   transition: all 0.2s ease;
+
   mat-icon {
     margin-right: 8px;
   }
+
   &:hover {
     background: rgba(102, 126, 234, 0.08);
   }
@@ -151,6 +172,10 @@ $text-muted: #8f9bb3;
 
 .features-section {
   margin-bottom: 80px;
+
+  .container {
+    padding: 0px;
+  }
 }
 
 .features-grid {
@@ -201,6 +226,7 @@ $text-muted: #8f9bb3;
     display: flex;
     align-items: center;
     justify-content: center;
+
     mat-icon {
       font-size: 28px;
       width: 28px;
@@ -210,13 +236,17 @@ $text-muted: #8f9bb3;
 
   &.free .card-icon {
     background: rgba(102, 126, 234, 0.1);
-    mat-icon { color: #667eea; }
+
+    mat-icon {
+      color: #667eea;
+    }
   }
 }
 
 // REVAMPED Premium Card
-.feature-card.premium-upgrade {
-  grid-column: 1 / -1; /* Full width on all screens */
+.feature-card.premium-card {
+  grid-column: 1 / -1;
+  /* Full width on all screen sizes */
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
   border: 1px solid rgba(102, 126, 234, 0.2);
   position: relative;
@@ -247,6 +277,7 @@ $text-muted: #8f9bb3;
     display: flex;
     align-items: center;
     justify-content: center;
+
     mat-icon {
       font-size: 28px;
       width: 28px;
@@ -274,6 +305,7 @@ $text-muted: #8f9bb3;
 
   .premium-features {
     list-style: none;
+    /* 🔥 Remove default bullets */
     padding: 0;
     margin: 0 0 24px;
     display: grid;
@@ -286,6 +318,9 @@ $text-muted: #8f9bb3;
       gap: 10px;
       font-size: 0.9375rem;
       color: $text-primary;
+      margin: 0;
+
+      /* Ensure no extra margin */
       mat-icon {
         font-size: 18px;
         width: 18px;
@@ -306,12 +341,34 @@ $text-muted: #8f9bb3;
     border-radius: 14px;
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
     transition: all 0.3s ease;
+
     mat-icon {
       margin-right: 10px;
     }
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 28px rgba(102, 126, 234, 0.5);
+    }
+  }
+
+  .pro-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 12px;
+    margin-top: 12px;
+
+    // width: 100%;
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
   }
 }
@@ -343,6 +400,7 @@ $text-muted: #8f9bb3;
 
 .faq-content {
   text-align: center;
+
   p {
     font-size: 1.125rem;
     color: $text-primary;
@@ -363,24 +421,61 @@ $text-muted: #8f9bb3;
   .hero-title {
     font-size: 2rem;
   }
+
   .hero-subtitle {
     font-size: 1.125rem;
   }
+
   .features-grid {
     grid-template-columns: 1fr;
   }
+
   .faq-cta {
     padding: 32px 24px;
   }
+
   .hero-cta,
   .cta-row {
     flex-direction: column;
     align-items: center;
     gap: 12px;
   }
-  .cta-primary, .cta-ghost {
+
+  .cta-primary,
+  .cta-ghost {
     width: 100%;
     max-width: 320px;
     justify-content: center;
+  }
+}
+
+// Pro status indicator (inside premium card)
+.pro-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 12px;
+  margin-top: 12px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Responsive: ensure premium card stacks correctly
+@media (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card.premium-card {
+    grid-column: 1;
   }
 }

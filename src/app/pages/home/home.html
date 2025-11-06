@@ -10,8 +10,9 @@
   <!-- Top Navigation Bar -->
   <header class="app-header">
     <mat-toolbar class="toolbar">
+      <!-- Left: Logo + Desktop Nav -->
       <div class="toolbar-left">
-        <div class="logo">
+        <div class="logo" (click)="navigate('')">
           <div class="logo-icon-wrapper">
             <img class="logo-icon" src="resuradar.png" alt="">
             <div class="logo-glow"></div>
@@ -21,7 +22,8 @@
           </span>
         </div>
 
-        <nav class="nav-links">
+        <!-- Desktop Nav (hidden on ≤768px) -->
+        <nav class="nav-links desktop-nav">
           <button
             class="nav-link"
             (click)="navigate('upload'); setActiveTab('upload')"
@@ -46,7 +48,6 @@
             </div>
             <div class="nav-link-indicator"></div>
           </button>
-
           <button
             class="nav-link"
             (click)="navigate('create')"
@@ -67,8 +68,10 @@
         </nav>
       </div>
 
+      <!-- Right: Actions + Mobile Hamburger -->
       <div class="toolbar-right">
-        <span [matTooltip]="!googleAuth.isLoggedIn ? 'Sign in to upgrade' : ''" matTooltipPosition="below">
+        <!-- Upgrade/Login - Desktop Only -->
+        <span class="desktop-only" [matTooltip]="!googleAuth.isLoggedIn ? 'Sign in to upgrade' : ''" matTooltipPosition="below">
           <button
             *ngIf="!user?.isPremium"
             mat-flat-button
@@ -79,16 +82,9 @@
             <mat-icon>workspace_premium</mat-icon>
             <span>Upgrade to Pro</span>
           </button>
-
-          <button
-            *ngIf="user?.isPremium && googleAuth.isLoggedIn"
-            mat-flat-button
-            class="premium-btn">
-            <mat-icon>workspace_premium</mat-icon>
-            <span>Pro Member</span>
-          </button>
         </span>
 
+        <!-- Profile Menu -->
         <div *ngIf="googleAuth.isLoggedIn" class="user-profile">
           <button mat-button [matMenuTriggerFor]="userMenu" class="profile-trigger">
             <div class="avatar-wrapper">
@@ -104,14 +100,82 @@
           </button>
         </div>
 
+        <!-- Login - Desktop Only -->
         <button
           *ngIf="!googleAuth.isLoggedIn"
           mat-flat-button
-          class="login-btn"
+          class="login-btn desktop-only"
           (click)="loginWithGoogle()">
           <mat-icon>login</mat-icon>
           <span>Sign In</span>
         </button>
+
+        <!-- Mobile Hamburger (Right-aligned) -->
+        <button
+          class="mobile-nav-toggle"
+          *ngIf="isMobileView"
+          (click)="toggleMobileNav()"
+          mat-icon-button
+          aria-label="Menu">
+          <mat-icon>{{ mobileNavOpen ? 'close' : 'menu' }}</mat-icon>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation (Overlay) -->
+      <div class="nav-wrapper" [class.mobile-open]="mobileNavOpen" *ngIf="isMobileView">
+        <nav class="nav-links mobile-nav">
+          <button
+            class="nav-link" [class.active]="activeTab === 'upload'"
+            (click)="navigate('upload'); setActiveTab('upload'); toggleMobileNav()">
+            <div class="nav-link-content">
+              <mat-icon>insights</mat-icon>
+              <span>Score</span>
+            </div>
+          </button>
+          <button
+            class="nav-link" [class.active]="activeTab === 'scan'"
+            (click)="navigate('scan'); setActiveTab('scan'); toggleMobileNav()">
+            <div class="nav-link-content">
+              <mat-icon>document_scanner</mat-icon>
+              <span>Scan</span>
+            </div>
+          </button>
+          <button
+            class="nav-link" [class.active]="activeTab === 'create'"
+            (click)="navigate('create'); toggleMobileNav()"
+            [disabled]="true">
+            <div class="nav-link-content">
+              <mat-icon>description</mat-icon>
+              <span>Create</span>
+              <span class="coming-soon-badge">
+                <span class="badge-shimmer"></span>
+                Soon
+              </span>
+            </div>
+          </button>
+
+          <!-- Mobile-only: Upgrade to Pro -->
+          <button
+            *ngIf="googleAuth.isLoggedIn && !user?.isPremium"
+            class="nav-link upgrade-mobile"
+            (click)="openUpgradeModal(); toggleMobileNav()">
+            <div class="nav-link-content">
+              <mat-icon>workspace_premium</mat-icon>
+              <span>Upgrade to Pro</span>
+            </div>
+          </button>
+
+          <!-- Mobile-only: Sign In -->
+          <button
+            *ngIf="!googleAuth.isLoggedIn"
+            class="nav-link login-mobile"
+            (click)="loginWithGoogle(); toggleMobileNav()">
+            <div class="nav-link-content">
+              <mat-icon>login</mat-icon>
+              <span>Sign In</span>
+            </div>
+          </button>
+        </nav>
       </div>
     </mat-toolbar>
 
@@ -124,19 +188,13 @@
         </div>
         <div class="menu-user-info">
           <p class="menu-user-name">{{ userName }}</p>
-          <!-- <p class="menu-user-stats">
-            <mat-icon class="stats-icon">description</mat-icon>
-            {{ userResumeCount }} resumes analyzed
-          </p> -->
           <span *ngIf="user?.isPremium" class="premium-badge">
             <mat-icon>workspace_premium</mat-icon>
             Pro Member
           </span>
         </div>
       </div>
-
       <mat-divider class="menu-divider"></mat-divider>
-
       <button mat-menu-item class="menu-item" (click)="navigate('profile')">
         <div class="menu-item-icon">
           <mat-icon>person_outline</mat-icon>
@@ -144,7 +202,6 @@
         <span class="menu-item-text">My Profile</span>
         <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
       </button>
-
       <button mat-menu-item class="menu-item" (click)="navigate('history')">
         <div class="menu-item-icon">
           <mat-icon>folder_open</mat-icon>
@@ -153,17 +210,7 @@
         <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
         <span class="menu-item-badge">{{ user?.resumeCount }}</span>
       </button>
-
-      <!-- <button mat-menu-item class="menu-item">
-        <div class="menu-item-icon">
-          <mat-icon>tune</mat-icon>
-        </div>
-        <span>Settings</span>
-        <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
-      </button> -->
-
       <mat-divider class="menu-divider"></mat-divider>
-
       <button mat-menu-item class="menu-item sign-out" (click)="googleAuth.logout()">
         <div class="menu-item-icon">
           <mat-icon>logout</mat-icon>
@@ -183,7 +230,7 @@
     <div class="footer-content">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="logo">
+          <div class="logo" (click)="navigate('')">
             <div class="logo-icon-wrapper">
                <img class="logo-icon" src="resuradar.png" alt="">
             </div>
@@ -199,58 +246,44 @@
             <button mat-icon-button class="social-btn" (click)="exteranlLink('linkedin')">
               <mat-icon>link</mat-icon>
             </button>
-            <!-- <button mat-icon-button class="social-btn">
-              <mat-icon>rss_feed</mat-icon>
-            </button> -->
           </div>
         </div>
-
         <div class="footer-links-wrapper">
           <div class="footer-section">
             <h4>Product</h4>
             <a routerLink="/features">Features</a>
             <a routerLink="/pricing">Pricing</a>
-            <!-- <a href="#">Use Cases</a>
-            <a href="#">Integrations</a> -->
           </div>
-
           <div class="footer-section">
             <h4>Resources</h4>
             <a routerLink="/help-center">Help Center</a>
             <a routerLink="/tutorial">Tutorials</a>
-            <!-- <a href="#">Blog</a>
-            <a href="#">Documentation</a> -->
           </div>
-
           <div class="footer-section">
             <h4>Company</h4>
             <a routerLink="/about-us">About Us</a>
-            <!-- <a href="#">Careers</a> -->
             <a routerLink="/contact">Contact</a>
             <a routerLink="/privacy-policy">Privacy Policy</a>
           </div>
         </div>
       </div>
-
       <div class="footer-bottom">
         <p>&copy; 2025 ResuRadar. All rights reserved.</p>
         <div class="footer-bottom-links">
           <a routerLink="/terms-of-service">Terms of Service</a>
           <span class="separator">•</span>
           <a routerLink="/privacy-policy">Privacy</a>
-          <!-- <span class="separator">•</span>
-          <a href="#">Cookies</a> -->
         </div>
       </div>
     </div>
   </footer>
 </div>
+
 <sc-angular-loader
   type="spinner"
   class="dots-3"
   color="#667eea"
   background="rgba(0,0,0,0.3)"
   width="50px"
-  height="50px"
->
+  height="50px">
 </sc-angular-loader>

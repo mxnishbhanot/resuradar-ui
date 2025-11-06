@@ -112,11 +112,14 @@ $text-muted: #8f9bb3;
 // Pricing Grid
 .pricing-content {
   margin-bottom: 80px;
+
+    .container{
+    padding: 0px;
+  }
 }
 
 .pricing-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 32px;
   margin-bottom: 40px;
 }
@@ -132,6 +135,8 @@ $text-muted: #8f9bb3;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  width: 100%; /* Ensure full grid item width */
+  box-sizing: border-box;
 
   &.highlight {
     border: 2px solid #667eea;
@@ -281,5 +286,49 @@ $text-muted: #8f9bb3;
   }
   .hero-title {
     font-size: 2rem;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 1025px) {
+  .pricing-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile: 1 column */
+@media (max-width: 767px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-card.highlight {
+    transform: scale(1); /* Prevent zoom on mobile */
+  }
+}
+
+.pro-status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 12px;
+  // width: 100%;
+  margin-top: 12px;
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 }

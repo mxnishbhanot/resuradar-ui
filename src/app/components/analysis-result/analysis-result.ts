@@ -66,7 +66,10 @@ export class AnalysisResult implements OnInit {
     this.dialog.open(UpgradePro, {
       width: '100%',
       maxWidth: '520px',
-      panelClass: 'upgrade-pro-dialog'
+      maxHeight: '90vh',
+      panelClass: 'upgrade-pro-dialog',
+      hasBackdrop: true,
+      disableClose: false,
     });
   }
 }

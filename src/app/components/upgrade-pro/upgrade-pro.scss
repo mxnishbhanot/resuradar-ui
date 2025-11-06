@@ -1,14 +1,18 @@
-// Design System Variables (from Home)
+// Reuse design tokens from home
 $primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 $card-bg: rgba(255, 255, 255, 0.95);
 $text-primary: #1a1f36;
 $text-secondary: #5d6b82;
 $text-muted: #8f9bb3;
 
-.upgrade-container {
+.upgrade-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* allow scrolling if needed */
+  // padding: 24px 16px;
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .upgrade-card {
@@ -22,6 +26,12 @@ $text-muted: #8f9bb3;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(102, 126, 234, 0.1);
   text-align: center;
+  box-sizing: border-box;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .logo {
@@ -33,28 +43,24 @@ $text-muted: #8f9bb3;
 
   .logo-wrapper {
     position: relative;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg,
-          rgba(102, 126, 234, 0.15) 0%,
-          rgba(118, 75, 162, 0.34) 100%);
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-  }
-
-  .logo-icon {
-    font-size: 24px;
-    width: 28px;
-    height: 28px;
-    color: #667eea;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(135deg,
+        rgba(102, 126, 234, 0.15) 0%,
+        rgba(118, 75, 162, 0.34) 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
     color: white;
+    border-radius: 8px;
+    object-fit: cover;
   }
 
   .logo-text {
@@ -95,6 +101,10 @@ $text-muted: #8f9bb3;
   padding: 32px;
   margin-bottom: 24px;
   border: 1px solid rgba(102, 126, 234, 0.1);
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .plan-header {
@@ -131,6 +141,7 @@ $text-muted: #8f9bb3;
   padding: 0;
   margin: 24px 0;
   text-align: left;
+  flex: 1;
 
   li {
     display: flex;
@@ -164,6 +175,7 @@ $text-muted: #8f9bb3;
   color: white;
   box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
   transition: all 0.3s ease;
+  margin-top: auto;
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -198,14 +210,61 @@ $text-muted: #8f9bb3;
   }
 }
 
+/* Mobile Responsive */
 @media (max-width: 600px) {
+  .upgrade-wrapper {
+    // padding: 16px 12px;
+  }
+
   .upgrade-card {
-    padding: 32px 24px;
+    padding: 32px 20px;
+    max-width: none;
+    max-height: 85vh;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+  }
+
+  .header h1 {
+    font-size: 1.75rem;
+  }
+
+  .header p {
+    font-size: 1rem;
   }
 
   .plan-header {
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    gap: 78px;
     text-align: center;
+  }
+
+  .plan-card {
+    padding: 24px 16px;
+  }
+
+  .features-list li {
+    font-size: 0.95rem;
+  }
+
+  .checkout-btn {
+    height: 52px;
+    font-size: 1rem;
+  }
+}
+
+/* Extra small */
+@media (max-width: 375px) {
+  .upgrade-card {
+    padding: 24px 16px;
+  }
+
+  .logo-text {
+    font-size: 1.375rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
   }
 }

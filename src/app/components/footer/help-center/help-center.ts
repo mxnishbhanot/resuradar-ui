@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-help-center',
@@ -8,5 +9,9 @@ import { MatExpansionModule } from '@angular/material/expansion';
   styleUrl: './help-center.scss',
 })
 export class HelpCenter {
+  private router = inject(Router);
 
+  navigate() {
+    this.router.navigate(['/contact'])
+  }
 }

@@ -34,7 +34,7 @@
           </li>
         </ul>
 
-        <button
+        <!-- <button
           *ngIf="!plan.comingSoon"
           mat-raised-button
           class="plan-cta"
@@ -42,7 +42,22 @@
           (click)="selectPlan(plan)"
         >
           {{ plan.type === 'free' ? 'Get Started' : 'Subscribe' }}
-        </button>
+        </button> -->
+        <ng-container *ngIf="!plan.comingSoon">
+          <button *ngIf="plan.type === 'free'" mat-raised-button class="plan-cta" (click)="selectPlan(plan)">
+            Get Started
+          </button>
+
+          <button *ngIf="plan.type === 'pro' && !isPro" mat-raised-button class="plan-cta highlight-cta"
+            (click)="selectPlan(plan)">
+            Subscribe
+          </button>
+
+          <div *ngIf="plan.type === 'pro' && isPro" class="pro-status-badge">
+            <mat-icon>check_circle</mat-icon>
+            <span>You’re a Pro Member!</span>
+          </div>
+        </ng-container>
 
         <div *ngIf="plan.comingSoon" class="coming-soon-badge">
           <span class="badge-shimmer"></span>

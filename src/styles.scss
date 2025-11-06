@@ -79,3 +79,18 @@ body {
 .mat-mdc-button-ripple {
   display: none !important;
 }
+
+.upgrade-pro-dialog .mat-mdc-dialog-container {
+  padding: 0 !important;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.upgrade-pro-dialog .mat-mdc-dialog-surface {
+  border-radius: 24px !important;
+  overflow: hidden;
+}
+
+.upgrade-pro-dialog{
+  padding: 0px 10px;
+}

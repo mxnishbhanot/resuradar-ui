@@ -6,12 +6,27 @@ $text-secondary: #5d6b82;
 $text-muted: #8f9bb3;
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
 }
+
 @keyframes slide-in {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // Hero
@@ -38,6 +53,7 @@ $text-muted: #8f9bb3;
   filter: blur(60px);
   opacity: 0.4;
   animation: float 20s ease-in-out infinite;
+
   &.orb-1 {
     width: 400px;
     height: 400px;
@@ -45,6 +61,7 @@ $text-muted: #8f9bb3;
     top: -100px;
     left: -100px;
   }
+
   &.orb-2 {
     width: 350px;
     height: 350px;
@@ -62,8 +79,8 @@ $text-muted: #8f9bb3;
   width: 100%;
   height: 100%;
   background-image:
-    linear-gradient(rgba(102,126,234,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(102,126,234,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(102, 126, 234, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(102, 126, 234, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
   opacity: 0.5;
 }
@@ -105,6 +122,10 @@ $text-muted: #8f9bb3;
 // Content
 .tutorial-content {
   margin-bottom: 80px;
+
+  .container {
+    padding: 0px;
+  }
 }
 
 .content-card {
@@ -128,7 +149,8 @@ $text-muted: #8f9bb3;
   iframe {
     width: 100%;
     height: 0;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    padding-bottom: 56.25%;
+    /* 16:9 aspect ratio */
     display: block;
     border: none;
   }
@@ -150,6 +172,7 @@ $text-muted: #8f9bb3;
 
   li {
     margin-bottom: 16px;
+
     strong {
       color: $text-primary;
       font-weight: 700;
@@ -162,12 +185,15 @@ $text-muted: #8f9bb3;
   .hero-title {
     font-size: 2rem;
   }
+
   .hero-subtitle {
     font-size: 1.125rem;
   }
+
   .content-card {
     padding: 32px 24px;
   }
+
   .video-wrapper {
     iframe {
       padding-bottom: 60%;

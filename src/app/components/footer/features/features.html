@@ -10,16 +10,25 @@
       <h1 class="hero-title">ResuRadar — Intelligent Resume Analysis</h1>
       <p class="hero-subtitle">
         Instant AI feedback to improve your resume and match it to real jobs.<br />
-        Try up to <strong>{{ freeLimit }}</strong> free analyses — Google sign-in required.
+        <ng-container *ngIf="!isPro">
+          Try up to <strong>{{ freeLimit }}</strong> free analyses — Google sign-in required.
+        </ng-container>
+        <ng-container *ngIf="isPro">
+          You have <strong>unlimited</strong> access as a Pro member.
+        </ng-container>
       </p>
 
       <div class="hero-cta">
         <button mat-raised-button class="cta-primary" routerLink="{{ ctaRoute }}">
           <mat-icon>auto_awesome</mat-icon>
-          Try {{ freeLimit }} Free Analyses
+          {{ isPro ? 'Go to Dashboard' : 'Try ' + freeLimit + ' Free Analyses' }}
         </button>
 
-        <button mat-stroked-button class="cta-ghost" (click)="openUpgradeModal()">
+        <button
+          *ngIf="!isPro"
+          mat-stroked-button
+          class="cta-ghost"
+          (click)="openUpgradeModal()">
           <mat-icon>workspace_premium</mat-icon>
           Upgrade — {{ premiumPrice }} Lifetime
         </button>
@@ -59,16 +68,20 @@
         <p>Specific, copy-paste suggestions to improve bullets, summary, and keywords.</p>
       </mat-card>
 
-      <!-- REVAMPED Premium Card -->
-      <mat-card class="feature-card premium-upgrade">
+      <!-- REVAMPED Premium Card (now informative for Pro, persuasive for free) -->
+      <mat-card class="feature-card premium-card">
         <div class="premium-header">
           <div class="premium-icon">
             <mat-icon>workspace_premium</mat-icon>
           </div>
-          <h3>Go Premium</h3>
+          <h3>{{ isPro ? 'You’re a Pro Member!' : 'Go Premium' }}</h3>
           <div class="premium-tag">Lifetime Access</div>
         </div>
-        <p class="premium-subtitle">Unlock the full power of ResuRadar with unlimited, expert-level insights.</p>
+        <p class="premium-subtitle">
+          {{ isPro
+            ? 'Enjoy unlimited, expert-level insights on every resume.'
+            : 'Unlock the full power of ResuRadar with unlimited, expert-level insights.' }}
+        </p>
         <ul class="premium-features">
           <li><mat-icon>check</mat-icon> Unlimited resume uploads</li>
           <li><mat-icon>check</mat-icon> Professional Level detection</li>
@@ -77,33 +90,20 @@
           <li><mat-icon>check</mat-icon> ATS keyword optimization</li>
           <li><mat-icon>check</mat-icon> Portfolio enhancement tips</li>
         </ul>
-        <button mat-raised-button class="premium-cta" routerLink="/pricing">
-          <mat-icon>rocket_launch</mat-icon>
-          Upgrade Now — {{ premiumPrice }}
-        </button>
+
+        <ng-container *ngIf="!isPro">
+          <button mat-raised-button class="premium-cta" (click)="openUpgradeModal()">
+            <mat-icon>rocket_launch</mat-icon>
+            Upgrade Now — {{ premiumPrice }}
+          </button>
+        </ng-container>
+        <ng-container *ngIf="isPro">
+          <div class="pro-status">
+            <mat-icon>check_circle</mat-icon>
+            <span>Active Pro Membership</span>
+          </div>
+        </ng-container>
       </mat-card>
     </div>
   </div>
 </section>
-
-<!-- CTA Footer -->
-<!-- <section class="faq-cta">
-  <div class="container">
-    <div class="faq-content">
-      <p>
-        Free users: sign in with Google to upload ({{ freeLimit }} free uploads).<br />
-        Premium users enjoy unlimited usage.
-      </p>
-      <div class="cta-row">
-        <button mat-raised-button class="cta-primary" routerLink="{{ ctaRoute }}">
-          <mat-icon>description</mat-icon>
-          Analyze My Resume
-        </button>
-        <button mat-stroked-button class="cta-ghost" routerLink="/pricing">
-          <mat-icon>workspace_premium</mat-icon>
-          Get Lifetime Premium — {{ premiumPrice }}
-        </button>
-      </div>
-    </div>
-  </div>
-</section> -->
