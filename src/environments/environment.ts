@@ -1,6 +1,7 @@
 export const environment = {
   production: isProduction(),
-  apiUrl: getApiUrl()
+  apiUrl: getApiUrl(),
+  keyString: "resuradar32characsupersecretkey!"
 };
 
 function getApiUrl(): string {
