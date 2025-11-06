@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { Router } from '@angular/router';
 
 declare const google: any;
 
@@ -12,7 +13,7 @@ export class GoogleAuthService {
   private userSubject = new BehaviorSubject<any>(null);
   user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   // 1️⃣ Initialize Google OAuth client + auto prompt setup
   initialize(clientId: string) {
@@ -138,6 +139,7 @@ export class GoogleAuthService {
     localStorage.removeItem('activeTab');
     this.userSubject.next(null);
     if (google?.accounts?.id) google.accounts.id.disableAutoSelect();
+    this.router.navigate(['/'])
   }
 
   get isLoggedIn(): boolean {
