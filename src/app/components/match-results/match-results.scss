@@ -12,7 +12,7 @@ $text-muted: #8f9bb3;
 .match-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px 64px;
+  // padding: 0 24px 64px;
   animation: slide-in 0.6s ease-out;
 }
 
@@ -321,5 +321,36 @@ mat-card {
   .score-section {
     width: 100%;
     justify-content: center;
+  }
+}
+
+.success-banner {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border: none;
+  color: $text-primary;
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .celebration-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: #667eea;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-family: 'Inter', 'Roboto', sans-serif;
+  }
+
+  p {
+    margin: 0;
+    color: $text-secondary;
   }
 }

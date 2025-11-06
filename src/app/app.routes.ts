@@ -19,6 +19,11 @@ export const routes: Routes = [
           import('./components/scan-resume/scan-resume').then((m) => m.ScanResume),
       },
       {
+        path: 'create',
+        loadComponent: () =>
+          import('./components/create-resume/create-resume').then((m) => m.CreateResume),
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./components/profile/profile').then((m) => m.Profile),
