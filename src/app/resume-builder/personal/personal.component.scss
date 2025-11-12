@@ -1,0 +1,135 @@
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$card-bg: rgba(255, 255, 255, 0.95);
+$text-primary: #1a1f36;
+$text-secondary: #5d6b82;
+$text-muted: #8f9bb3;
+
+.rr-personal {
+  padding: 20px 0;
+}
+
+.rr-section-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .rr-section-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
+  .rr-section-subtitle {
+    font-size: 1.125rem;
+    color: $text-secondary;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+}
+
+.rr-personal__form {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 28px;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  margin: 0 auto;
+  max-width: 800px;
+
+  ::ng-deep .mat-mdc-form-field {
+    width: 100%;
+
+    .mat-mdc-text-field-wrapper {
+      border-radius: 12px;
+      background: rgba(248, 250, 252, 0.6);
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 6px;
+    }
+
+    mat-icon {
+      color: #667eea;
+    }
+
+    input {
+      font-size: 15px;
+    }
+  }
+}
+
+.rr-form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.rr-form-field--full {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+// ————— Save Indicators —————
+.rr-save-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  width: fit-content;
+
+  .rr-save-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &--success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+
+    .rr-save-icon {
+      color: #10b981;
+    }
+  }
+}
+
+// ————— Responsive —————
+@media (max-width: 600px) {
+  .rr-section-header {
+    padding: 0 16px;
+  }
+
+  .rr-section-title {
+    font-size: 1.875rem;
+  }
+
+  .rr-section-subtitle {
+    font-size: 1rem;
+  }
+
+  .rr-personal__form {
+    padding: 20px 16px;
+  }
+}
+
+// Optional: Add subtle transition for save indicator
+.rr-save-indicator {
+  transition: opacity 0.2s ease;
+}

@@ -50,6 +50,18 @@
           </button>
           <button
             class="nav-link"
+            (click)="navigate('build'); setActiveTab('build')"
+            [class.active]="activeTab === 'build'"
+            matTooltip="Build Resume"
+            matTooltipPosition="below">
+            <div class="nav-link-content">
+              <mat-icon>description</mat-icon>
+              <span>Build</span>
+            </div>
+            <div class="nav-link-indicator"></div>
+          </button>
+          <!-- <button
+            class="nav-link"
             (click)="navigate('create')"
             [class.active]="activeTab === 'create'"
             [disabled]="true"
@@ -64,7 +76,7 @@
               </span>
             </div>
             <div class="nav-link-indicator"></div>
-          </button>
+          </button> -->
         </nav>
       </div>
 
@@ -141,18 +153,26 @@
             </div>
           </button>
           <button
-            class="nav-link" [class.active]="activeTab === 'create'"
-            (click)="navigate('create'); toggleMobileNav()"
+            class="nav-link" [class.active]="activeTab === 'build'"
+            (click)="navigate('build'); setActiveTab('scan'); toggleMobileNav()">
+            <div class="nav-link-content">
+              <mat-icon>description</mat-icon>
+              <span>Build</span>
+            </div>
+          </button>
+          <!-- <button
+            class="nav-link" [class.active]="activeTab === 'build'"
+            (click)="navigate('build'); toggleMobileNav()"
             [disabled]="true">
             <div class="nav-link-content">
               <mat-icon>description</mat-icon>
-              <span>Create</span>
+              <span>Build</span>
               <span class="coming-soon-badge">
                 <span class="badge-shimmer"></span>
                 Soon
               </span>
             </div>
-          </button>
+          </button> -->
 
           <!-- Mobile-only: Upgrade to Pro -->
           <button

@@ -1,0 +1,254 @@
+$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$card-bg: rgba(255, 255, 255, 0.95);
+$text-primary: #1a1f36;
+$text-secondary: #5d6b82;
+$text-muted: #8f9bb3;
+
+.rr-builder {
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+  gap: 32px;
+
+  @media (max-width: 960px) {
+    flex-direction: column;
+  }
+}
+
+.rr-builder__left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rr-builder__right {
+  width: 600px;
+  flex-shrink: 0;
+
+  @media (max-width: 960px) {
+    width: 100%;
+    order: -1;
+  }
+}
+
+// ————— Header —————
+.rr-builder__header {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.rr-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  &__icon {
+    color: #667eea;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  &__text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+  }
+}
+
+.rr-progress {
+  &__text {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 8px;
+  }
+
+  &__bar {
+    ::ng-deep .mat-mdc-progress-bar {
+      height: 8px !important;
+      border-radius: 4px;
+
+      .mdc-linear-progress__primary-bar {
+        background: $primary-gradient !important;
+      }
+    }
+  }
+}
+
+// ————— Stepper —————
+.rr-stepper {
+  ::ng-deep .mat-mdc-stepper-vertical {
+    .mat-mdc-step-header {
+      padding: 16px 0;
+      cursor: default;
+    }
+
+    .mat-mdc-step-label {
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .mat-mdc-step-optional {
+      color: $text-secondary;
+    }
+
+    .mat-mdc-step-icon {
+      background: rgba(102, 126, 234, 0.1) !important;
+      color: #667eea !important;
+    }
+
+    .mat-mdc-step-icon-selected {
+      background: $primary-gradient !important;
+      color: white !important;
+    }
+  }
+}
+
+.rr-step-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .rr-step-check {
+    color: #10b981; // green success
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// ————— Actions —————
+.rr-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+  &--final {
+    justify-content: flex-end;
+    gap: 16px;
+  }
+
+  button {
+    font-weight: 600;
+    border-radius: 12px;
+    height: 44px;
+    padding: 0 20px;
+
+    mat-icon {
+      margin: 0 4px;
+    }
+  }
+
+  button.mat-raised-button {
+    background: $primary-gradient;
+    color: white;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+    }
+  }
+
+  button.mat-button {
+    color: $text-secondary;
+  }
+}
+
+// ————— Preview Panel —————
+.rr-preview-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  height: fit-content;
+}
+
+.rr-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .rr-preview-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+
+    mat-icon {
+      color: #667eea;
+    }
+  }
+
+  .rr-preview-toggle {
+    color: $text-secondary;
+  }
+}
+
+.rr-preview-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  min-height: 600px;
+}
+
+// ————— Responsive —————
+@media (max-width: 960px) {
+  .rr-builder {
+    padding: 0 12px;
+  }
+
+  .rr-builder__left {
+    gap: 16px;
+  }
+
+  .rr-builder__header,
+  .rr-preview-container {
+    padding: 20px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .rr-actions {
+    flex-direction: column;
+    gap: 12px;
+
+    &--final {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .rr-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+mat-stepper {
+  border-radius: 10px;
+
+}

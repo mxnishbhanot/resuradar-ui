@@ -1,0 +1,241 @@
+// ATS-Friendly Professional Resume Preview Styles
+// Matches PDF output exactly for consistent experience
+
+.rr-preview {
+  font-family: 'Arial', sans-serif;
+  font-size: 10pt;
+  line-height: 1.4;
+  color: #1a1a1a;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+
+  // Print-ready
+  @media print {
+    padding: 0;
+    max-width: 100%;
+  }
+}
+
+// Header Section
+.rr-header {
+  text-align: center;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid #2c3e50;
+}
+
+.rr-name {
+  font-size: 18pt;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.rr-headline {
+  font-size: 11pt;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+  color: #2c3e50;
+  font-style: normal;
+}
+
+.rr-contact {
+  font-size: 9pt;
+  margin: 0;
+  color: #555555;
+  font-weight: 400;
+}
+
+// Section Styling
+.rr-section {
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+
+  &:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.rr-section-title {
+  font-size: 12pt;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1.5px solid #2c3e50;
+  padding-bottom: 3px;
+}
+
+// Item Styling (Experience, Education, Projects)
+.rr-item {
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+
+  &--last {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+}
+
+.rr-item-header {
+  margin-bottom: 2px;
+}
+
+.rr-item-title {
+  font-size: 11pt;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: #1a1a1a;
+}
+
+.rr-item-company {
+  font-size: 10pt;
+  font-weight: 600;
+  margin: 0 0 2px 0;
+  color: #2c3e50;
+}
+
+.rr-date {
+  font-size: 9pt;
+  font-style: italic;
+  margin: 0 0 6px 0;
+  color: #666666;
+}
+
+.rr-degree {
+  font-size: 10pt;
+  margin: 0 0 2px 0;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+// Bullets
+.rr-bullets {
+  margin: 4px 0 0 18px;
+  padding: 0;
+  list-style-type: disc;
+
+  li {
+    margin-bottom: 3px;
+    line-height: 1.4;
+    color: #333333;
+    font-size: 10pt;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Description Text
+.rr-description {
+  margin: 4px 0 0 0;
+  line-height: 1.4;
+  color: #333333;
+  font-size: 10pt;
+}
+
+.rr-summary {
+  margin: 0;
+  line-height: 1.4;
+  color: #333333;
+  text-align: justify;
+  font-size: 10pt;
+}
+
+// Skills
+.rr-skills {
+  margin: 0;
+  line-height: 1.4;
+  color: #333333;
+  font-size: 10pt;
+}
+
+// Project Link
+.rr-link {
+  font-size: 9pt;
+  margin: 0 0 4px 0;
+  color: #2c3e50;
+  font-style: italic;
+}
+
+.rr-tech {
+  font-size: 9pt;
+  margin: 4px 0 0 0;
+  color: #555555;
+
+  strong {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+}
+
+// Empty State
+.rr-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999999;
+
+  p {
+    margin: 0 0 12px 0;
+    font-size: 11pt;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .rr-empty-hint {
+    font-size: 10pt;
+    color: #bbbbbb;
+    font-style: italic;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .rr-preview {
+    padding: 16px;
+    font-size: 9pt;
+  }
+
+  .rr-name {
+    font-size: 16pt;
+  }
+
+  .rr-section-title {
+    font-size: 11pt;
+  }
+
+  .rr-item-title {
+    font-size: 10pt;
+  }
+}
+
+// Print optimizations
+@media print {
+  .rr-preview {
+    font-size: 10pt;
+  }
+
+  .rr-section {
+    page-break-inside: avoid;
+  }
+
+  .rr-item {
+    page-break-inside: avoid;
+  }
+
+  .rr-header {
+    page-break-after: avoid;
+  }
+}

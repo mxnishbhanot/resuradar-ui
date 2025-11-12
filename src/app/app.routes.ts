@@ -24,6 +24,11 @@ export const routes: Routes = [
           import('./components/profile/profile').then((m) => m.Profile),
       },
       {
+        path: 'build',
+        loadComponent: () =>
+          import('./resume-builder/builder/builder.component').then((m) => m.ResumeBuilderComponent),
+      },
+      {
         path: 'analysis',
         loadComponent: () =>
           import('./components/analysis-result/analysis-result').then((m) => m.AnalysisResult),
@@ -77,6 +82,13 @@ export const routes: Routes = [
         path: 'pricing',
         loadComponent: () =>
           import('./components/footer/pricing/pricing').then(m => m.Pricing),
+      }
+      ,
+      // Resume Builder - lazy loaded standalone component
+      {
+        path: 'builder',
+        loadComponent: () =>
+          import('./resume-builder/builder/builder.component').then((m) => m.ResumeBuilderComponent),
       }
     ],
   },
