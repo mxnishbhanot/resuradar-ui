@@ -1,0 +1,104 @@
+<!-- src/app/features/start-resume/start-resume.component.html -->
+<div class="start-resume-section">
+  <!-- Header -->
+  <div class="start-resume-header">
+    <h1 class="start-resume-title">Build Your Professional Resume</h1>
+    <p class="start-resume-subtitle">
+      Start fresh or upload an existing resume to enhance with our AI-powered builder
+    </p>
+  </div>
+
+  <!-- Options Card -->
+  <mat-card class="start-resume-card" [class.drag-over]="isDragOver">
+    <mat-card-content>
+      <div class="start-resume-content">
+        <!-- Choice Buttons -->
+        <div class="choice-buttons">
+          <button
+            mat-raised-button
+            color="primary"
+            class="choice-btn"
+            (click)="startFromScratch()">
+            <mat-icon>add</mat-icon>
+            Start from Scratch
+          </button>
+
+          <div class="or-separator">or</div>
+
+          <!-- Upload Area -->
+          <div
+            class="upload-area"
+            (click)="fileInput.click()"
+            (drop)="onFileDropped($event)"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            [class.has-file]="selectedFileName"
+          >
+            <input
+              type="file"
+              #fileInput
+              (change)="onFileSelected($event)"
+              accept=".pdf,.doc,.docx"
+              hidden
+            />
+
+            <!-- Initial State -->
+            <div class="upload-initial" *ngIf="!selectedFileName && !isUploading">
+              <div class="upload-icon">
+                <mat-icon>cloud_upload</mat-icon>
+              </div>
+              <h3>Upload Existing Resume</h3>
+              <p>Drag & drop your PDF or DOCX file here, or click to browse</p>
+              <div class="file-requirements">
+                <mat-icon>info</mat-icon>
+                <span>Supports PDF and DOCX files up to 5MB</span>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="upload-loading" *ngIf="isUploading">
+              <h3>Processing Resume...</h3>
+              <p>Extracting and structuring your resume data</p>
+            </div>
+
+            <!-- File Selected -->
+            <div class="upload-complete" *ngIf="selectedFileName && !isUploading">
+              <div class="file-info">
+                <div class="file-icon">
+                  <mat-icon>description</mat-icon>
+                </div>
+                <div class="file-details">
+                  <h4>{{ selectedFileName }}</h4>
+                </div>
+                <button
+                  mat-icon-button
+                  class="remove-btn"
+                  (click)="resetUpload(); $event.stopPropagation()"
+                  matTooltip="Remove file">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <button
+                mat-stroked-button
+                color="primary"
+                class="reupload-btn"
+                (click)="fileInput.click(); $event.stopPropagation()">
+                <mat-icon>upload</mat-icon>
+                Choose Different File
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Privacy Notice -->
+  <div class="privacy-notice">
+    <mat-icon>lock</mat-icon>
+    <div class="privacy-text">
+      <strong>Your data is secure</strong>
+      <span>We use enterprise-grade encryption and never share your resume with third parties.</span>
+    </div>
+  </div>
+</div>

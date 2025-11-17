@@ -24,39 +24,31 @@
 
         <!-- Desktop Nav (hidden on ≤768px) -->
         <nav class="nav-links desktop-nav">
-          <button
-            class="nav-link"
-            (click)="navigate('upload'); setActiveTab('upload')"
-            [class.active]="activeTab === 'upload'"
-            matTooltip="Analyze your resume"
-            matTooltipPosition="below">
+          <button class="nav-link" (click)="navigate('upload'); setActiveTab('upload')"
+            [class.active]="activeTab === 'upload'" matTooltip="Analyze your resume" matTooltipPosition="below">
             <div class="nav-link-content">
               <mat-icon>insights</mat-icon>
               <span>Score</span>
             </div>
             <div class="nav-link-indicator"></div>
           </button>
-          <button
-            class="nav-link"
-            (click)="navigate('scan'); setActiveTab('scan')"
-            [class.active]="activeTab === 'scan'"
-            matTooltip="Compare resume to JD"
-            matTooltipPosition="below">
+          <button class="nav-link" (click)="navigate('scan'); setActiveTab('scan')"
+            [class.active]="activeTab === 'scan'" matTooltip="Compare resume to JD" matTooltipPosition="below">
             <div class="nav-link-content">
               <mat-icon>document_scanner</mat-icon>
               <span>Scan</span>
             </div>
             <div class="nav-link-indicator"></div>
           </button>
-          <button
-            class="nav-link"
-            (click)="navigate('build'); setActiveTab('build')"
-            [class.active]="activeTab === 'build'"
-            matTooltip="Build Resume"
-            matTooltipPosition="below">
+          <button class="nav-link" (click)="navigate('start'); setActiveTab('start')"
+            [class.active]="activeTab === 'start'" matTooltip="Build Resume" matTooltipPosition="below">
             <div class="nav-link-content">
               <mat-icon>description</mat-icon>
               <span>Build</span>
+              <span class="coming-soon-badge">
+                <span class="badge-shimmer"></span>
+                Beta
+              </span>
             </div>
             <div class="nav-link-indicator"></div>
           </button>
@@ -83,12 +75,9 @@
       <!-- Right: Actions + Mobile Hamburger -->
       <div class="toolbar-right">
         <!-- Upgrade/Login - Desktop Only -->
-        <span class="desktop-only" [matTooltip]="!googleAuth.isLoggedIn ? 'Sign in to upgrade' : ''" matTooltipPosition="below">
-          <button
-            *ngIf="!user?.isPremium"
-            mat-flat-button
-            class="upgrade-btn"
-            [disabled]="!googleAuth.isLoggedIn"
+        <span class="desktop-only" [matTooltip]="!googleAuth.isLoggedIn ? 'Sign in to upgrade' : ''"
+          matTooltipPosition="below">
+          <button *ngIf="!user?.isPremium" mat-flat-button class="upgrade-btn" [disabled]="!googleAuth.isLoggedIn"
             (click)="openUpgradeModal()">
             <span class="btn-shine"></span>
             <mat-icon>workspace_premium</mat-icon>
@@ -113,21 +102,14 @@
         </div>
 
         <!-- Login - Desktop Only -->
-        <button
-          *ngIf="!googleAuth.isLoggedIn"
-          mat-flat-button
-          class="login-btn desktop-only"
+        <button *ngIf="!googleAuth.isLoggedIn" mat-flat-button class="login-btn desktop-only"
           (click)="loginWithGoogle()">
           <mat-icon>login</mat-icon>
           <span>Sign In</span>
         </button>
 
         <!-- Mobile Hamburger (Right-aligned) -->
-        <button
-          class="mobile-nav-toggle"
-          *ngIf="isMobileView"
-          (click)="toggleMobileNav()"
-          mat-icon-button
+        <button class="mobile-nav-toggle" *ngIf="isMobileView" (click)="toggleMobileNav()" mat-icon-button
           aria-label="Menu">
           <mat-icon>{{ mobileNavOpen ? 'close' : 'menu' }}</mat-icon>
         </button>
@@ -136,28 +118,29 @@
       <!-- Mobile Navigation (Overlay) -->
       <div class="nav-wrapper" [class.mobile-open]="mobileNavOpen" *ngIf="isMobileView">
         <nav class="nav-links mobile-nav">
-          <button
-            class="nav-link" [class.active]="activeTab === 'upload'"
+          <button class="nav-link" [class.active]="activeTab === 'upload'"
             (click)="navigate('upload'); setActiveTab('upload'); toggleMobileNav()">
             <div class="nav-link-content">
               <mat-icon>insights</mat-icon>
               <span>Score</span>
             </div>
           </button>
-          <button
-            class="nav-link" [class.active]="activeTab === 'scan'"
+          <button class="nav-link" [class.active]="activeTab === 'scan'"
             (click)="navigate('scan'); setActiveTab('scan'); toggleMobileNav()">
             <div class="nav-link-content">
               <mat-icon>document_scanner</mat-icon>
               <span>Scan</span>
             </div>
           </button>
-          <button
-            class="nav-link" [class.active]="activeTab === 'build'"
-            (click)="navigate('build'); setActiveTab('scan'); toggleMobileNav()">
+          <button class="nav-link" [class.active]="activeTab === 'start'"
+            (click)="navigate('start'); setActiveTab('start'); toggleMobileNav()">
             <div class="nav-link-content">
               <mat-icon>description</mat-icon>
               <span>Build</span>
+              <span class="coming-soon-badge">
+                <span class="badge-shimmer"></span>
+                Beta
+              </span>
             </div>
           </button>
           <!-- <button
@@ -175,9 +158,7 @@
           </button> -->
 
           <!-- Mobile-only: Upgrade to Pro -->
-          <button
-            *ngIf="googleAuth.isLoggedIn && !user?.isPremium"
-            class="nav-link upgrade-mobile"
+          <button *ngIf="googleAuth.isLoggedIn && !user?.isPremium" class="nav-link upgrade-mobile"
             (click)="openUpgradeModal(); toggleMobileNav()">
             <div class="nav-link-content">
               <mat-icon>workspace_premium</mat-icon>
@@ -186,9 +167,7 @@
           </button>
 
           <!-- Mobile-only: Sign In -->
-          <button
-            *ngIf="!googleAuth.isLoggedIn"
-            class="nav-link login-mobile"
+          <button *ngIf="!googleAuth.isLoggedIn" class="nav-link login-mobile"
             (click)="loginWithGoogle(); toggleMobileNav()">
             <div class="nav-link-content">
               <mat-icon>login</mat-icon>
@@ -219,16 +198,24 @@
         <div class="menu-item-icon">
           <mat-icon>person_outline</mat-icon>
         </div>
-        <span class="menu-item-text">My Profile</span>
+        <span class="menu-item-text">Profile</span>
         <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
       </button>
-      <button mat-menu-item class="menu-item" (click)="navigate('history')">
+      <!-- <button mat-menu-item class="menu-item" (click)="navigate('history')">
         <div class="menu-item-icon">
           <mat-icon>folder_open</mat-icon>
         </div>
         <span class="menu-item-text">My Resumes</span>
         <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
         <span class="menu-item-badge">{{ user?.resumeCount }}</span>
+      </button> -->
+      <button mat-menu-item class="menu-item" (click)="navigate('custom-list')">
+        <div class="menu-item-icon">
+          <mat-icon>folder_open</mat-icon>
+        </div>
+        <span class="menu-item-text">Resumes</span>
+        <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
+        <!-- <span class="menu-item-badge">{{ user?.resumeCount }}</span> -->
       </button>
       <mat-divider class="menu-divider"></mat-divider>
       <button mat-menu-item class="menu-item sign-out" (click)="googleAuth.logout()">
@@ -252,7 +239,7 @@
         <div class="footer-brand">
           <div class="logo" (click)="navigate('')">
             <div class="logo-icon-wrapper">
-               <img class="logo-icon" src="resuradar.png" alt="">
+              <img class="logo-icon" src="resuradar.png" alt="">
             </div>
             <span class="logo-text">
               Resu<span class="logo-highlight">Radar</span>
@@ -299,11 +286,6 @@
   </footer>
 </div>
 
-<sc-angular-loader
-  type="spinner"
-  class="dots-3"
-  color="#667eea"
-  background="rgba(0,0,0,0.3)"
-  width="50px"
+<sc-angular-loader type="spinner" class="dots-3" color="#667eea" background="rgba(0,0,0,0.3)" width="50px"
   height="50px">
 </sc-angular-loader>

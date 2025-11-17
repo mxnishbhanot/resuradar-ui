@@ -82,14 +82,18 @@ export const routes: Routes = [
         path: 'pricing',
         loadComponent: () =>
           import('./components/footer/pricing/pricing').then(m => m.Pricing),
-      }
-      ,
-      // Resume Builder - lazy loaded standalone component
+      },
       {
-        path: 'builder',
+        path: 'start',
         loadComponent: () =>
-          import('./resume-builder/builder/builder.component').then((m) => m.ResumeBuilderComponent),
+          import('./resume-builder/start-resume/start-resume').then(m => m.StartResumeComponent),
+      },
+      {
+        path: 'custom-list',
+        loadComponent: () =>
+          import('./components/custom-resumes/custom-resumes').then(m => m.CustomResumesComponent),
       }
+
     ],
   },
   { path: '**', redirectTo: 'upload' },

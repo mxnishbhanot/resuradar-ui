@@ -1,0 +1,162 @@
+<!-- src/app/features/custom-resumes/custom-resumes.component.html -->
+<div class="custom-resumes-wrapper">
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">My Resumes</h1>
+        <p class="page-subtitle">Create, manage, and customize your professional resumes</p>
+      </div>
+      <button mat-raised-button color="primary" class="btn-create-new" (click)="createNew()">
+        <mat-icon>add_circle_outline</mat-icon>
+        <span>Create Resume</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Loading your resumes...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="resumes-content" *ngIf="!isLoading">
+    <!-- Stats Bar -->
+    <div class="stats-bar" *ngIf="resumes.length > 0">
+      <div class="stat-item">
+        <mat-icon>description</mat-icon>
+        <span class="stat-label">Total Resumes</span>
+        <span class="stat-value">{{ resumes.length }}</span>
+      </div>
+      <div class="stat-item">
+        <mat-icon>edit_note</mat-icon>
+        <span class="stat-label">In Progress</span>
+        <span class="stat-value">{{ draftCount }}</span>
+      </div>
+      <div class="stat-item">
+        <mat-icon>check_circle</mat-icon>
+        <span class="stat-label">Completed</span>
+        <span class="stat-value">{{ completedCount }}</span>
+      </div>
+    </div>
+
+    <!-- Resume Grid -->
+    <div class="resumes-grid" *ngIf="resumes.length > 0">
+      <!-- Create New Card -->
+      <article class="resume-card create-card" (click)="createNew()">
+        <div class="create-card-content">
+          <div class="create-icon-wrapper">
+            <mat-icon class="create-icon">note_add</mat-icon>
+          </div>
+          <h3 class="create-title">Start Fresh</h3>
+          <p class="create-description">Create a new professional resume from scratch</p>
+          <div class="create-action">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      </article>
+
+      <!-- Existing Resume Cards -->
+      <article
+        *ngFor="let resume of paginatedResumes"
+        class="resume-card"
+        (click)="editResume(resume)"
+        [attr.data-completion]="resume.completionPercentage">
+
+        <div class="card-header">
+          <div class="card-badges">
+            <span class="badge badge-draft" *ngIf="resume.isDraft">
+              <mat-icon>edit</mat-icon>
+              Draft
+            </span>
+            <span
+              class="badge badge-completion {{ getCompletionClass(resume.completionPercentage) }}">
+              {{ resume.completionPercentage }}%
+            </span>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="resume-icon">
+            <mat-icon>description</mat-icon>
+          </div>
+          <h3 class="resume-title">{{ resume.title }}</h3>
+          <p class="resume-snippet">
+            {{ resume.title.length > 60 ? (resume.title | slice:0:60) + '...' : resume.title }}
+          </p>
+        </div>
+
+        <div class="card-footer">
+          <div class="footer-info">
+            <mat-icon class="footer-icon">schedule</mat-icon>
+            <span class="footer-text">{{ formatDate(resume.updatedAt) }}</span>
+          </div>
+          <div class="card-actions">
+            <button mat-icon-button class="action-btn" (click)="editResume(resume); $event.stopPropagation()">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div
+            class="progress-bar {{ getCompletionClass(resume.completionPercentage) }}"
+            [style.width.%]="resume.completionPercentage">
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="pagination-wrapper" *ngIf="totalPages > 1">
+      <button
+        mat-stroked-button
+        class="pagination-btn"
+        [disabled]="currentPage === 1"
+        (click)="goToPage(currentPage - 1)">
+        <mat-icon>chevron_left</mat-icon>
+        <span>Previous</span>
+      </button>
+
+      <div class="page-numbers">
+        <button
+          *ngFor="let page of getPageNumbers()"
+          mat-button
+          [class.active-page]="page === currentPage"
+          (click)="goToPage(page)"
+          class="page-number-btn">
+          {{ page }}
+        </button>
+      </div>
+
+      <button
+        mat-stroked-button
+        class="pagination-btn"
+        [disabled]="currentPage === totalPages"
+        (click)="goToPage(currentPage + 1)">
+        <span>Next</span>
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </nav>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="resumes.length === 0">
+      <div class="empty-state-content">
+        <div class="empty-icon-wrapper">
+          <mat-icon class="empty-icon">folder_open</mat-icon>
+        </div>
+        <h2 class="empty-title">No Resumes Yet</h2>
+        <p class="empty-description">
+          Get started by creating your first professional resume.
+          Build a standout resume in minutes with our easy-to-use builder.
+        </p>
+        <button mat-raised-button color="primary" class="btn-empty-action" (click)="createNew()">
+          <mat-icon>add_circle_outline</mat-icon>
+          Create Your First Resume
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
