@@ -35,7 +35,16 @@ export class AnalysisResult implements OnInit {
   @Input() isProUser = false;
   data: any = null;
 
-  constructor(private resumeService: ResumeService, private router: Router, private userService: UserService, public dialog: MatDialog) { }
+  // For the circular progress bar
+  private radius = 54;
+  circumference = 2 * Math.PI * this.radius;
+
+  constructor(
+    private resumeService: ResumeService,
+    private router: Router,
+    private userService: UserService,
+    public dialog: MatDialog
+  ) { }
 
   ngOnInit() {
     this.data = this.resumeService.getLatestAnalysis();
@@ -50,6 +59,13 @@ export class AnalysisResult implements OnInit {
     })
   }
 
+  get strokeDashoffset(): number {
+    if (!this.data) return this.circumference;
+    const score = this.data.score;
+    const progress = score / 100;
+    return this.circumference * (1 - progress);
+  }
+
   getScoreClass(): string {
     if (this.data.score >= 80) return 'score-excellent';
     if (this.data.score >= 60) return 'score-good';
@@ -60,6 +76,12 @@ export class AnalysisResult implements OnInit {
     if (this.data.score >= 80) return 'Excellent';
     if (this.data.score >= 60) return 'Good';
     return 'Needs Improvement';
+  }
+
+  getScoreDescription(): string {
+    if (this.data.score >= 80) return 'Outstanding resume with strong impact and effectiveness';
+    if (this.data.score >= 60) return 'Good resume with potential for improvement in key areas';
+    return 'Resume needs significant improvements to stand out to employers';
   }
 
   openUpgradeModal() {

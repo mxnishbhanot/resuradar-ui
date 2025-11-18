@@ -1,7 +1,13 @@
-<!-- src/app/features/start-resume/start-resume.component.html -->
 <div class="start-resume-section">
+  <!-- Animated Background -->
+  <div class="background-gradient"></div>
+
   <!-- Header -->
   <div class="start-resume-header">
+    <div class="header-badge">
+      <mat-icon>auto_awesome</mat-icon>
+      <span>AI-Powered Builder</span>
+    </div>
     <h1 class="start-resume-title">Build Your Professional Resume</h1>
     <p class="start-resume-subtitle">
       Start fresh or upload an existing resume to enhance with our AI-powered builder
@@ -15,15 +21,17 @@
         <!-- Choice Buttons -->
         <div class="choice-buttons">
           <button
-            mat-raised-button
+            mat-flat-button
             color="primary"
             class="choice-btn"
             (click)="startFromScratch()">
             <mat-icon>add</mat-icon>
-            Start from Scratch
+            <span>Start from Scratch</span>
           </button>
 
-          <div class="or-separator">or</div>
+          <div class="or-separator">
+            <span>or</span>
+          </div>
 
           <!-- Upload Area -->
           <div
@@ -44,25 +52,48 @@
 
             <!-- Initial State -->
             <div class="upload-initial" *ngIf="!selectedFileName && !isUploading">
-              <div class="upload-icon">
-                <mat-icon>cloud_upload</mat-icon>
+              <div class="upload-icon-wrapper">
+                <div class="upload-icon-bg"></div>
+                <mat-icon class="upload-icon">cloud_upload</mat-icon>
               </div>
-              <h3>Upload Existing Resume</h3>
-              <p>Drag & drop your PDF or DOCX file here, or click to browse</p>
+              <h3 class="upload-state-title">Upload Existing Resume</h3>
+              <p class="upload-state-desc">
+                Drag & drop your PDF or DOCX file here, or <span class="highlight-text">click to browse</span>
+              </p>
               <div class="file-requirements">
-                <mat-icon>info</mat-icon>
-                <span>Supports PDF and DOCX files up to 5MB</span>
+                <div class="requirement-item">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>PDF & DOCX supported</span>
+                </div>
+                <div class="requirement-item">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Max 5MB</span>
+                </div>
+                <div class="requirement-item">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>AI processing</span>
+                </div>
               </div>
             </div>
 
             <!-- Loading State -->
             <div class="upload-loading" *ngIf="isUploading">
-              <h3>Processing Resume...</h3>
-              <p>Extracting and structuring your resume data</p>
+              <div class="loading-animation">
+                <div class="spinner"></div>
+                <div class="pulse-ring"></div>
+              </div>
+              <h3 class="upload-state-title">Processing Resume</h3>
+              <p class="upload-state-desc">Extracting and structuring your resume data...</p>
+              <div class="loading-progress">
+                <div class="progress-bar"></div>
+              </div>
             </div>
 
             <!-- File Selected -->
             <div class="upload-complete" *ngIf="selectedFileName && !isUploading">
+              <div class="success-animation">
+                <mat-icon>check_circle</mat-icon>
+              </div>
               <div class="file-info">
                 <div class="file-icon">
                   <mat-icon>description</mat-icon>
@@ -79,12 +110,12 @@
                 </button>
               </div>
               <button
-                mat-stroked-button
+                mat-flat-button
                 color="primary"
                 class="reupload-btn"
                 (click)="fileInput.click(); $event.stopPropagation()">
-                <mat-icon>upload</mat-icon>
-                Choose Different File
+                <mat-icon>swap_horiz</mat-icon>
+                <span>Choose Different File</span>
               </button>
             </div>
           </div>
@@ -95,9 +126,11 @@
 
   <!-- Privacy Notice -->
   <div class="privacy-notice">
-    <mat-icon>lock</mat-icon>
-    <div class="privacy-text">
-      <strong>Your data is secure</strong>
+    <div class="privacy-icon">
+      <mat-icon>verified_user</mat-icon>
+    </div>
+    <div class="privacy-content">
+      <strong>Bank-Grade Security</strong>
       <span>We use enterprise-grade encryption and never share your resume with third parties.</span>
     </div>
   </div>

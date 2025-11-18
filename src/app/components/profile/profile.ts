@@ -8,13 +8,19 @@ import { MatDividerModule } from '@angular/material/divider';
 import { UserService } from '../../core/services/user';
 import { Router } from '@angular/router';
 import { GoogleAuthService } from '../../core/services/google-auth';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ThemeService } from '../../core/services/theme';
+
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatDividerModule],
+    MatDividerModule,
+    MatTooltipModule
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
@@ -28,7 +34,18 @@ export class Profile implements OnInit {
     joinedDate: new Date(),
     isPremium: false
   };
-  constructor(private userService: UserService, private router: Router, private googleAuth: GoogleAuthService) { }
+
+  isDarkTheme = false;
+
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private googleAuth: GoogleAuthService,
+    private themeService: ThemeService
+  ) {
+    // Check current theme preference
+    this.isDarkTheme = localStorage.getItem('theme') === 'dark';
+  }
 
   ngOnInit() {
     this.userService.fetchCurrentUser().subscribe();
@@ -39,12 +56,11 @@ export class Profile implements OnInit {
           email: user.email,
           picture: user.picture,
           isPremium: user.isPremium,
-          joinedDate: new Date(user?.joinedDate) ?? '',
+          joinedDate: new Date(user?.joinedDate) ?? new Date(),
           resumeCount: user.resumeCount || 0,
           lastActive: new Date(),
         };
         console.log(this.user);
-
       }
     });
   }
@@ -58,10 +74,13 @@ export class Profile implements OnInit {
       .substring(0, 2);
   }
 
+  toggleTheme() {
+    this.themeService.toggle();
+    this.isDarkTheme = localStorage.getItem('theme') === 'dark';
+  }
+
   signOut() {
-    // Implement your Google Sign-Out logic here
-    // console.log('Signing out...');
-    // e.g., this.authService.signOut();
+    this.googleAuth.logout();
   }
 
   downloadData() {

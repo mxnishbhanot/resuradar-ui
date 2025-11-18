@@ -1,4 +1,7 @@
 <div class="profile-container">
+  <!-- Animated Background -->
+  <div class="background-gradient"></div>
+
   <!-- Header -->
   <header class="profile-header">
     <div class="header-content">
@@ -23,13 +26,23 @@
         </div>
       </div>
     </div>
+
+    <!-- Theme Toggle -->
+    <button
+      mat-icon-button
+      class="theme-toggle-btn"
+      (click)="toggleTheme()"
+      matTooltip="Switch theme"
+    >
+      <mat-icon>{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
   </header>
 
   <!-- Stats Overview -->
   <mat-card class="stats-card">
     <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-value" (click)="navigate()">{{ user.resumeCount }}</div>
+      <div class="stat-item" (click)="navigate()">
+        <div class="stat-value" >{{ user.resumeCount }}</div>
         <div class="stat-label">Resumes Analyzed</div>
       </div>
     </div>
@@ -63,17 +76,19 @@
 
   <!-- Privacy Notice -->
   <div class="privacy-notice">
-    <mat-icon>lock</mat-icon>
-    <div class="privacy-text">
-      <strong>Your data is private</strong>
+    <div class="privacy-icon">
+      <mat-icon>verified_user</mat-icon>
+    </div>
+    <div class="privacy-content">
+      <strong>Bank-Grade Security</strong>
       <span>We never sell or share your information. All resumes are encrypted and auto-deleted after 30 days.</span>
     </div>
   </div>
 
   <div class="sign-out-section">
-  <button mat-stroked-button class="sign-out-btn" (click)="logout()">
-    <mat-icon>logout</mat-icon>
-    Sign Out
-  </button>
-</div>
+    <button mat-flat-button class="sign-out-btn" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Sign Out</span>
+    </button>
+  </div>
 </div>

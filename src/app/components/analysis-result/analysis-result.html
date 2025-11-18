@@ -1,20 +1,41 @@
 <div class="analysis-container" *ngIf="data">
+  <!-- Animated Background -->
+  <div class="background-gradient"></div>
+
   <!-- Header with Score -->
   <div class="analysis-header">
     <div class="header-content">
       <div class="title-section">
+        <div class="header-badge">
+          <mat-icon>auto_awesome</mat-icon>
+          <span>AI-Powered Analysis</span>
+        </div>
         <h1 class="main-title">Resume Analysis</h1>
         <p class="subtitle">AI-powered comprehensive feedback report</p>
       </div>
       <div class="score-section">
-        <div class="score-display" [ngClass]="getScoreClass()">
-          <div class="score-circle">
-            <span class="score-value">{{ data?.score }}</span>
-            <span class="score-out-of">/100</span>
-          </div>
-          <div class="score-label">{{ getScoreLabel() }}</div>
-        </div>
+  <div class="score-display" [ngClass]="getScoreClass()">
+    <div class="score-circle">
+      <svg class="score-progress" viewBox="0 0 120 120">
+        <circle class="progress-bg" cx="60" cy="60" r="54" />
+        <circle
+          class="progress-bar"
+          cx="60"
+          cy="60"
+          r="54"
+          [attr.stroke-dasharray]="circumference"
+          [attr.stroke-dashoffset]="strokeDashoffset"
+        />
+      </svg>
+      <div class="score-content">
+        <span class="score-value">{{ data?.score }}</span>
+        <span class="score-out-of">/100</span>
       </div>
+    </div>
+    <div class="score-label">{{ getScoreLabel() }}</div>
+    <div class="score-description">{{ getScoreDescription() }}</div>
+  </div>
+</div>
     </div>
   </div>
 
@@ -25,7 +46,9 @@
       <!-- Executive Summary -->
       <mat-card class="summary-card">
         <div class="card-header">
-          <mat-icon class="header-icon">summarize</mat-icon>
+          <div class="icon-container">
+            <mat-icon class="header-icon">summarize</mat-icon>
+          </div>
           <h2>Executive Summary</h2>
         </div>
         <mat-divider></mat-divider>
@@ -76,7 +99,9 @@
       <!-- Professional Level (Pro only) -->
       <mat-card class="level-card" *ngIf="isProUser">
         <div class="level-content">
-          <mat-icon class="level-icon">workspace_premium</mat-icon>
+          <div class="level-icon-container">
+            <mat-icon class="level-icon">workspace_premium</mat-icon>
+          </div>
           <div class="level-info">
             <span class="level-label">Professional Level</span>
             <h2 class="level-value">{{ data?.premium_feedback?.professional_level }}</h2>
@@ -87,16 +112,16 @@
       <!-- Premium Locked State -->
       <mat-card class="premium-lock-card" *ngIf="!isProUser">
         <div class="lock-content">
-          <div class="lock-icon">
-            <mat-icon>lock</mat-icon>
+          <div class="lock-icon-container">
+            <mat-icon class="lock-icon">lock</mat-icon>
           </div>
           <h3>Unlock Premium Analysis</h3>
           <p class="lock-subtitle">
             Get detailed insights, personalized recommendations, and actionable strategies to elevate your resume.
           </p>
-          <button mat-raised-button color="primary" class="upgrade-btn"  (click)="openUpgradeModal()">
+          <button mat-flat-button color="primary" class="upgrade-btn" (click)="openUpgradeModal()">
             <mat-icon>rocket_launch</mat-icon>
-            Upgrade to Pro
+            <span>Upgrade to Pro</span>
           </button>
           <div class="premium-features">
             <div class="feature">
@@ -124,7 +149,9 @@
         <!-- Detailed Suggestions -->
         <mat-card class="premium-card">
           <div class="card-header">
-            <mat-icon class="header-icon">lightbulb</mat-icon>
+            <div class="icon-container">
+              <mat-icon class="header-icon">lightbulb</mat-icon>
+            </div>
             <h3>Detailed Suggestions</h3>
           </div>
           <mat-divider></mat-divider>
@@ -142,7 +169,9 @@
         <!-- Rewritten Examples -->
         <mat-card class="premium-card">
           <div class="card-header">
-            <mat-icon class="header-icon">auto_fix_high</mat-icon>
+            <div class="icon-container">
+              <mat-icon class="header-icon">auto_fix_high</mat-icon>
+            </div>
             <h3>Rewritten Examples</h3>
           </div>
           <mat-divider></mat-divider>
@@ -159,7 +188,9 @@
         <!-- Keywords -->
         <mat-card class="premium-card">
           <div class="card-header">
-            <mat-icon class="header-icon">tag</mat-icon>
+            <div class="icon-container">
+              <mat-icon class="header-icon">tag</mat-icon>
+            </div>
             <h3>Recommended Keywords</h3>
           </div>
           <mat-divider></mat-divider>
@@ -176,7 +207,9 @@
         <!-- Portfolio Tips -->
         <mat-card class="premium-card">
           <div class="card-header">
-            <mat-icon class="header-icon">star</mat-icon>
+            <div class="icon-container">
+              <mat-icon class="header-icon">star</mat-icon>
+            </div>
             <h3>Portfolio Enhancement</h3>
           </div>
           <mat-divider></mat-divider>
@@ -193,7 +226,9 @@
         <!-- Success Banner -->
         <mat-card class="success-banner">
           <div class="banner-content">
-            <mat-icon class="celebration-icon">celebration</mat-icon>
+            <div class="celebration-icon-container">
+              <mat-icon class="celebration-icon">celebration</mat-icon>
+            </div>
             <div class="banner-text">
               <h3>You're All Set!</h3>
               <p>Apply these insights to enhance your career opportunities</p>

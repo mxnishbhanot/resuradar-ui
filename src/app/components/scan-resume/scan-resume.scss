@@ -1,48 +1,105 @@
-// Design system variables from Home
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$card-bg: rgba(255, 255, 255, 0.95);
-$text-primary: #1a1f36;
-$text-secondary: #5d6b82;
-$text-muted: #8f9bb3;
+@use '../../../theme/variables' as *;
 
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+// ==============================
+// SCAN SECTION STYLES (unified theme)
+// ==============================
 
 .scan-section {
-  max-width: 800px;
+  position: relative;
+  max-width: 900px;
   margin: 0 auto;
-  animation: slide-in 0.6s ease-out;
-  width: 100%;
-  box-sizing: border-box;
+  padding: $spacing-xl $spacing-lg;
+  // min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    padding: $spacing-lg $spacing-md;
+  }
 }
 
+// Animated Background (same as upload component)
+.background-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    var(--primary-angle),
+    rgba(var(--primary-start), 0.085) 0%,
+    rgba(var(--primary-end), 0.085) 50%,
+    rgba(var(--secondary-start), 0.085) 100%
+  );
+  z-index: -1;
+  animation: gradientShift 15s ease infinite;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%);
+    animation: float 20s ease-in-out infinite;
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -30px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+}
+
+// Header (same styling as upload component)
 .scan-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: $spacing-2xl;
+  animation: fadeInUp 0.6s ease-out;
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    background: $primary-gradient;
+    color: $text-inverse;
+    padding: $spacing-xs $spacing-md;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: $spacing-lg;
+    box-shadow: $shadow-md;
+    animation: pulse 2s ease-in-out infinite;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: $text-inverse;
+    }
+  }
 
   .scan-title {
-    font-size: 2.25rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    font-family: 'Inter', 'Roboto', sans-serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
     background: $primary-gradient;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    margin: 0 0 $spacing-md 0;
     line-height: 1.2;
+    letter-spacing: -0.02em;
   }
 
   .scan-subtitle {
-    font-size: 1.125rem;
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
     color: $text-secondary;
     max-width: 600px;
     margin: 0 auto;
@@ -50,384 +107,609 @@ $text-muted: #8f9bb3;
   }
 }
 
-.scan-card {
-  border-radius: 20px;
-  box-shadow: 0 4x 24px rgba(0, 0, 0, 0.06);
-  background: $card-bg;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  transition: box-shadow 0.3s ease;
-  overflow: hidden;
-  border: 1px solid rgba(102, 126, 234, 0.1);
-
-  &:hover {
-    box-shadow: 0 6px 32px rgba(102, 126, 234, 0.2);
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.scan-content {
-  padding: 32px;
-  box-sizing: border-box;
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
-.scan-area {
-  border: 2px dashed rgba(102, 126, 234, 0.3);
-  border-radius: 16px;
-  padding: 40px 24px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  background: rgba(255, 255, 255, 0.6);
-  position: relative;
-  margin-bottom: 32px;
-  box-sizing: border-box;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+// Scan Card (same as upload component)
+.scan-card {
+  background: $card-bg;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+  border: 1px solid $accent-overlay-10;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease-out 0.2s backwards;
+  transition: all 0.3s ease;
 
-  &.disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    background: rgba(248, 250, 252, 0.8);
-    border-color: rgba(203, 213, 225, 0.5);
-
-    &:hover {
-      box-shadow: none;
-    }
+  &:hover {
+    box-shadow: 0 25px 35px rgba(var(--shadow-rgb), 0.12), 0 15px 15px rgba(var(--shadow-rgb), 0.06);
+    transform: translateY(-4px);
   }
 
   &.drag-over {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.08);
-    box-shadow: inset 0 0 0 2px rgba(102, 126, 234, 0.2);
+    border-color: $accent-color;
+    box-shadow: 0 0 0 4px $accent-overlay-10, $shadow-xl;
+    transform: scale(1.02);
   }
 
-  h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: $text-primary;
-    margin: 16px 0 8px;
+  mat-card-content {
+    padding: $spacing-xl;
+
+    @media (max-width: 768px) {
+      padding: $spacing-lg;
+    }
+  }
+}
+
+// Scan Area (unified styling)
+.scan-area {
+  border: 2px dashed $border-color;
+  border-radius: $radius-lg;
+  padding: $spacing-2xl;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    var(--primary-angle),
+    $accent-overlay-02 0%,
+    rgba(var(--secondary-end), 0.02) 100%
+  );
+  position: relative;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    padding: $spacing-xl $spacing-lg;
   }
 
-  p {
-    color: $text-secondary;
-    margin-bottom: 24px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.1), transparent);
+    transition: left 0.5s ease;
   }
 
-  .upload-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    background: rgba(102, 126, 234, 0.1);
-    border-radius: 50%;
-    margin-bottom: 16px;
+  &:hover:not(.disabled) {
+    border-color: $accent-color;
+    background: linear-gradient(
+      var(--primary-angle),
+      rgba(var(--accent-rgb), 0.05) 0%,
+      rgba(var(--secondary-end), 0.05) 100%
+    );
+    transform: translateY(-2px);
 
-    mat-icon {
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
-      color: #667eea;
+    &::before {
+      left: 100%;
+    }
+
+    .upload-icon-wrapper {
+      transform: scale(1.1) rotate(5deg);
     }
   }
 
-  .file-requirements {
+  &.disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  &.has-file {
+    border-style: solid;
+    border-color: $success-color;
+    background: linear-gradient(
+      var(--success-angle),
+      rgba(var(--success-rgb), 0.05) 0%,
+      rgba(var(--success-end), 0.05) 100%
+    );
+  }
+}
+
+// Scan States (unified with upload component)
+.scan-initial,
+.scan-loading,
+.file-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.upload-icon-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+  }
+
+  .upload-icon-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: $primary-gradient;
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .upload-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    z-index: 1;
+
+    @media (max-width: 768px) {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+    }
+  }
+}
+
+.scan-state-title {
+  font-size: clamp(1.5rem, 3vw, 1.75rem);
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.scan-state-desc {
+  font-size: 1rem;
+  color: $text-secondary;
+  margin: 0;
+  max-width: 400px;
+  line-height: 1.5;
+
+  .highlight-text {
+    color: $accent-color;
+    font-weight: 600;
+  }
+}
+
+// File Requirements (same as upload component)
+.file-requirements {
+  display: flex;
+  gap: $spacing-lg;
+  margin-top: $spacing-sm;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: $spacing-sm;
+    align-items: center;
+  }
+
+  .requirement-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: $text-muted;
+    gap: $spacing-xs;
+    color: $text-secondary;
     font-size: 0.875rem;
-    margin-top: 16px;
 
     mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
-      color: #667eea;
-    }
-  }
-
-  .signin-btn {
-    margin-top: 20px;
-    background: $primary-gradient;
-    color: white;
-    font-weight: 600;
-    border-radius: 12px;
-    padding: 0 24px;
-    height: 44px;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-    transition: all 0.3s ease;
-
-    mat-icon {
-      margin-right: 8px;
-    }
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+      color: $success-color;
     }
   }
 }
 
-.file-selected {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  width: 100%;
+// Sign In Button (same as upload component)
+.signin-btn {
+  background: $primary-gradient !important;
+  color: $text-inverse !important;
+  padding: $spacing-md $spacing-xl !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  box-shadow: $shadow-md;
+  transition: all 0.3s ease !important;
+  margin-top: $spacing-md;
+
+  mat-icon {
+    margin-right: $spacing-xs;
+    color: $text-inverse;
+  }
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.file-info {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: rgba(102, 126, 234, 0.06);
-  padding: 12px 20px;
-  border-radius: 14px;
-  width: 100%;
-  box-sizing: border-box;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-
-.file-icon {
+// Loading Animation (same as upload component)
+.loading-animation {
+  position: relative;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 10px;
-  flex-shrink: 0;
 
-  mat-icon {
-    color: #667eea;
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+  }
+
+  .spinner {
+    width: 80px;
+    height: 80px;
+    border: 4px solid transparent;
+    border-top: 4px solid rgb(var(--primary-start));
+    border-right: 4px solid rgb(var(--primary-end));
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+
+    @media (max-width: 768px) {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  .pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid $accent-color;
+    border-radius: 50%;
+    opacity: 0;
+    animation: pulseRing 2s ease-out infinite;
   }
 }
 
-.file-details {
-  flex: 1;
-  min-width: 0;
-  /* Critical for text truncation */
-  text-align: left;
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
-  h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: $text-primary;
-    margin: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
   }
-
-  p {
-    font-size: 0.875rem;
-    color: $text-secondary;
-    margin: 4px 0 0;
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
   }
 }
 
-.remove-btn {
-  color: #ef4444;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-.reupload-btn {
-  color: #667eea;
-  border-color: #667eea;
-  font-weight: 600;
-  border-radius: 12px;
-  padding: 0 20px;
-  background: transparent;
+.loading-progress {
   width: 100%;
   max-width: 300px;
+  height: 4px;
+  background: $border-color;
+  border-radius: 2px;
+  overflow: hidden;
 
-  &:hover {
-    background: rgba(102, 126, 234, 0.08);
+  .progress-bar {
+    height: 100%;
+    background: $primary-gradient;
+    border-radius: 2px;
+    animation: progress 2s ease-in-out infinite;
+  }
+}
+
+@keyframes progress {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+
+// Success Animation (same as upload component)
+.success-animation {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $success-gradient;
+  border-radius: 50%;
+  animation: scaleIn 0.5s ease-out;
+
+  @media (max-width: 768px) {
+    width: 60px;
+    height: 60px;
   }
 
   mat-icon {
-    margin-right: 8px;
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: $text-inverse;
+
+    @media (max-width: 768px) {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+    }
   }
 }
 
-.scan-loading {
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// File Info (same as upload component)
+.file-info {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 16px;
-
-  h3 {
-    font-size: 1.25rem;
-    color: $text-primary;
-  }
-
-  p {
-    color: $text-secondary;
-  }
-}
-
-.jd-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.jd-input-field {
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  background: $hover-bg;
+  border-radius: $radius-md;
   width: 100%;
-
-  .mat-mdc-form-field-subscript-wrapper {
-    justify-content: flex-end;
-  }
-
-  mat-hint {
-    color: $text-muted;
-    font-size: 0.875rem;
-  }
-}
-
-.analyze-btn {
-  margin: auto;
-  background: $primary-gradient;
-  color: white;
-  font-weight: 600;
-  height: 52px;
-  border-radius: 14px;
-  align-self: stretch;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  max-width: 400px;
+  border: 1px solid $border-color;
   transition: all 0.3s ease;
 
-  mat-icon {
-    margin-right: 10px;
+  &:hover {
+    border-color: $accent-color;
+    box-shadow: $shadow-sm;
   }
 
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-.privacy-notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-top: 32px;
-  padding: 16px 24px;
-  background: rgba(102, 126, 234, 0.05);
-  border-radius: 14px;
-  width: 100%;
-  box-sizing: border-box;
-  margin-left: auto;
-  margin-right: auto;
-
-  mat-icon {
-    color: #667eea;
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+  .file-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $primary-gradient;
+    border-radius: $radius-sm;
     flex-shrink: 0;
-  }
-
-  .privacy-text {
-    strong {
-      color: $text-primary;
-      display: block;
-    }
-
-    span {
-      color: $text-secondary;
-      font-size: 0.9375rem;
-    }
-  }
-}
-
-/* Responsive Breakpoints */
-@media (max-width: 768px) {
-  .scan-content {
-    padding: 24px 16px;
-  }
-
-  .scan-title {
-    font-size: 1.875rem;
-  }
-
-  .scan-area {
-    padding: 32px 16px;
-  }
-
-  .file-info {
-    padding: 12px 16px;
-    gap: 12px;
-  }
-
-  .file-details h4 {
-    font-size: 0.95rem;
-  }
-
-  .file-details p {
-    font-size: 0.8125rem;
-  }
-
-  .reupload-btn {
-    max-width: none;
-  }
-}
-
-@media (max-width: 480px) {
-
-  .file-selected {
-    .remove-btn {
-      position: absolute;
-      right: 10px;
-      top: 24px;
-    }
-  }
-
-  .scan-title {
-    font-size: 1.625rem;
-  }
-
-  .scan-subtitle {
-    font-size: 1rem;
-  }
-
-  .scan-area {
-    padding: 28px 12px;
-  }
-
-  .upload-icon {
-    width: 56px;
-    height: 56px;
 
     mat-icon {
+      color: $text-inverse;
       font-size: 28px;
       width: 28px;
       height: 28px;
     }
   }
 
-  .file-info {
-    flex-direction: column;
-    align-items: flex-start;
+  .file-details {
+    flex: 1;
+    min-width: 0;
+
+    h4 {
+      margin: 0 0 4px 0;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: $text-primary;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: $text-muted;
+    }
   }
 
   .remove-btn {
-    margin-left: 0;
-    align-self: flex-end;
+    flex-shrink: 0;
+    color: $text-muted;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $error-color;
+      background: rgba(var(--error-rgb), 0.1);
+    }
+  }
+}
+
+// Reupload Button (same as upload component)
+.reupload-btn {
+  background: $card-bg !important;
+  border: 2px solid $accent-color !important;
+  color: $accent-color !important;
+  padding: $spacing-sm $spacing-lg !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+
+  mat-icon {
+    margin-right: $spacing-xs;
   }
 
-  .privacy-notice {
+  &:hover {
+    background: $accent-color !important;
+    color: $text-inverse !important;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+// JD Section (new component specific)
+.jd-section {
+  margin-top: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  .jd-input-field {
+    // width: 100%;
+    background: $hover-bg; // Using hover background instead of undefined variable
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+    }
+
+    &:focus-within {
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
+    }
+
+    mat-label {
+      color: $text-secondary;
+      font-weight: 500;
+    }
+
+    textarea {
+      font-family: inherit;
+      font-size: 1rem;
+      line-height: 1.5;
+      padding: $spacing-sm 0;
+      resize: none;
+      background: transparent;
+      color: $text-primary;
+    }
+
+    mat-hint {
+      color: $text-muted;
+      font-size: 0.875rem;
+    }
+
+    mat-error {
+      color: $error-color;
+      font-size: 0.875rem;
+    }
+  }
+
+  .analyze-btn {
+    background: $primary-gradient !important;
+    color: $text-inverse !important;
+    padding: $spacing-md $spacing-xl !important;
+    border-radius: 50px !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    box-shadow: $shadow-md;
+    transition: all 0.3s ease !important;
+    align-self: center;
+
+    mat-icon {
+      margin-right: $spacing-xs;
+    }
+
+    &:hover:not([disabled]) {
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Privacy Notice (same as upload component)
+.privacy-notice {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+  padding: $spacing-lg;
+  background: linear-gradient(
+    var(--success-angle),
+    rgba(var(--success-rgb), 0.05) 0%,
+    rgba(var(--success-end), 0.05) 100%
+  );
+  border-radius: $radius-md;
+  border: 1px solid rgba(var(--success-rgb), 0.2);
+  animation: fadeInUp 0.6s ease-out 0.4s backwards;
+
+  @media (max-width: 768px) {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    text-align: center;
   }
 
+  .privacy-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $success-gradient;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: $shadow-sm;
+
+    mat-icon {
+      color: $text-inverse;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .privacy-content {
+    flex: 1;
+
+    strong {
+      display: block;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin-bottom: 4px;
+    }
+
+    span {
+      font-size: 0.875rem;
+      color: $text-secondary;
+      line-height: 1.5;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 1024px) {
+  .jd-section {
+    .analyze-btn {
+      align-self: center;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .scan-section {
+    min-height: auto;
+    padding-top: $spacing-lg;
+    padding-bottom: $spacing-lg;
+  }
+
+  .jd-section {
+    .analyze-btn {
+      width: 100%;
+    }
+  }
 }

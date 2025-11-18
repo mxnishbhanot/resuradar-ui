@@ -1,270 +1,360 @@
-// Reuse design tokens from home
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$card-bg: rgba(255, 255, 255, 0.95);
-$text-primary: #1a1f36;
-$text-secondary: #5d6b82;
-$text-muted: #8f9bb3;
+@use '../../../theme/variables' as *;
+
+// ==============================
+// UPGRADE PRO STYLES (unified theme)
+// ==============================
 
 .upgrade-wrapper {
+  position: relative;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start; /* allow scrolling if needed */
-  // padding: 24px 16px;
-  max-height: 90vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  min-height: 100vh;
+  padding: $spacing-xl $spacing-lg;
+  background: $card-bg;
+
+  // Ensure proper centering for all devices
+  @media (max-width: 768px) {
+    padding: $spacing-lg $spacing-md;
+    min-height: auto;
+    height: 100%;
+    overflow-y: auto;
+  }
+}
+
+// Animated Background (same as other components)
+.background-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    var(--primary-angle),
+    rgba(var(--primary-start), 0.085) 0%,
+    rgba(var(--primary-end), 0.085) 50%,
+    rgba(var(--secondary-start), 0.085) 100%
+  );
+  z-index: -1;
+  animation: gradientShift 15s ease infinite;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%);
+    animation: float 20s ease-in-out infinite;
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -30px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
 }
 
 .upgrade-card {
   background: $card-bg;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 48px 40px;
-  width: 100%;
-  max-width: 520px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  text-align: center;
-  box-sizing: border-box;
-  max-height: 85vh;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+  border: 1px solid $accent-overlay-10;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  width: 100%;
+  max-width: 480px;
+  padding: $spacing-xl;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+  margin: 0 auto;
 
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 32px;
+  // For mobile devices
+  @media (max-width: 768px) {
+    max-width: 95%;
+    padding: $spacing-lg;
+  }
 
-  .logo-wrapper {
-    position: relative;
-    width: 40px;
-    height: 40px;
+  &:hover {
+    box-shadow: 0 25px 35px rgba(var(--shadow-rgb), 0.12), 0 15px 15px rgba(var(--shadow-rgb), 0.06);
+    transform: translateY(-4px);
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    background: $primary-gradient;
+    color: $text-inverse;
+    padding: $spacing-xs $spacing-md;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: $spacing-lg;
+    box-shadow: $shadow-md;
+    animation: pulse 2s ease-in-out infinite;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: $text-inverse;
+    }
+  }
+
+  .logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg,
-        rgba(102, 126, 234, 0.15) 0%,
-        rgba(118, 75, 162, 0.34) 100%);
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-  }
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
 
-  .logo-icon {
-    width: 28px;
-    height: 28px;
-    color: white;
-    border-radius: 8px;
-    object-fit: cover;
-  }
+    .logo-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: $radius-md;
+      background: $primary-gradient;
 
-  .logo-text {
-    display: inline-block;
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: $text-primary;
-    font-family: "Inter", "Roboto", sans-serif;
-    background: $primary-gradient;
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    line-height: 1.2;
-  }
-}
-
-.header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: $text-primary;
-  margin-bottom: 8px;
-  font-family: 'Inter', 'Roboto', sans-serif;
-}
-
-.header p {
-  color: $text-secondary;
-  font-size: 1.125rem;
-  margin-bottom: 32px;
-}
-
-.plan-card {
-  border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  background: $card-bg;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 32px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.plan-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-
-  h2 {
-    font-size: 1.5rem;
-    color: $text-primary;
-    margin: 0;
-    font-family: 'Inter', 'Roboto', sans-serif;
-  }
-
-  .price {
-    text-align: right;
-
-    .amount {
-      font-size: 2rem;
-      font-weight: 700;
-      color: $text-primary;
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+      }
     }
 
-    .period {
-      font-size: 0.875rem;
-      color: $text-muted;
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
   }
-}
 
-.features-list {
-  list-style: none;
-  padding: 0;
-  margin: 24px 0;
-  text-align: left;
-  flex: 1;
-
-  li {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 16px;
-    color: $text-primary;
-  }
-
-  .feature-icon {
-    color: #10b981;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
-  }
-}
-
-.checkout-btn {
-  width: 100%;
-  height: 56px;
-  font-size: 1.125rem;
-  font-weight: 600;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  cursor: pointer;
-  background: $primary-gradient;
-  color: white;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-  transition: all 0.3s ease;
-  margin-top: auto;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
-  }
-
-  mat-spinner {
-    color: white;
-  }
-}
-
-.trust-notice {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: $text-muted;
-  font-size: 0.875rem;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: #667eea;
-  }
-}
-
-/* Mobile Responsive */
-@media (max-width: 600px) {
-  .upgrade-wrapper {
-    // padding: 16px 12px;
-  }
-
-  .upgrade-card {
-    padding: 32px 20px;
-    max-width: none;
-    max-height: 85vh;
-  }
-
-  .logo-text {
-    font-size: 1.5rem;
-  }
-
-  .header h1 {
-    font-size: 1.75rem;
-  }
-
-  .header p {
-    font-size: 1rem;
-  }
-
-  .plan-header {
-    flex-direction: row;
-    gap: 78px;
+  .header {
     text-align: center;
+    margin-bottom: $spacing-xl;
+
+    h1 {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 800;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 $spacing-sm 0;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      font-size: 1.125rem;
+      color: $text-secondary;
+      margin: 0;
+      line-height: 1.5;
+    }
   }
 
   .plan-card {
-    padding: 24px 16px;
+    background: $hover-bg;
+    border-radius: $radius-lg;
+    border: 1px solid $border-color;
+    overflow: hidden;
+    margin-bottom: $spacing-xl;
+
+    .plan-header {
+      padding: $spacing-xl;
+      text-align: center;
+
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0 0 $spacing-md 0;
+      }
+
+      .price {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-xs;
+
+        .amount {
+          font-size: 2.5rem;
+          font-weight: 800;
+          background: $primary-gradient;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .period {
+          font-size: 0.875rem;
+          color: $text-secondary;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          font-weight: 600;
+        }
+      }
+    }
+
+    mat-divider {
+      margin: 0 $spacing-xl;
+    }
+
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .feature-item {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        padding: $spacing-md $spacing-xl;
+
+        .feature-icon-wrapper {
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: $success-gradient;
+          border-radius: 50%;
+          flex-shrink: 0;
+
+          .feature-icon {
+            color: $text-inverse;
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+
+        span {
+          flex: 1;
+          color: $text-primary;
+          font-size: 1rem;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background: $primary-gradient !important;
+      color: $text-inverse !important;
+      padding: $spacing-md $spacing-xl !important;
+      border-radius: 50px !important;
+      font-weight: 600 !important;
+      font-size: 1rem !important;
+      box-shadow: $shadow-md !important;
+      transition: all 0.3s ease !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-xs;
+      margin: $spacing-xl;
+
+      mat-icon {
+        margin-right: $spacing-xs;
+      }
+
+      &:hover:not([disabled]) {
+        box-shadow: $shadow-lg !important;
+        transform: translateY(-2px);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
   }
 
-  .features-list li {
-    font-size: 0.95rem;
-  }
+  .trust-notice {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    background: linear-gradient(
+      var(--success-angle),
+      rgba(var(--success-rgb), 0.05) 0%,
+      rgba(var(--success-end), 0.05) 100%
+    );
+    border-radius: $radius-md;
+    border: 1px solid rgba(var(--success-rgb), 0.2);
 
-  .checkout-btn {
-    height: 52px;
-    font-size: 1rem;
+    .trust-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $success-gradient;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: $shadow-sm;
+
+      mat-icon {
+        color: $text-inverse;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .trust-content {
+      flex: 1;
+
+      strong {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin-bottom: 4px;
+      }
+
+      span {
+        font-size: 0.875rem;
+        color: $text-secondary;
+        line-height: 1.5;
+      }
+    }
   }
 }
 
-/* Extra small */
-@media (max-width: 375px) {
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+// Additional responsive adjustments for better centering
+@media (max-width: 768px) {
+  .upgrade-wrapper {
+    padding: $spacing-lg $spacing-md;
+    min-height: 100vh;
+    height: auto;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+  }
+
   .upgrade-card {
-    padding: 24px 16px;
-  }
-
-  .logo-text {
-    font-size: 1.375rem;
-  }
-
-  .header h1 {
-    font-size: 1.5rem;
+    max-width: 95%;
+    padding: $spacing-lg;
+    margin-top: $spacing-xl;
+    margin-bottom: $spacing-xl;
   }
 }

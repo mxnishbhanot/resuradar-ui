@@ -1,36 +1,8 @@
-// Modern Color Palette
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-$success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-$card-bg: #ffffff;
-$text-primary: #1a202c;
-$text-secondary: #4a5568;
-$text-muted: #718096;
-$border-color: #e2e8f0;
-$hover-bg: #f7fafc;
-$accent-color: #667eea;
-$success-color: #48bb78;
+@use '../../../theme/variables' as *;
 
-// Spacing
-$spacing-xs: 8px;
-$spacing-sm: 12px;
-$spacing-md: 16px;
-$spacing-lg: 24px;
-$spacing-xl: 32px;
-$spacing-2xl: 48px;
-$spacing-3xl: 64px;
-
-// Border Radius
-$radius-sm: 8px;
-$radius-md: 12px;
-$radius-lg: 16px;
-$radius-xl: 24px;
-
-// Shadows
-$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
-$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
-$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+// ==============================
+// UPLOAD SECTION STYLES (now fully dynamic)
+// ==============================
 
 .upload-section {
   position: relative;
@@ -54,7 +26,12 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 50%, #f093fb15 100%);
+  background: linear-gradient(
+    var(--primary-angle),
+    rgba(var(--primary-start), 0.085) 0%,
+    rgba(var(--primary-end), 0.085) 50%,
+    rgba(var(--secondary-start), 0.085) 100%
+  );
   z-index: -1;
   animation: gradientShift 15s ease infinite;
 
@@ -65,7 +42,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%);
     animation: float 20s ease-in-out infinite;
   }
 }
@@ -92,7 +69,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     align-items: center;
     gap: $spacing-xs;
     background: $primary-gradient;
-    color: white;
+    color: $text-inverse;
     padding: $spacing-xs $spacing-md;
     border-radius: 50px;
     font-size: 0.875rem;
@@ -105,6 +82,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
       font-size: 18px;
       width: 18px;
       height: 18px;
+      color: $text-inverse;
     }
   }
 
@@ -150,19 +128,19 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
   background: $card-bg;
   border-radius: $radius-xl;
   box-shadow: $shadow-xl;
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  border: 1px solid $accent-overlay-10;
   overflow: hidden;
   animation: fadeInUp 0.6s ease-out 0.2s backwards;
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 25px 35px rgba(0, 0, 0, 0.12), 0 15px 15px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 25px 35px rgba(var(--shadow-rgb), 0.12), 0 15px 15px rgba(var(--shadow-rgb), 0.06);
     transform: translateY(-4px);
   }
 
   &.drag-over {
     border-color: $accent-color;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), $shadow-xl;
+    box-shadow: 0 0 0 4px $accent-overlay-10, $shadow-xl;
     transform: scale(1.02);
   }
 
@@ -183,7 +161,11 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(245, 87, 108, 0.02) 100%);
+  background: linear-gradient(
+    var(--primary-angle),
+    $accent-overlay-02 0%,
+    rgba(var(--secondary-end), 0.02) 100%
+  );
   position: relative;
   overflow: hidden;
 
@@ -198,13 +180,17 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.1), transparent);
     transition: left 0.5s ease;
   }
 
   &:hover:not(.disabled) {
     border-color: $accent-color;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(245, 87, 108, 0.05) 100%);
+    background: linear-gradient(
+      var(--primary-angle),
+      rgba(var(--accent-rgb), 0.05) 0%,
+      rgba(var(--secondary-end), 0.05) 100%
+    );
     transform: translateY(-2px);
 
     &::before {
@@ -224,7 +210,11 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
   &.has-file {
     border-style: solid;
     border-color: $success-color;
-    background: linear-gradient(135deg, rgba(72, 187, 120, 0.05) 0%, rgba(79, 172, 254, 0.05) 100%);
+    background: linear-gradient(
+      var(--success-angle),
+      rgba(var(--success-rgb), 0.05) 0%,
+      rgba(var(--success-end), 0.05) 100%
+    );
   }
 }
 
@@ -334,7 +324,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
 // Sign In Button
 .signin-btn {
   background: $primary-gradient !important;
-  color: white !important;
+  color: $text-inverse !important;
   padding: $spacing-md $spacing-xl !important;
   border-radius: 50px !important;
   font-weight: 600 !important;
@@ -345,6 +335,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
 
   mat-icon {
     margin-right: $spacing-xs;
+    color: $text-inverse;
   }
 
   &:hover {
@@ -375,8 +366,8 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     width: 80px;
     height: 80px;
     border: 4px solid transparent;
-    border-top: 4px solid #667eea;
-    border-right: 4px solid #764ba2;
+    border-top: 4px solid rgb(var(--primary-start));
+    border-right: 4px solid rgb(var(--primary-end));
     border-radius: 50%;
     animation: spin 1s linear infinite;
 
@@ -454,7 +445,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     font-size: 48px;
     width: 48px;
     height: 48px;
-    color: white;
+    color: $text-inverse;
 
     @media (max-width: 768px) {
       font-size: 36px;
@@ -504,7 +495,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     flex-shrink: 0;
 
     mat-icon {
-      color: white;
+      color: $text-inverse;
       font-size: 28px;
       width: 28px;
       height: 28px;
@@ -538,14 +529,14 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     transition: all 0.2s ease;
 
     &:hover {
-      color: #f56565;
-      background: rgba(245, 101, 101, 0.1);
+      color: $error-color;
+      background: rgba(var(--error-rgb), 0.1);
     }
   }
 }
 
 .reupload-btn {
-  background: white !important;
+  background: $card-bg !important;
   border: 2px solid $accent-color !important;
   color: $accent-color !important;
   padding: $spacing-sm $spacing-lg !important;
@@ -559,7 +550,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
 
   &:hover {
     background: $accent-color !important;
-    color: white !important;
+    color: $text-inverse !important;
     transform: translateY(-2px);
     box-shadow: $shadow-md;
   }
@@ -595,14 +586,22 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
   display: flex;
   gap: $spacing-md;
   padding: $spacing-lg;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(245, 87, 108, 0.03) 100%);
+  background: linear-gradient(
+    var(--primary-angle),
+    rgba(var(--accent-rgb), 0.03) 0%,
+    rgba(var(--secondary-end), 0.03) 100%
+  );
   border-radius: $radius-md;
   border: 1px solid transparent;
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: rgba(102, 126, 234, 0.2);
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(245, 87, 108, 0.08) 100%);
+    border-color: rgba(var(--accent-rgb), 0.2);
+    background: linear-gradient(
+      var(--primary-angle),
+      rgba(var(--accent-rgb), 0.08) 0%,
+      rgba(var(--secondary-end), 0.08) 100%
+    );
     transform: translateY(-4px);
     box-shadow: $shadow-md;
   }
@@ -619,7 +618,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     box-shadow: $shadow-sm;
 
     .feature-icon {
-      color: white;
+      color: $text-inverse;
       font-size: 24px;
       width: 24px;
       height: 24px;
@@ -653,9 +652,13 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
   gap: $spacing-md;
   margin-top: $spacing-xl;
   padding: $spacing-lg;
-  background: linear-gradient(135deg, rgba(72, 187, 120, 0.05) 0%, rgba(79, 172, 254, 0.05) 100%);
+  background: linear-gradient(
+    var(--success-angle),
+    rgba(var(--success-rgb), 0.05) 0%,
+    rgba(var(--success-end), 0.05) 100%
+  );
   border-radius: $radius-md;
-  border: 1px solid rgba(72, 187, 120, 0.2);
+  border: 1px solid rgba(var(--success-rgb), 0.2);
   animation: fadeInUp 0.6s ease-out 0.4s backwards;
 
   @media (max-width: 768px) {
@@ -675,7 +678,7 @@ $shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
     box-shadow: $shadow-sm;
 
     mat-icon {
-      color: white;
+      color: $text-inverse;
       font-size: 24px;
       width: 24px;
       height: 24px;
