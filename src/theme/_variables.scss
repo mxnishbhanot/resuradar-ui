@@ -1,0 +1,79 @@
+/* ---------------------------------------------------------
+   THEME VARIABLES — SCSS BRIDGE TO CSS CUSTOM PROPERTIES
+--------------------------------------------------------- */
+
+/* Gradient tokens (angle + rgb start/end) */
+$primary-angle: var(--primary-angle);
+$primary-start: var(--primary-start);
+$primary-end: var(--primary-end);
+
+$secondary-angle: var(--secondary-angle);
+$secondary-start: var(--secondary-start);
+$secondary-end: var(--secondary-end);
+
+$success-angle: var(--success-angle);
+$success-start: var(--success-start);
+$success-end: var(--success-end);
+
+/* Core color tokens */
+$accent-color: var(--accent-color);
+$accent-rgb: var(--accent-rgb);
+
+$accent-secondary: var(--accent-secondary);
+$accent-secondary-rgb: var(--accent-secondary-rgb);
+
+$bg-primary: var(--bg-primary);
+$bg-primary-rgb: var(--bg-primary-rgb);
+
+$bg-secondary: var(--bg-secondary);
+$bg-secondary-rgb: var(--bg-secondary-rgb);
+
+$bg-glass: var(--bg-glass);
+
+$text-primary: var(--text-primary);
+$text-primary-rgb: var(--text-primary-rgb);
+
+$text-secondary: var(--text-secondary);
+$text-secondary-rgb: var(--text-secondary-rgb);
+
+$text-muted: var(--text-muted);
+$text-muted-rgb: var(--text-muted-rgb);
+
+$text-inverse: var(--text-inverse);
+$text-inverse-rgb: var(--text-inverse-rgb);
+
+$border-color: var(--border-color);
+$border-color-rgb: var(--border-color-rgb);
+
+/* feedback colors */
+$error-color: var(--error-color);
+$error-rgb: var(--error-rgb);
+
+$success-color: var(--success-color);
+$success-rgb: var(--success-rgb);
+
+/* shadows */
+$shadow-sm: var(--shadow-sm);
+$shadow-md: var(--shadow-md);
+$shadow-lg: var(--shadow-lg);
+$shadow-xl: var(--shadow-xl);
+$shadow-rgb: var(--shadow-rgb);
+
+/* ---------------------------------------------------------
+   STATIC SCSS VARIABLES (NOT theme-dependent)
+--------------------------------------------------------- */
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-full: 50px;
+
+$mobile: 480px;
+$tablet: 768px;
+$desktop: 1024px;

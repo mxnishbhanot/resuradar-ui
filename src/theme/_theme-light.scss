@@ -1,0 +1,65 @@
+/* ---------------------------------------------------------
+   LIGHT THEME (applies to :root.light-theme and body.light-theme)
+--------------------------------------------------------- */
+
+:root.light-theme,
+body.light-theme {
+  /* GRADIENT ANGLES + RGB START/END */
+  --primary-angle: 135deg;
+  --primary-start: 102, 126, 234;   /* #667eea */
+  --primary-end:   118, 75, 162;    /* #764ba2 */
+
+  --secondary-angle: 135deg;
+  --secondary-start: 240, 147, 251; /* #f093fb */
+  --secondary-end:   245, 87, 108;  /* #f5576c */
+
+  --success-angle: 135deg;
+  --success-start: 79, 172, 254;    /* #4facfe */
+  --success-end:   0, 242, 254;     /* #00f2fe */
+
+  /* CORE COLORS (solid + rgb tokens) */
+  --accent-color: #667eea;
+  --accent-rgb: 102, 126, 234;
+
+  --accent-secondary: #764ba2;
+  --accent-secondary-rgb: 118, 75, 162;
+
+  --bg-primary: #ffffff;
+  --bg-primary-rgb: 255,255,255;
+
+  --bg-secondary: #f8fafc;
+  --bg-secondary-rgb: 248,250,252;
+
+  --bg-glass: rgba(255,255,255,0.85);
+
+  --text-primary: #1a202c;
+  --text-primary-rgb: 26,32,44;
+
+  --text-secondary: #4a5568;
+  --text-secondary-rgb: 74,85,104;
+
+  --text-muted: #718096;
+  --text-muted-rgb: 113,128,150;
+
+  --text-inverse: #ffffff;
+  --text-inverse-rgb: 255,255,255;
+
+  --border-color: #e2e8f0;
+  --border-color-rgb: 226,232,240;
+
+  /* feedback colors */
+  --error-color: #f5576c;
+  --error-rgb: 245,87,108;
+
+  --success-color: #4facfe;
+  --success-rgb: 79,172,254;
+
+  /* SHADOWS (strings kept as-is) */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04);
+
+  /* small helper */
+  --shadow-rgb: 0,0,0;
+}

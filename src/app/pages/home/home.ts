@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,20 +35,24 @@ import { filter } from 'rxjs';
   styleUrls: ['./home.scss']
 })
 export class Home {
-  userName = 'Sarah Johnson';
-  avatar = 'https://i.pravatar.cc/150?img=12';
+  userName = 'Guest User';
+  userEmail = '';
+  avatar = '';
   activeTab = 'upload';
   user: any;
 
   // Mobile nav state
   mobileNavOpen = false;
+  profileMenuOpen = false;
   isMobileView = false;
+  isIpadView = false;
 
   constructor(
     private router: Router,
     public googleAuth: GoogleAuthService,
     public dialog: MatDialog,
     private userService: UserService,
+    private renderer: Renderer2
   ) { }
 
   @HostListener('window:resize', [])
@@ -57,38 +61,102 @@ export class Home {
   }
 
   ngOnInit() {
+    // Initialize Google Auth
     setTimeout(() => {
       this.googleAuth.initialize('159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com');
     }, 500);
+
+    // Load user from storage
     this.googleAuth.loadUserFromStorage();
+
+    // Subscribe to user changes
     this.googleAuth.user$.subscribe((u) => {
-      this.userName = u ? u.name : 'Guest';
-      this.avatar = u ? u.picture : 'https://i.pravatar.cc/150?img=12';
       if (u) {
+        this.userName = u.name || 'Guest User';
+        this.userEmail = u.email || '';
+        this.avatar = u.picture || '';
         this.userService.fetchCurrentUser().subscribe();
+      } else {
+        this.userName = 'Guest User';
+        this.userEmail = '';
+        this.avatar = '';
       }
     });
+
+    // Subscribe to user service
     this.userService.user$.subscribe(user => {
       this.user = user;
     });
+
+    // Scroll to top on route change
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
       });
+
+    // Load active tab from localStorage
     this.activeTab = localStorage.getItem('activeTab') || 'upload';
+
+    // Check screen size
     this.checkScreenSize();
   }
 
+  ngOnDestroy() {
+    // Remove body class if component is destroyed with nav open
+    if (this.mobileNavOpen) {
+      this.renderer.removeClass(document.body, 'mobile-nav-open');
+    }
+
+    // Close profile menu if open
+    if (this.profileMenuOpen) {
+      this.profileMenuOpen = false;
+    }
+  }
+
   checkScreenSize() {
-    this.isMobileView = window.innerWidth <= 834;
-    if (!this.isMobileView) {
-      this.mobileNavOpen = false;
+    this.isMobileView = window.innerWidth <= 768;
+    this.isIpadView = window.innerWidth <= 820;
+
+    // Close mobile nav if screen becomes desktop
+    if (!this.isMobileView && this.mobileNavOpen) {
+      this.closeMobileNav();
+    }
+
+    // Close profile menu on mobile
+    if (this.isMobileView && this.profileMenuOpen) {
+      this.profileMenuOpen = false;
     }
   }
 
   toggleMobileNav() {
     this.mobileNavOpen = !this.mobileNavOpen;
+
+    // Close profile menu if mobile nav opens
+    if (this.mobileNavOpen && this.profileMenuOpen) {
+      this.profileMenuOpen = false;
+    }
+
+    // Prevent body scroll when mobile nav is open
+    if (this.mobileNavOpen) {
+      this.renderer.addClass(document.body, 'mobile-nav-open');
+    } else {
+      this.renderer.removeClass(document.body, 'mobile-nav-open');
+    }
+  }
+
+  closeMobileNav() {
+    this.mobileNavOpen = false;
+    this.renderer.removeClass(document.body, 'mobile-nav-open');
+  }
+
+  toggleProfileMenu() {
+    this.profileMenuOpen = !this.profileMenuOpen;
+
+    // Close mobile nav if profile menu opens
+    if (this.profileMenuOpen && this.mobileNavOpen) {
+      this.closeMobileNav();
+    }
   }
 
   navigate(path: string) {

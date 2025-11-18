@@ -1,9 +1,16 @@
 <div class="upload-section">
+  <!-- Animated Background -->
+  <div class="background-gradient"></div>
+
   <!-- Header -->
   <div class="upload-header">
-    <h1 class="upload-title">Optimize Your Resume with AI</h1>
+    <div class="header-badge">
+      <mat-icon>auto_awesome</mat-icon>
+      <span>AI-Powered Analysis</span>
+    </div>
+    <h1 class="upload-title">Transform Your Resume with AI</h1>
     <p class="upload-subtitle">
-      Get detailed feedback, score improvements, and professional suggestions to land your dream job
+      Get instant feedback, professional insights, and actionable recommendations to stand out from the crowd
     </p>
   </div>
 
@@ -31,35 +38,62 @@
 
           <!-- Initial State -->
           <div class="upload-initial" *ngIf="!fileName && !loading">
-            <div class="upload-icon">
-              <mat-icon>cloud_upload</mat-icon>
+            <div class="upload-icon-wrapper">
+              <div class="upload-icon-bg"></div>
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
             </div>
-            <h3 *ngIf="isLoggedIn">Upload Your Resume</h3>
-            <h3 *ngIf="!isLoggedIn">Sign In to Upload</h3>
-            <p *ngIf="isLoggedIn">Drag & drop your PDF file here or click to browse</p>
-            <p *ngIf="!isLoggedIn">Please sign in to analyze your resume with AI</p>
+            <h3 class="upload-state-title" *ngIf="isLoggedIn">Drop Your Resume Here</h3>
+            <h3 class="upload-state-title" *ngIf="!isLoggedIn">Ready to Get Started?</h3>
+            <p class="upload-state-desc" *ngIf="isLoggedIn">
+              Drag & drop your PDF file or <span class="highlight-text">click to browse</span>
+            </p>
+            <p class="upload-state-desc" *ngIf="!isLoggedIn">
+              Sign in to unlock AI-powered resume analysis
+            </p>
+
             <div class="file-requirements" *ngIf="isLoggedIn">
-              <mat-icon>info</mat-icon>
-              <span>Supports PDF files up to 5MB</span>
+              <div class="requirement-item">
+                <mat-icon>check_circle</mat-icon>
+                <span>PDF format</span>
+              </div>
+              <div class="requirement-item">
+                <mat-icon>check_circle</mat-icon>
+                <span>Max 5MB</span>
+              </div>
+              <div class="requirement-item">
+                <mat-icon>check_circle</mat-icon>
+                <span>Instant results</span>
+              </div>
             </div>
+
             <button
               *ngIf="!isLoggedIn"
               mat-flat-button
               class="signin-btn"
               (click)="openLogin($event)">
               <mat-icon>login</mat-icon>
-              Sign In with Google
+              <span>Sign In with Google</span>
             </button>
           </div>
 
           <!-- Loading State -->
           <div class="upload-loading" *ngIf="loading">
-            <h3>Analyzing Resume...</h3>
-            <p>Our AI is reviewing your resume for optimization opportunities</p>
+            <div class="loading-animation">
+              <div class="spinner"></div>
+              <div class="pulse-ring"></div>
+            </div>
+            <h3 class="upload-state-title">Analyzing Your Resume</h3>
+            <p class="upload-state-desc">Our AI is processing your document and generating insights...</p>
+            <div class="loading-progress">
+              <div class="progress-bar"></div>
+            </div>
           </div>
 
           <!-- File Selected State -->
           <div class="upload-complete" *ngIf="fileName && !loading">
+            <div class="success-animation">
+              <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="file-info">
               <div class="file-icon">
                 <mat-icon>description</mat-icon>
@@ -78,47 +112,55 @@
               </button>
             </div>
             <button
-              mat-stroked-button
+              mat-flat-button
               color="primary"
               class="reupload-btn"
               (click)="fileInput.click(); $event.stopPropagation()"
             >
-              <mat-icon>upload</mat-icon>
-              Upload Different File
+              <mat-icon>swap_horiz</mat-icon>
+              <span>Choose Different File</span>
             </button>
           </div>
         </div>
 
-        <!-- Features Grid (only when no file & logged in) -->
+        <!-- Features Grid -->
         <div class="features-section" *ngIf="!fileName && isLoggedIn">
-          <h4>What you'll get:</h4>
+          <h4 class="features-title">What You'll Receive</h4>
           <div class="features-grid">
             <div class="feature-item">
-              <mat-icon class="feature-icon">score</mat-icon>
-              <div>
-                <strong>Overall Score</strong>
-                <span>0–10 rating with detailed breakdown</span>
+              <div class="feature-icon-wrapper">
+                <mat-icon class="feature-icon">analytics</mat-icon>
+              </div>
+              <div class="feature-content">
+                <strong>Comprehensive Score</strong>
+                <span>Detailed 0-10 rating with category breakdown</span>
               </div>
             </div>
             <div class="feature-item">
-              <mat-icon class="feature-icon">insights</mat-icon>
-              <div>
-                <strong>AI Insights</strong>
-                <span>Strengths and improvement areas</span>
+              <div class="feature-icon-wrapper">
+                <mat-icon class="feature-icon">psychology</mat-icon>
+              </div>
+              <div class="feature-content">
+                <strong>AI-Powered Insights</strong>
+                <span>Identify strengths and growth opportunities</span>
               </div>
             </div>
             <div class="feature-item">
-              <mat-icon class="feature-icon">tips_and_updates</mat-icon>
-              <div>
-                <strong>Actionable Tips</strong>
-                <span>Specific suggestions to improve</span>
+              <div class="feature-icon-wrapper">
+                <mat-icon class="feature-icon">lightbulb</mat-icon>
+              </div>
+              <div class="feature-content">
+                <strong>Expert Recommendations</strong>
+                <span>Actionable tips for immediate improvement</span>
               </div>
             </div>
             <div class="feature-item">
-              <mat-icon class="feature-icon">key</mat-icon>
-              <div>
-                <strong>Keyword Optimization</strong>
-                <span>ATS-friendly keyword suggestions</span>
+              <div class="feature-icon-wrapper">
+                <mat-icon class="feature-icon">search</mat-icon>
+              </div>
+              <div class="feature-content">
+                <strong>ATS Optimization</strong>
+                <span>Keywords to beat applicant tracking systems</span>
               </div>
             </div>
           </div>
@@ -129,10 +171,12 @@
 
   <!-- Privacy Notice -->
   <div class="privacy-notice">
-    <mat-icon>lock</mat-icon>
-    <div class="privacy-text">
-      <strong>Your data is secure</strong>
-      <span>We use enterprise-grade encryption and never share your resume with third parties.</span>
+    <div class="privacy-icon">
+      <mat-icon>verified_user</mat-icon>
+    </div>
+    <div class="privacy-content">
+      <strong>Bank-Grade Security</strong>
+      <span>Your resume is encrypted end-to-end. We never share your data with third parties.</span>
     </div>
   </div>
 </div>

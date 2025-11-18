@@ -1,0 +1,64 @@
+/* ---------------------------------------------------------
+   DARK THEME (applies to :root.dark-theme and body.dark-theme)
+--------------------------------------------------------- */
+
+:root.dark-theme,
+body.dark-theme {
+  /* GRADIENT ANGLES + RGB START/END (darker bg, brighter accents) */
+  --primary-angle: 135deg;
+  --primary-start: 180, 140, 255;   /* brighter/lighter blue-purple */
+  --primary-end:   210, 120, 255;   /* slightly shifted purple */
+
+  --secondary-angle: 135deg;
+  --secondary-start: 255, 120, 160; /* lighter pink */
+  --secondary-end:   255, 80, 120;  /* lively pink/red */
+
+  --success-angle: 135deg;
+  --success-start: 80, 220, 255;    /* lighter cyan */
+  --success-end:   0, 255, 180;     /* mint-ish end */
+
+  /* CORE COLORS (solid + rgb tokens) */
+  --accent-color: #9b6bff;
+  --accent-rgb: 155,107,255;
+
+  --accent-secondary: #7b3cff;
+  --accent-secondary-rgb: 123,60,255;
+
+  --bg-primary: #0d0d15;
+  --bg-primary-rgb: 13,13,21;
+
+  --bg-secondary: #141420;
+  --bg-secondary-rgb: 20,20,32;
+
+  --bg-glass: rgba(20,20,30,0.5);
+
+  --text-primary: #e5e7ff;
+  --text-primary-rgb: 229,231,255;
+
+  --text-secondary: #a5a7c8;
+  --text-secondary-rgb: 165,167,200;
+
+  --text-muted: #6f7290;
+  --text-muted-rgb: 111,114,144;
+
+  --text-inverse: #ffffff;
+  --text-inverse-rgb: 255,255,255;
+
+  --border-color: rgba(255,255,255,0.08);
+  --border-color-rgb: 255,255,255;
+
+  /* feedback colors */
+  --error-color: #ff3d6e;
+  --error-rgb: 255,61,110;
+
+  --success-color: #21e1ff;
+  --success-rgb: 33,225,255;
+
+  /* SHADOWS tuned for dark */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.7);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.75);
+  --shadow-lg: 0 10px 20px rgba(0,0,0,0.8);
+  --shadow-xl: 0 20px 35px rgba(0,0,0,0.85), 0 0 15px rgba(130,80,255,0.2);
+
+  --shadow-rgb: 0,0,0;
+}
