@@ -9,7 +9,7 @@ import { Router, RouterOutlet, RouterModule, NavigationEnd } from '@angular/rout
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { UserService } from '../../core/services/user';
 import { ScAngularLoader } from 'sc-angular-loader';
 import { MatRippleModule } from '@angular/material/core';
@@ -167,16 +167,48 @@ export class Home {
     this.googleAuth.signIn();
   }
 
-  openUpgradeModal() {
-    this.dialog.open(UpgradePro, {
-      width: '100%',
-      maxWidth: '520px',
-      maxHeight: '90vh',
-      panelClass: 'upgrade-pro-dialog',
-      hasBackdrop: true,
-      disableClose: false,
-    });
-  }
+  // openUpgradeModal() {
+  //   this.dialog.open(UpgradePro, {
+  //     width: '100%',
+  //     maxWidth: '520px',
+  //     maxHeight: '90vh',
+  //     panelClass: 'upgrade-pro-dialog',
+  //     hasBackdrop: true,
+  //     disableClose: false,
+  //   });
+  // }
+openUpgradeModal(): void {
+  const dialogConfig: MatDialogConfig = {
+    width: '100%',
+    // Desktop: Fixed height, mobile: Full height
+    height: 'auto',
+    panelClass: 'upgrade-modal-container',
+    autoFocus: false,
+    restoreFocus: true,
+    disableClose: false, // Allow closing by clicking outside
+    hasBackdrop: true,
+    backdropClass: 'upgrade-modal-backdrop',
+    data: {
+      userName: 'John Doe',
+      userEmail: 'john@example.com'
+    },
+    // Smooth entrance animation
+    enterAnimationDuration: '300ms',
+    exitAnimationDuration: '250ms',
+
+    // Desktop-specific settings
+    maxWidth: window.innerWidth > 768 ? '500px' : '90vw',
+    maxHeight: window.innerWidth > 768 ? 'fit-content' : '90vh',
+  };
+
+  const dialogRef = this.dialog.open(UpgradePro, dialogConfig);
+
+  // Handle modal close
+  dialogRef.afterClosed().subscribe(result => {
+    console.log('Modal closed with result:', result);
+    // Handle any post-close logic
+  });
+}
 
   exteranlLink(type: string) {
     if (type === 'site') {

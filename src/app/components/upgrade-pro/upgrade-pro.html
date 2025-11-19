@@ -3,6 +3,16 @@
   <div class="background-gradient"></div>
 
   <div class="upgrade-card">
+    <!-- Close Button -->
+    <button
+      mat-icon-button
+      class="close-btn"
+      (click)="close()"
+      matTooltip="Close"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+
     <!-- Header Badge -->
     <div class="header-badge">
       <mat-icon>workspace_premium</mat-icon>
@@ -10,16 +20,16 @@
     </div>
 
     <!-- Logo -->
-    <div class="logo">
+    <!-- <div class="logo">
       <span class="logo-wrapper">
         <img class="logo-icon" src="resuradar.png" alt="ResuRadar Logo">
       </span>
       <span class="logo-text">ResuRadar</span>
-    </div>
+    </div> -->
 
     <!-- Header -->
     <div class="header">
-      <h1>Upgrade to Pro</h1>
+      <!-- <h1>Upgrade to Pro</h1> -->
       <p>Unlock lifetime access with a one-time payment</p>
     </div>
 
@@ -67,19 +77,20 @@
           <span>Priority support</span>
         </li>
       </ul>
-
-      <button
-        mat-flat-button
-        color="primary"
-        class="checkout-btn"
-        (click)="startCheckout()"
-        [disabled]="isLoading"
-      >
-        <mat-icon *ngIf="!isLoading">workspace_premium</mat-icon>
-        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-        <span>{{ isLoading ? 'Processing...' : 'Upgrade Now' }}</span>
-      </button>
     </mat-card>
+
+    <!-- Checkout Button -->
+    <button
+      mat-flat-button
+      color="primary"
+      class="checkout-btn"
+      (click)="startCheckout()"
+      [disabled]="isLoading"
+    >
+      <mat-icon *ngIf="!isLoading">workspace_premium</mat-icon>
+      <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      <span>{{ isLoading ? 'Processing...' : 'Upgrade Now' }}</span>
+    </button>
 
     <!-- Trust Notice -->
     <div class="trust-notice">
@@ -87,7 +98,7 @@
         <mat-icon>verified_user</mat-icon>
       </div>
       <div class="trust-content">
-        <strong>Secure Payment</strong>
+        <!-- <strong>Secure Payment</strong> -->
         <span>Payments secured by PhonePe • No recurring charges</span>
       </div>
     </div>

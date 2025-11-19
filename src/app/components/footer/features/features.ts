@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { UpgradePro } from '../../upgrade-pro/upgrade-pro';
 import { UserService } from '../../../core/services/user';
 
@@ -34,15 +34,35 @@ export class Features {
     return this.user?.isPremium === true;
   }
 
-  openUpgradeModal() {
+
+  openUpgradeModal(): void {
     if (!this.isPro) {
-      this.dialog.open(UpgradePro, {
+      const dialogConfig: MatDialogConfig = {
         width: '100%',
-        maxWidth: '520px',
+        maxWidth: '500px',
+        height: 'auto',
         maxHeight: '90vh',
-        panelClass: 'upgrade-pro-dialog',
+        panelClass: 'upgrade-modal-container',
+        autoFocus: false,
+        restoreFocus: true,
+        disableClose: false, // Allow closing by clicking outside
         hasBackdrop: true,
-        disableClose: false,
+        backdropClass: 'upgrade-modal-backdrop',
+        data: {
+          userName: 'John Doe',
+          userEmail: 'john@example.com'
+        },
+        // Smooth entrance animation
+        enterAnimationDuration: '300ms',
+        exitAnimationDuration: '250ms'
+      };
+
+      const dialogRef = this.dialog.open(UpgradePro, dialogConfig);
+
+      // Handle modal close
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('Modal closed with result:', result);
+        // Handle any post-close logic
       });
     }
   }
