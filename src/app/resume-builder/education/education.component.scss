@@ -1,288 +1,251 @@
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$card-bg: rgba(255, 255, 255, 0.95);
-$text-primary: #1a1f36;
-$text-secondary: #5d6b82;
-$text-muted: #8f9bb3;
+@use '../../../theme/variables' as *;
+/* =========================================
+   VARIABLES
+   ========================================= */
+$spacing-md: 16px;
+$radius-md: 12px;
+$primary-color: rgb(var(--primary-start));
 
-.rr-education {
-  padding: 20px 0;
+:host {
+  display: block;
 }
 
-.rr-section-header {
-  text-align: center;
-  margin-bottom: 32px;
-
-  .rr-section-title {
-    font-size: 2.25rem;
+/* =========================================
+   SECTION HEADER
+   ========================================= */
+.section-header {
+  padding: 0;
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: $spacing-md;
+  }
+  .header-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: $primary-color;
+  }
+  .section-title {
+    margin: 0;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin: 0 0 12px;
-    font-family: 'Inter', 'Roboto', sans-serif;
-    background: $primary-gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.2;
+    color: var(--text-primary);
   }
-
-  .rr-section-subtitle {
-    font-size: 1.125rem;
-    color: $text-secondary;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
+  .section-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
   }
 }
 
-// ————— Education List —————
-.rr-education__list {
+.section-divider {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 0 0 $spacing-md 0;
+}
+
+/* =========================================
+   EDUCATION LIST (mat-card)
+   ========================================= */
+.list-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  margin-bottom: 28px;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
 }
 
-.rr-education-card {
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  transition: box-shadow 0.3s ease;
+.education-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid $primary-color; /* Left accent border */
+  border-radius: $radius-md;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 
   &:hover {
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.15);
+    box-shadow: var(--shadow-md);
   }
 
-  ::ng-deep .mat-mdc-card-content {
-    padding: 20px;
+  mat-card-content {
+    padding: $spacing-md !important;
+  }
+
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-md;
+    margin-bottom: 8px;
+  }
+
+  &__school {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 15px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .degree-info {
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  &__years {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+
+    .date-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: $primary-color;
+    }
+  }
+
+  &__description {
+    margin: 8px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+  }
+
+  &__actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+
+    .delete-btn {
+        color: var(--error-color);
+    }
   }
 }
 
-.rr-education-card__header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
+/* =========================================
+   EDITOR FORM & ACTIONS
+   ========================================= */
+.editor-form {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    margin-bottom: $spacing-md;
 }
 
-.rr-education-card__info {
-  flex: 1;
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+
+  .span-full {
+    grid-column: 1 / -1;
+  }
 }
 
-.rr-education-card__school {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: $text-primary;
-  margin: 0 0 6px;
-}
-
-.rr-education-card__degree {
-  font-size: 1rem;
-  color: $text-secondary;
-  margin: 0 0 8px;
-}
-
-.rr-education-card__meta {
-  display: flex;
-  flex-wrap: wrap;
+.date-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto; /* Start Year | End Year | Checkbox */
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
+  gap: $spacing-md;
 
-.rr-badge {
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
-  font-size: 0.8125rem;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.rr-education-card__years {
-  font-size: 0.9375rem;
-  color: $text-muted;
-  font-style: italic;
-}
-
-.rr-education-card__description {
-  color: $text-secondary;
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  margin-top: 8px;
-}
-
-.rr-education-card__actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  button {
-    width: 40px;
-    height: 40px;
+  .current-checkbox {
+      margin-top: -15px; /* Adjust vertical alignment with form fields */
   }
 }
 
-// ————— Empty State —————
-.rr-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-  color: $text-muted;
-  margin: 0 auto 28px;
-
-  .rr-empty-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: rgba(102, 126, 234, 0.3);
-    margin-bottom: 16px;
-  }
-
-  h3 {
-    font-size: 1.25rem;
-    color: $text-primary;
-    margin: 0 0 8px;
-  }
-
-  p {
-    font-size: 1rem;
-    max-width: 400px;
-  }
-}
-
-// ————— Form —————
-.rr-education__form {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 28px;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  margin-bottom: 24px;
-
-  ::ng-deep .mat-mdc-form-field {
-    width: 100%;
-
-    .mat-mdc-text-field-wrapper {
-      border-radius: 12px;
-      background: rgba(248, 250, 252, 0.6);
-    }
-
-    .mat-mdc-form-field-subscript-wrapper {
-      margin-top: 6px;
-    }
-
-    mat-icon {
-      color: #667eea;
-    }
-  }
-}
-
-.rr-form-row {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 16px;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    gap: 16px;
-  }
-}
-
-.rr-checkbox {
-  margin: 12px 0 20px;
-  font-size: 0.9375rem;
-  color: $text-secondary;
-
-  ::ng-deep .mdc-checkbox {
-    margin-right: 12px;
-  }
-}
-
-.rr-form-actions {
+.form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
-  margin-top: 12px;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-  }
+  gap: $spacing-md;
+  margin-top: $spacing-md;
 
   button {
-    height: 44px;
-    font-weight: 600;
-    border-radius: 12px;
-    padding: 0 24px;
-
-    &.mat-mdc-stroked-button {
-      color: $text-primary;
-      border-color: rgba(102, 126, 234, 0.3);
-    }
-
-    &.mat-mdc-flat-button {
-      background: $primary-gradient;
-      color: white;
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
-      }
-
-      &:disabled {
-        opacity: 0.7;
-        transform: none;
-        box-shadow: none;
-      }
-    }
+      min-width: 120px;
   }
 }
 
-// ————— Add Button —————
-.rr-add-button {
-  display: block;
-  margin: 0 auto;
-  background: $primary-gradient;
-  color: white;
-  font-weight: 600;
-  border-radius: 12px;
-  padding: 0 28px;
+.add-button {
+  width: 100%;
   height: 48px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-  transition: all 0.3s ease;
+  font-size: 1rem;
+}
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+/* =========================================
+   EMPTY STATE
+   ========================================= */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  margin-bottom: $spacing-md;
+  border: 2px dashed var(--border-color);
+  border-radius: $radius-md;
+  background: var(--bg-secondary);
+
+  .empty-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
   }
 
-  mat-icon {
-    margin-right: 8px;
+  .empty-title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+  }
+
+  .empty-description {
+    margin: 5px 0 0;
+    color: var(--text-secondary);
   }
 }
 
-// ————— Responsive —————
-@media (max-width: 600px) {
-  .rr-section-header {
-    padding: 0 16px;
-  }
-
-  .rr-section-title {
-    font-size: 1.875rem;
-  }
-
-  .rr-section-subtitle {
-    font-size: 1rem;
-  }
-
-  .rr-education-card__header {
+/* =========================================
+   RESPONSIVENESS
+   ========================================= */
+@media (max-width: 768px) {
+  .education-card__content {
     flex-direction: column;
+    align-items: stretch;
   }
 
-  .rr-education-card__actions {
-    flex-direction: row;
+  .education-card__actions {
     justify-content: flex-end;
+    margin-top: 10px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .date-row {
+    grid-template-columns: 1fr;
+
+    .current-checkbox {
+        margin-top: 0;
+    }
+  }
+
+  .form-actions {
+      flex-direction: column-reverse;
+
+      button {
+          width: 100%;
+          margin: 0 !important;
+      }
   }
 }

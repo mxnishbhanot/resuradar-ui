@@ -32,10 +32,10 @@ export class ResumeHistory {
   private resumeService = inject(ResumeService);
 
   ngOnInit() {
-    this.resumeService.getResumeHistory().subscribe((result) => {
-      this.resumes = result.data || [];
-      this.currentPage = 1; // reset to first page on data load
-    });
+    // this.resumeService.getResumeHistory().subscribe((result) => {
+    //   this.resumes = result.data || [];
+    //   this.currentPage = 1; // reset to first page on data load
+    // });
   }
 
   get paginatedResumes(): ResumeItem[] {

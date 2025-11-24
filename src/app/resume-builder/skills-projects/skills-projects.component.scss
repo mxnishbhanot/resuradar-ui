@@ -1,352 +1,329 @@
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$card-bg: rgba(255, 255, 255, 0.95);
-$text-primary: #1a1f36;
-$text-secondary: #5d6b82;
-$text-muted: #8f9bb3;
+@use '../../../theme/variables' as *;
+/* =========================================
+   VARIABLES
+   ========================================= */
+$spacing-md: 16px;
+$radius-md: 12px;
+$primary-color: var(--primary-start);
 
-.rr-skills-projects {
-  padding: 20px 0;
+:host {
+  display: block;
 }
 
-.rr-section-header {
-  text-align: center;
-  margin-bottom: 32px;
-
-  .rr-section-title {
-    font-size: 2.25rem;
-    font-weight: 700;
-    margin: 0 0 12px;
-    font-family: 'Inter', 'Roboto', sans-serif;
-    background: $primary-gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.2;
-  }
-
-  .rr-section-subtitle {
-    font-size: 1.125rem;
-    color: $text-secondary;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
-}
-
-// ————— Tabs —————
-.rr-tabs {
-  ::ng-deep .mat-mdc-tab-group {
-    .mat-mdc-tab-labels {
-      justify-content: center;
-    }
-
-    .mat-mdc-tab {
-      font-weight: 600;
-      color: $text-secondary;
-      min-width: 160px;
-    }
-
-    .mat-mdc-tab.mdc-tab--active {
-      color: #667eea;
-    }
-
-    .mat-mdc-ink-bar {
-      background: $primary-gradient !important;
-      height: 3px;
-    }
-  }
-}
-
-.rr-tab-content {
-  padding: 28px 0 0;
-}
-
-// ————— Skills Grid —————
-.rr-skills-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.rr-skill-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(102, 126, 234, 0.08);
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-weight: 600;
-  color: $text-primary;
-  transition: background 0.2s;
-
-  &:hover {
-    background: rgba(102, 126, 234, 0.15);
-  }
-
-  &__name {
-    font-size: 14px;
-  }
-
-  &__level {
-    font-size: 12px;
-    color: $text-muted;
-    margin-left: 8px;
-  }
-
-  &__delete {
-    color: #ef4444;
-    width: 28px;
-    height: 28px;
-    margin: 0;
+/* =========================================
+   SECTION HEADER
+   ========================================= */
+.section-header {
+  padding: 0;
+  .header-content {
     display: flex;
     align-items: center;
+    gap: 12px;
+    margin-bottom: $spacing-md;
+  }
+  .header-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: $primary-color;
+  }
+  .section-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .section-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
   }
 }
 
-// ————— Projects List —————
-.rr-projects-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 28px;
+.section-divider {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 0 0 $spacing-md 0;
 }
 
-.rr-project-card {
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  transition: box-shadow 0.3s ease;
+/* =========================================
+   TABS
+   ========================================= */
+.theme-tabs {
+  margin-top: $spacing-md;
 
-  &:hover {
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.15);
-  }
-
-  ::ng-deep .mat-mdc-card-content {
-    padding: 20px;
-  }
-}
-
-.rr-project-card__header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.rr-project-card__info {
-  flex: 1;
-}
-
-.rr-project-card__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: $text-primary;
-  margin: 0 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.rr-project-link {
-  color: #667eea;
-  display: inline-flex;
-  line-height: 1;
-  text-decoration: none;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  &:hover mat-icon {
-    color: #764ba2;
-  }
-}
-
-.rr-project-card__description {
-  color: $text-secondary;
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-
-.rr-project-card__tech {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.rr-tech-badge {
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
-  font-size: 13px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.rr-project-card__actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  button {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-// ————— Empty State —————
-.rr-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-  color: $text-muted;
-  margin: 0 auto 28px;
-
-  .rr-empty-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: rgba(102, 126, 234, 0.3);
-    margin-bottom: 16px;
-  }
-
-  h3 {
-    font-size: 1.25rem;
-    color: $text-primary;
-    margin: 0 0 8px;
-  }
-
-  p {
-    font-size: 1rem;
-    max-width: 400px;
-  }
-}
-
-// ————— Forms —————
-.rr-form {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 28px;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  margin-bottom: 24px;
-
-  ::ng-deep .mat-mdc-form-field {
-    width: 100%;
-
-    .mat-mdc-text-field-wrapper,
-    .mat-mdc-select-trigger {
-      border-radius: 12px;
-      background: rgba(248, 250, 252, 0.6);
+  ::ng-deep {
+    /* Set tab background/border to match overall theme */
+    .mat-mdc-tab-group, .mat-mdc-tab-header, .mat-mdc-tab-body-wrapper {
+      background: transparent;
+      border-color: var(--border-color);
     }
 
-    mat-icon {
-      color: #667eea;
+    /* Active tab indicator color */
+    .mat-mdc-tab-header .mat-mdc-tab .mat-mdc-tab-indicator {
+      background-color: var(--accent-color);
     }
 
-    textarea {
-      resize: vertical;
-    }
-  }
-}
-
-.rr-form-field--full {
-  width: 100%;
-}
-
-.rr-form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-top: 24px;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-  }
-
-  button {
-    height: 44px;
-    font-weight: 600;
-    border-radius: 12px;
-    padding: 0 24px;
-
-    &.mat-mdc-stroked-button {
-      color: $text-primary;
-      border-color: rgba(102, 126, 234, 0.3);
-    }
-
-    &.mat-mdc-flat-button {
-      background: $primary-gradient;
-      color: white;
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+    /* Tab label text color */
+    .mat-mdc-tab-labels .mat-mdc-tab-label {
+      .mdc-tab__text-label {
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+      &.mdc-tab--active .mdc-tab__text-label {
+        color: var(--accent-color);
       }
     }
   }
 }
 
-// ————— Add Buttons —————
-.rr-add-button {
-  display: block;
-  margin: 0 auto;
-  background: $primary-gradient;
-  color: white;
-  font-weight: 600;
-  border-radius: 12px;
-  padding: 0 28px;
-  height: 48px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-  transition: all 0.3s ease;
+.tab-content {
+  padding-top: $spacing-md;
+}
+
+/* =========================================
+   SKILLS GRID (Chips)
+   ========================================= */
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: $spacing-md;
+}
+
+.skill-chip {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 4px 6px 4px 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+      box-shadow: var(--shadow-sm);
   }
 
-  mat-icon {
-    margin-right: 8px;
+  &__content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+  }
+
+  &__level {
+      background-color: rgba($primary-color, 0.1);
+      color: $primary-color;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+  }
+
+  &__delete {
+      width: 24px;
+      height: 24px;
+      margin-left: 4px;
+
+      mat-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+          color: var(--text-secondary);
+      }
+
+      &:hover {
+          color: var(--error-color);
+      }
   }
 }
 
-// ————— Responsive —————
-@media (max-width: 600px) {
-  .rr-section-header {
-    padding: 0 16px;
+/* =========================================
+   PROJECTS LIST (Cards)
+   ========================================= */
+.list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.project-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid $primary-color;
+  border-radius: $radius-md;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
   }
 
-  .rr-section-title {
-    font-size: 1.875rem;
+  mat-card-content {
+    padding: $spacing-md !important;
   }
 
-  .rr-section-subtitle {
-    font-size: 1rem;
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-md;
   }
 
-  ::ng-deep .mat-mdc-tab {
-    min-width: 120px;
-    font-size: 0.9375rem;
+  &__info {
+    flex-grow: 1;
   }
 
-  .rr-project-card__header {
+  &__title {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .project-link {
+    color: $primary-color;
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__description {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  &__tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tech-badge {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  &__actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+
+    .delete-btn {
+        color: var(--error-color);
+    }
+  }
+}
+
+/* =========================================
+   FORM LAYOUTS & ACTIONS
+   ========================================= */
+.editor-form {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    margin-bottom: $spacing-md;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+
+  .span-full {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+
+  button {
+      min-width: 120px;
+  }
+}
+
+.add-button {
+  width: 100%;
+  height: 48px;
+  font-size: 1rem;
+}
+
+/* =========================================
+   EMPTY STATE (Reused from other components)
+   ========================================= */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  margin-bottom: $spacing-md;
+  border: 2px dashed var(--border-color);
+  border-radius: $radius-md;
+  background: var(--bg-secondary);
+
+  .empty-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .empty-title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+  }
+
+  .empty-description {
+    margin: 5px 0 0;
+    color: var(--text-secondary);
+  }
+}
+
+/* =========================================
+   RESPONSIVENESS
+   ========================================= */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-card__content {
     flex-direction: column;
+    align-items: stretch;
   }
 
-  .rr-project-card__actions {
-    flex-direction: row;
+  .project-card__actions {
     justify-content: flex-end;
+    margin-top: 10px;
   }
 
-  .rr-form {
-    padding: 20px 16px;
+  .form-actions {
+      flex-direction: column-reverse;
+
+      button {
+          width: 100%;
+          margin: 0 !important;
+      }
   }
 }

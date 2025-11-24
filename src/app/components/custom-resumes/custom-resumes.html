@@ -1,108 +1,209 @@
-<!-- src/app/features/custom-resumes/custom-resumes.component.html -->
 <div class="custom-resumes-wrapper">
   <!-- Header Section -->
   <header class="page-header">
     <div class="header-content">
       <div class="header-text">
         <h1 class="page-title">My Resumes</h1>
-        <p class="page-subtitle">Create, manage, and customize your professional resumes</p>
+        <p class="page-subtitle">Manage all your resumes, ATS scores, and job matches in one place</p>
       </div>
       <button mat-raised-button color="primary" class="btn-create-new" (click)="createNew()">
-        <mat-icon>add_circle_outline</mat-icon>
-        <span>Create Resume</span>
+        <mat-icon>add</mat-icon>
+        <span>Create New Resume</span>
       </button>
     </div>
   </header>
 
   <!-- Loading State -->
   <div class="loading-container" *ngIf="isLoading">
-    <mat-spinner diameter="50"></mat-spinner>
+    <mat-spinner diameter="40"></mat-spinner>
     <p class="loading-text">Loading your resumes...</p>
   </div>
 
   <!-- Main Content -->
   <div class="resumes-content" *ngIf="!isLoading">
-    <!-- Stats Bar -->
-    <div class="stats-bar" *ngIf="resumes.length > 0">
-      <div class="stat-item">
+    <!-- Filter Tabs -->
+    <nav class="filter-tabs" role="tablist">
+      <button
+        role="tab"
+        class="filter-tab"
+        [attr.aria-selected]="activeFilter === 'all'"
+        [class.active]="activeFilter === 'all'"
+        (click)="setFilter('all')">
+        <mat-icon>view_module</mat-icon>
+        <span>All Resumes</span>
+        <span class="tab-badge">{{ getTotalCount() }}</span>
+      </button>
+      <button
+        role="tab"
+        class="filter-tab"
+        [attr.aria-selected]="activeFilter === 'builder'"
+        [class.active]="activeFilter === 'builder'"
+        (click)="setFilter('builder')">
+        <mat-icon>edit_document</mat-icon>
+        <span>Built Resumes</span>
+        <span class="tab-badge">{{ builderResumes.length }}</span>
+      </button>
+      <button
+        role="tab"
+        class="filter-tab"
+        [attr.aria-selected]="activeFilter === 'ats'"
+        [class.active]="activeFilter === 'ats'"
+        (click)="setFilter('ats')">
+        <mat-icon>analytics</mat-icon>
+        <span>ATS Checked</span>
+        <span class="tab-badge">{{ atsResumes.length }}</span>
+      </button>
+      <button
+        role="tab"
+        class="filter-tab"
+        [attr.aria-selected]="activeFilter === 'jd'"
+        [class.active]="activeFilter === 'jd'"
+        (click)="setFilter('jd')">
+        <mat-icon>work</mat-icon>
+        <span>JD Matched</span>
+        <span class="tab-badge">{{ jdResumes.length }}</span>
+      </button>
+    </nav>
+
+    <!-- Stats Overview -->
+    <div class="stats-overview" *ngIf="getTotalCount() > 0">
+      <div class="stat-card stat-builder">
         <mat-icon>description</mat-icon>
-        <span class="stat-label">Total Resumes</span>
-        <span class="stat-value">{{ resumes.length }}</span>
+        <div>
+          <span class="stat-value">{{ builderResumes.length }}</span>
+          <span class="stat-label">Built Resumes</span>
+        </div>
       </div>
-      <div class="stat-item">
+      <div class="stat-card stat-ats">
+        <mat-icon>speed</mat-icon>
+        <div>
+          <span class="stat-value">{{ atsResumes.length }}</span>
+          <span class="stat-label">ATS Analyzed</span>
+        </div>
+      </div>
+      <div class="stat-card stat-jd">
+        <mat-icon>flag</mat-icon>
+        <div>
+          <span class="stat-value">{{ jdResumes.length }}</span>
+          <span class="stat-label">Job Matched</span>
+        </div>
+      </div>
+      <div class="stat-card stat-draft">
         <mat-icon>edit_note</mat-icon>
-        <span class="stat-label">In Progress</span>
-        <span class="stat-value">{{ draftCount }}</span>
-      </div>
-      <div class="stat-item">
-        <mat-icon>check_circle</mat-icon>
-        <span class="stat-label">Completed</span>
-        <span class="stat-value">{{ completedCount }}</span>
+        <div>
+          <span class="stat-value">{{ draftCount }}</span>
+          <span class="stat-label">In Progress</span>
+        </div>
       </div>
     </div>
 
     <!-- Resume Grid -->
-    <div class="resumes-grid" *ngIf="resumes.length > 0">
+    <div class="resumes-grid" *ngIf="getFilteredResumes().length > 0">
       <!-- Create New Card -->
-      <article class="resume-card create-card" (click)="createNew()">
+      <article class="resume-card create-card" (click)="createNew()" role="button" tabindex="0">
         <div class="create-card-content">
           <div class="create-icon-wrapper">
-            <mat-icon class="create-icon">note_add</mat-icon>
+            <mat-icon class="create-icon">add</mat-icon>
           </div>
-          <h3 class="create-title">Start Fresh</h3>
-          <p class="create-description">Create a new professional resume from scratch</p>
-          <div class="create-action">
+          <h3 class="create-title">Create New Resume</h3>
+          <p class="create-description">Build a professional resume from scratch</p>
+          <div class="create-cta">
             <mat-icon>arrow_forward</mat-icon>
           </div>
         </div>
       </article>
 
-      <!-- Existing Resume Cards -->
+      <!-- Resume Cards -->
       <article
         *ngFor="let resume of paginatedResumes"
         class="resume-card"
-        (click)="editResume(resume)"
-        [attr.data-completion]="resume.completionPercentage">
+        [class.builder-card]="resume.type === 'builder'"
+        [class.ats-card]="resume.type === 'ats'"
+        [class.jd-card]="resume.type === 'jd'"
+        (click)="handleResumeClick(resume)"
+        role="button"
+        tabindex="0">
 
         <div class="card-header">
-          <div class="card-badges">
-            <span class="badge badge-draft" *ngIf="resume.isDraft">
-              <mat-icon>edit</mat-icon>
-              Draft
-            </span>
-            <span
-              class="badge badge-completion {{ getCompletionClass(resume.completionPercentage) }}">
-              {{ resume.completionPercentage }}%
-            </span>
-          </div>
+          <span class="type-badge" [ngClass]="'badge-' + resume.type">
+            <mat-icon>{{ getTypeIcon(resume.type) }}</mat-icon>
+            {{ getTypeLabel(resume.type) }}
+          </span>
+          <!-- <button
+            mat-icon-button
+            class="card-menu-btn"
+            aria-label="Resume options"
+            (click)="openMenu(resume, $event); $event.stopPropagation()">
+            <mat-icon>more_vert</mat-icon>
+          </button> -->
         </div>
 
         <div class="card-body">
-          <div class="resume-icon">
-            <mat-icon>description</mat-icon>
-          </div>
           <h3 class="resume-title">{{ resume.title }}</h3>
-          <p class="resume-snippet">
-            {{ resume.title.length > 60 ? (resume.title | slice:0:60) + '...' : resume.title }}
+
+          <div class="resume-metadata">
+            <div class="metadata-item" *ngIf="resume.type === 'builder' && resume.completionPercentage !== undefined">
+              <mat-icon>pie_chart</mat-icon>
+              <span>{{ resume.completionPercentage }}% Complete</span>
+            </div>
+
+            <div class="metadata-item score-item" *ngIf="resume.type === 'ats' && resume.atsScore !== undefined">
+              <mat-icon [ngClass]="getScoreClass(resume.atsScore)">
+                {{ resume.atsScore >= 80 ? 'check_circle' : resume.atsScore >= 60 ? 'warning' : 'error' }}
+              </mat-icon>
+              <span [ngClass]="getScoreClass(resume.atsScore)">
+                ATS Score: {{ resume.atsScore }}%
+              </span>
+            </div>
+
+            <div class="metadata-item score-item" *ngIf="resume.type === 'jd' && resume.matchScore !== undefined">
+              <mat-icon [ngClass]="getScoreClass(resume.matchScore)">
+                {{ resume.matchScore >= 80 ? 'check_circle' : resume.matchScore >= 60 ? 'warning' : 'error' }}
+              </mat-icon>
+              <span [ngClass]="getScoreClass(resume.matchScore)">
+                Match: {{ resume.matchScore }}%
+              </span>
+            </div>
+
+            <div class="metadata-item" *ngIf="resume.isDraft">
+              <mat-icon>edit</mat-icon>
+              <span>Draft</span>
+            </div>
+          </div>
+
+          <p class="resume-job-title" *ngIf="resume.type === 'jd' && resume.jobTitle">
+            <mat-icon>work_outline</mat-icon>
+            {{ resume.jobTitle }}
           </p>
         </div>
 
         <div class="card-footer">
           <div class="footer-info">
-            <mat-icon class="footer-icon">schedule</mat-icon>
-            <span class="footer-text">{{ formatDate(resume.updatedAt) }}</span>
+            <mat-icon>schedule</mat-icon>
+            <span>{{ formatDate(resume.updatedAt) }}</span>
           </div>
           <div class="card-actions">
-            <button mat-icon-button class="action-btn" (click)="editResume(resume); $event.stopPropagation()">
-              <mat-icon>edit</mat-icon>
+            <button
+              mat-icon-button
+              class="action-btn"
+              [attr.aria-label]="resume.type === 'builder' ? 'Edit Resume' : 'View Details'"
+              (click)="handleResumeClick(resume); $event.stopPropagation()">
+              <mat-icon>{{ resume.type === 'builder' ? 'edit' : 'visibility' }}</mat-icon>
             </button>
+            <!-- <button
+              mat-icon-button
+              class="action-btn download-btn"
+              aria-label="Download resume"
+              (click)="downloadResume(resume); $event.stopPropagation()">
+              <mat-icon>download</mat-icon>
+            </button> -->
           </div>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="progress-container">
+        <div class="progress-container" *ngIf="resume.type === 'builder' && resume.completionPercentage !== undefined">
           <div
-            class="progress-bar {{ getCompletionClass(resume.completionPercentage) }}"
+            class="progress-bar"
+            [ngClass]="getProgressClass(resume.completionPercentage)"
             [style.width.%]="resume.completionPercentage">
           </div>
         </div>
@@ -110,14 +211,14 @@
     </div>
 
     <!-- Pagination -->
-    <nav class="pagination-wrapper" *ngIf="totalPages > 1">
+    <nav class="pagination-wrapper" *ngIf="totalPages > 1" aria-label="Resume pagination">
       <button
-        mat-stroked-button
+        mat-button
         class="pagination-btn"
         [disabled]="currentPage === 1"
-        (click)="goToPage(currentPage - 1)">
+        (click)="goToPage(currentPage - 1)"
+        aria-label="Previous page">
         <mat-icon>chevron_left</mat-icon>
-        <span>Previous</span>
       </button>
 
       <div class="page-numbers">
@@ -125,36 +226,36 @@
           *ngFor="let page of getPageNumbers()"
           mat-button
           [class.active-page]="page === currentPage"
-          (click)="goToPage(page)"
-          class="page-number-btn">
-          {{ page }}
+          [class.ellipsis]="page === -1"
+          [disabled]="page === -1"
+          (click)="page !== -1 && goToPage(page)"
+          class="page-number-btn"
+          [attr.aria-label]="page === -1 ? 'More pages' : 'Go to page ' + page">
+          {{ page === -1 ? '...' : page }}
         </button>
       </div>
 
       <button
-        mat-stroked-button
+        mat-button
         class="pagination-btn"
         [disabled]="currentPage === totalPages"
-        (click)="goToPage(currentPage + 1)">
-        <span>Next</span>
+        (click)="goToPage(currentPage + 1)"
+        aria-label="Next page">
         <mat-icon>chevron_right</mat-icon>
       </button>
     </nav>
 
     <!-- Empty State -->
-    <div class="empty-state" *ngIf="resumes.length === 0">
+    <div class="empty-state" *ngIf="getFilteredResumes().length === 0">
       <div class="empty-state-content">
         <div class="empty-icon-wrapper">
-          <mat-icon class="empty-icon">folder_open</mat-icon>
+          <mat-icon class="empty-icon">{{ getEmptyStateIcon() }}</mat-icon>
         </div>
-        <h2 class="empty-title">No Resumes Yet</h2>
-        <p class="empty-description">
-          Get started by creating your first professional resume.
-          Build a standout resume in minutes with our easy-to-use builder.
-        </p>
-        <button mat-raised-button color="primary" class="btn-empty-action" (click)="createNew()">
-          <mat-icon>add_circle_outline</mat-icon>
-          Create Your First Resume
+        <h2 class="empty-title">{{ getEmptyStateTitle() }}</h2>
+        <p class="empty-description">{{ getEmptyStateDescription() }}</p>
+        <button mat-raised-button color="primary" class="btn-empty-action" (click)="getEmptyStateAction()">
+          <mat-icon>{{ getEmptyStateActionIcon() }}</mat-icon>
+          {{ getEmptyStateActionText() }}
         </button>
       </div>
     </div>

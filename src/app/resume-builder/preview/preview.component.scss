@@ -1,134 +1,211 @@
-// ATS-Friendly Professional Resume Preview Styles
-// Matches PDF output exactly for consistent experience
+@use '../../../theme/variables' as *;
 
-.rr-preview {
-  font-family: 'Arial', sans-serif;
-  font-size: 10pt;
-  line-height: 1.4;
-  color: #1a1a1a;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
+/* =========================================
+   BLACK & WHITE RESUME PREVIEW
+   Professional Print-Ready Design
+   ========================================= */
+
+:host {
+  display: block;
+}
+
+.resume-paper {
   background: #ffffff;
-
-  // Print-ready
-  @media print {
-    padding: 0;
-    max-width: 100%;
-  }
-}
-
-// Header Section
-.rr-header {
-  text-align: center;
-  padding-bottom: 12px;
-  margin-bottom: 14px;
-  border-bottom: 2px solid #2c3e50;
-}
-
-.rr-name {
-  font-size: 18pt;
-  font-weight: 700;
-  margin: 0 0 4px 0;
-  color: #1a1a1a;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.rr-headline {
-  font-size: 11pt;
-  font-weight: 500;
-  margin: 0 0 4px 0;
-  color: #2c3e50;
-  font-style: normal;
-}
-
-.rr-contact {
-  font-size: 9pt;
+  width: 210mm; /* A4 width */
+  min-height: 297mm; /* A4 height */
+  padding: 0;
   margin: 0;
-  color: #555555;
-  font-weight: 400;
-}
+  box-sizing: border-box;
+  position: relative;
 
-// Section Styling
-.rr-section {
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e0e0e0;
-
-  &:last-of-type {
-    border-bottom: none;
-    padding-bottom: 0;
+  /* Print optimization */
+  @media print {
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
   }
 }
 
-.rr-section-title {
-  font-size: 12pt;
-  font-weight: 700;
-  margin: 0 0 8px 0;
-  color: #2c3e50;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  border-bottom: 1.5px solid #2c3e50;
-  padding-bottom: 3px;
+/* =========================================
+   PAPER CONTENT WRAPPER
+   ========================================= */
+.paper-content {
+  padding: 20mm 18mm;
+  color: #000000;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+
+  @media print {
+    padding: 15mm 12mm;
+  }
 }
 
-// Item Styling (Experience, Education, Projects)
-.rr-item {
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f0f0f0;
+/* =========================================
+   HEADER SECTION
+   ========================================= */
+.resume-header {
+  margin-bottom: 24px;
+  text-align: center;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 20px;
+}
 
-  &--last {
-    border-bottom: none;
-    padding-bottom: 0;
+.full-name {
+  margin: 0 0 8px 0;
+  font-size: 28pt;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.headline {
+  margin: 0 0 12px 0;
+  font-size: 11pt;
+  font-weight: 600;
+  color: #333333;
+  letter-spacing: 0.3px;
+}
+
+.contact-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 9.5pt;
+  color: #000000;
+}
+
+.contact-item {
+  white-space: nowrap;
+}
+
+.separator {
+  color: #666666;
+  margin: 0 4px;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 9pt;
+  color: #333333;
+  font-style: italic;
+}
+
+.social-item {
+  white-space: nowrap;
+}
+
+/* =========================================
+   SECTION LAYOUT
+   ========================================= */
+.resume-section {
+  margin-bottom: 20px;
+  page-break-inside: avoid;
+
+  &:last-child {
     margin-bottom: 0;
   }
 }
 
-.rr-item-header {
-  margin-bottom: 2px;
+.section-title {
+  margin: 0 0 6px 0;
+  font-size: 12pt;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
-.rr-item-title {
+.section-divider {
+  height: 1.5px;
+  background-color: #000000;
+  margin-bottom: 14px;
+}
+
+/* =========================================
+   PROFESSIONAL SUMMARY
+   ========================================= */
+.summary-text {
+  margin: 0;
+  font-size: 10pt;
+  line-height: 1.6;
+  color: #000000;
+  text-align: justify;
+}
+
+/* =========================================
+   EXPERIENCE SECTION
+   ========================================= */
+.experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.experience-item {
+  page-break-inside: avoid;
+
+  &:not(.last-item) {
+    padding-bottom: 16px;
+    border-bottom: 1px solid #cccccc;
+  }
+}
+
+.exp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.exp-main {
+  flex: 1;
+}
+
+.job-title {
+  margin: 0 0 4px 0;
   font-size: 11pt;
   font-weight: 700;
-  margin: 0 0 2px 0;
-  color: #1a1a1a;
+  color: #000000;
+  line-height: 1.3;
 }
 
-.rr-item-company {
+.company-name {
+  margin: 0;
   font-size: 10pt;
   font-weight: 600;
-  margin: 0 0 2px 0;
-  color: #2c3e50;
-}
-
-.rr-date {
-  font-size: 9pt;
+  color: #333333;
   font-style: italic;
-  margin: 0 0 6px 0;
-  color: #666666;
 }
 
-.rr-degree {
-  font-size: 10pt;
-  margin: 0 0 2px 0;
-  color: #1a1a1a;
-  font-weight: 500;
+.date-range {
+  font-size: 9pt;
+  color: #000000;
+  white-space: nowrap;
+  font-weight: 600;
+  text-align: right;
+  min-width: 120px;
 }
 
-// Bullets
-.rr-bullets {
-  margin: 4px 0 0 18px;
+.bullet-list {
+  margin: 8px 0 0 20px;
   padding: 0;
   list-style-type: disc;
 
   li {
-    margin-bottom: 3px;
-    line-height: 1.4;
-    color: #333333;
-    font-size: 10pt;
+    margin-bottom: 6px;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: #000000;
 
     &:last-child {
       margin-bottom: 0;
@@ -136,106 +213,288 @@
   }
 }
 
-// Description Text
-.rr-description {
-  margin: 4px 0 0 0;
-  line-height: 1.4;
-  color: #333333;
-  font-size: 10pt;
+/* =========================================
+   EDUCATION SECTION
+   ========================================= */
+.education-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.rr-summary {
-  margin: 0;
-  line-height: 1.4;
-  color: #333333;
-  text-align: justify;
-  font-size: 10pt;
+.education-item {
+  page-break-inside: avoid;
+
+  &:not(.last-item) {
+    padding-bottom: 14px;
+    border-bottom: 1px solid #cccccc;
+  }
 }
 
-// Skills
-.rr-skills {
-  margin: 0;
-  line-height: 1.4;
-  color: #333333;
-  font-size: 10pt;
+.edu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 6px;
 }
 
-// Project Link
-.rr-link {
-  font-size: 9pt;
+.edu-main {
+  flex: 1;
+}
+
+.school-name {
   margin: 0 0 4px 0;
-  color: #2c3e50;
-  font-style: italic;
+  font-size: 11pt;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1.3;
 }
 
-.rr-tech {
+.degree-info {
+  margin: 0;
+  font-size: 10pt;
+  color: #333333;
+  font-weight: 500;
+}
+
+.edu-description {
+  margin: 6px 0 0 0;
+  font-size: 9.5pt;
+  line-height: 1.5;
+  color: #000000;
+}
+
+/* =========================================
+   SKILLS SECTION
+   ========================================= */
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 9.5pt;
+  line-height: 1.6;
+  color: #000000;
+}
+
+.skill-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.skill-separator {
+  color: #666666;
+  font-weight: 400;
+}
+
+/* =========================================
+   PROJECTS SECTION
+   ========================================= */
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.project-item {
+  page-break-inside: avoid;
+
+  &:not(.last-item) {
+    padding-bottom: 14px;
+    border-bottom: 1px solid #cccccc;
+  }
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.project-title {
+  margin: 0;
+  font-size: 11pt;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1.3;
+}
+
+.project-link {
   font-size: 9pt;
-  margin: 4px 0 0 0;
-  color: #555555;
+  color: #333333;
+  font-style: italic;
+  word-break: break-all;
+}
+
+.project-description {
+  margin: 0 0 8px 0;
+  font-size: 9.5pt;
+  line-height: 1.5;
+  color: #000000;
+}
+
+.project-tech {
+  margin: 0;
+  font-size: 9pt;
+  color: #000000;
 
   strong {
-    font-weight: 600;
-    color: #2c3e50;
+    font-weight: 700;
   }
 }
 
-// Empty State
-.rr-empty {
+/* =========================================
+   EMPTY STATE (Modal colors allowed here)
+   ========================================= */
+.empty-state-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 297mm;
+  padding: $spacing-xl;
   text-align: center;
-  padding: 60px 20px;
-  color: #999999;
+}
 
-  p {
-    margin: 0 0 12px 0;
-    font-size: 11pt;
+.empty-illustration {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: $spacing-xl;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
+  .circle-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: $primary-gradient;
+    border-radius: 50%;
+    opacity: 0.1;
   }
 
-  .rr-empty-hint {
-    font-size: 10pt;
-    color: #bbbbbb;
-    font-style: italic;
+  mat-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 72px;
+    width: 72px;
+    height: 72px;
+    color: var(--accent-color);
+    display: block;
+    margin: 24px auto;
   }
 }
 
-// Responsive adjustments
-@media (max-width: 768px) {
-  .rr-preview {
-    padding: 16px;
-    font-size: 9pt;
+.empty-title {
+  margin: 0 0 $spacing-md 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.empty-description {
+  margin: 0 0 $spacing-xl 0;
+  font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+.empty-steps {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  align-items: flex-start;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  background-color: var(--bg-secondary);
+  border-radius: $radius-md;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--accent-color);
   }
 
-  .rr-name {
-    font-size: 16pt;
-  }
-
-  .rr-section-title {
-    font-size: 11pt;
-  }
-
-  .rr-item-title {
-    font-size: 10pt;
+  &:hover {
+    background-color: rgba(var(--accent-color-rgb), 0.05);
+    border-color: var(--accent-color);
+    transform: translateX(4px);
   }
 }
 
-// Print optimizations
+/* =========================================
+   PRINT OPTIMIZATIONS
+   ========================================= */
 @media print {
-  .rr-preview {
-    font-size: 10pt;
+  .resume-paper {
+    width: 100%;
+    height: auto;
+    page-break-after: auto;
   }
 
-  .rr-section {
+  .resume-section {
     page-break-inside: avoid;
   }
 
-  .rr-item {
+  .experience-item,
+  .education-item,
+  .project-item {
     page-break-inside: avoid;
   }
 
-  .rr-header {
-    page-break-after: avoid;
+  .bullet-list li {
+    page-break-inside: avoid;
+  }
+
+  /* Hide empty state in print */
+  .empty-state-wrapper {
+    display: none;
+  }
+}
+
+/* =========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================= */
+@media (max-width: 768px) {
+  .resume-paper {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .paper-content {
+    padding: 16px;
+  }
+
+  .full-name {
+    font-size: 22pt;
+  }
+
+  .exp-header,
+  .edu-header {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .date-range {
+    text-align: left;
+    min-width: auto;
   }
 }

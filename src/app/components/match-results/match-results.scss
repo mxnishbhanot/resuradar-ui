@@ -187,12 +187,14 @@
             font-size: 2.5rem;
             font-weight: 800;
             color: $text-primary;
+            padding-top: 12px;
           }
 
           .score-out-of {
             font-size: 1rem;
             font-weight: 600;
             color: $text-secondary;
+            padding-top: 12px;
           }
         }
       }
@@ -666,7 +668,7 @@
     .card-content {
       .insight-list {
         .insight-item {
-          flex-direction: column;
+          // flex-direction: column;
           align-items: flex-start;
           gap: $spacing-xs;
 

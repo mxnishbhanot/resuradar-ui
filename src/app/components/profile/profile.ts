@@ -90,7 +90,7 @@ export class Profile implements OnInit {
   navigate() {
     // Implement navigation to resume history page
     // console.log('Navigating to resume history...');
-    this.router.navigate(['/history']);
+    this.router.navigate(['/custom-list']);
   }
 
   logout() {

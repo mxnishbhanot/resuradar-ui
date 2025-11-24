@@ -1,0 +1,177 @@
+<div class="skills-projects-container">
+
+  <div class="section-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">auto_fix_high</mat-icon>
+      <div class="header-text">
+        <h2 class="section-title">Skills & Projects</h2>
+        <p class="section-subtitle">Highlight your expertise and portfolio.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <mat-tab-group class="theme-tabs" animationDuration="300ms">
+
+    <mat-tab label="Skills">
+      <div class="tab-content">
+
+        <div class="skills-grid" *ngIf="skills.length > 0">
+          <div *ngFor="let skill of skills; let i = index" class="skill-chip">
+            <div class="skill-chip__content">
+              <span class="skill-chip__name">{{ skill.name }}</span>
+              <span class="skill-chip__level" *ngIf="skill.level">{{ skill.level }}</span>
+            </div>
+            <button mat-icon-button (click)="deleteSkill(i)" class="skill-chip__delete delete-btn">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="skills.length === 0 && !showSkillForm">
+          <mat-icon class="empty-icon">engineering</mat-icon>
+          <h3 class="empty-title">No skills added yet</h3>
+          <p class="empty-description">Add your technical and soft skills.</p>
+        </div>
+
+        <form [formGroup]="skillForm" class="editor-form" *ngIf="showSkillForm">
+          <div class="form-grid">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Skill Name</mat-label>
+              <input matInput formControlName="name" placeholder="TypeScript" />
+              <mat-icon matPrefix>stars</mat-icon>
+              <mat-error *ngIf="skillForm.get('name')?.hasError('required')">
+                Skill name is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Proficiency Level</mat-label>
+              <mat-select formControlName="level">
+                <mat-option value="Beginner">Beginner</mat-option>
+                <mat-option value="Intermediate">Intermediate</mat-option>
+                <mat-option value="Advanced">Advanced</mat-option>
+                <mat-option value="Expert">Expert</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-stroked-button type="button" (click)="cancelSkillForm()">
+              <mat-icon>close</mat-icon>
+              Cancel
+            </button>
+            <button mat-flat-button color="primary" (click)="saveSkill()"
+                    [disabled]="skillForm.invalid">
+              <mat-icon>add</mat-icon>
+              Add Skill
+            </button>
+          </div>
+        </form>
+
+        <button mat-flat-button color="primary" class="add-button"
+                *ngIf="!showSkillForm" (click)="showAddSkillForm()">
+          <mat-icon>add</mat-icon>
+          Add Skill
+        </button>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Projects">
+      <div class="tab-content">
+
+        <div class="list-wrapper" *ngIf="projects.length > 0">
+          <mat-card *ngFor="let project of projects; let i = index" class="project-card">
+            <mat-card-content>
+              <div class="project-card__content">
+                <div class="project-card__info">
+                  <h3 class="project-card__title">
+                    {{ project.title }}
+                    <a *ngIf="project.link" [href]="project.link" target="_blank"
+                       class="project-link" (click)="$event.stopPropagation()">
+                      <mat-icon>open_in_new</mat-icon>
+                    </a>
+                  </h3>
+                  <p class="project-card__description" *ngIf="project.description">
+                    {{ project.description }}
+                  </p>
+                  <div class="project-card__tech" *ngIf="project.tech && project.tech.length > 0">
+                    <span *ngFor="let tech of project.tech" class="tech-badge">
+                      {{ tech }}
+                    </span>
+                  </div>
+                </div>
+                <div class="project-card__actions">
+                  <button mat-icon-button (click)="editProject(i)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="deleteProject(i)" class="delete-btn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <div class="empty-state" *ngIf="projects.length === 0 && !showProjectForm">
+          <mat-icon class="empty-icon">folder_special</mat-icon>
+          <h3 class="empty-title">No projects added yet</h3>
+          <p class="empty-description">Showcase your portfolio and side projects.</p>
+        </div>
+
+        <form [formGroup]="projectForm" class="editor-form" *ngIf="showProjectForm">
+          <div class="form-grid">
+            <mat-form-field appearance="outline" class="form-field span-full">
+              <mat-label>Project Title</mat-label>
+              <input matInput formControlName="title" placeholder="E-commerce Platform" />
+              <mat-icon matPrefix>folder</mat-icon>
+              <mat-error *ngIf="projectForm.get('title')?.hasError('required')">
+                Project title is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field span-full">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" rows="3"
+                        placeholder="Built a full-stack e-commerce platform with real-time inventory management..."></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field span-full">
+              <mat-label>Technologies Used</mat-label>
+              <input matInput formControlName="tech"
+                     placeholder="React, Node.js, MongoDB (comma separated)" />
+              <mat-icon matPrefix>code</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field span-full">
+              <mat-label>Project Link</mat-label>
+              <input matInput formControlName="link" type="url"
+                     placeholder="https://github.com/username/project" />
+              <mat-icon matPrefix>link</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-stroked-button type="button" (click)="cancelProjectForm()">
+              <mat-icon>close</mat-icon>
+              Cancel
+            </button>
+            <button mat-flat-button color="primary" (click)="saveProject()"
+                    [disabled]="projectForm.invalid">
+              <mat-icon>{{ editingProjectIndex !== null ? 'save' : 'add' }}</mat-icon>
+              {{ editingProjectIndex !== null ? 'Update' : 'Add' }} Project
+            </button>
+          </div>
+        </form>
+
+        <button mat-flat-button color="primary" class="add-button"
+                *ngIf="!showProjectForm" (click)="showAddProjectForm()">
+          <mat-icon>add</mat-icon>
+          Add Project
+        </button>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

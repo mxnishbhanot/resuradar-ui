@@ -1,375 +1,327 @@
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$card-bg: rgba(255, 255, 255, 0.95);
-$text-primary: #1a1f36;
-$text-secondary: #5d6b82;
-$text-muted: #8f9bb3;
+@use '../../../theme/variables' as *;
+/* =========================================
+   VARIABLES
+   ========================================= */
+$spacing-md: 16px;
+$radius-md: 12px;
+$primary-color: rgb(var(--primary-start));
 
-.rr-experience {
-  padding: 20px 0;
+:host {
+  display: block;
 }
 
-.rr-section-header {
-  text-align: center;
-  margin-bottom: 32px;
 
-  .rr-section-title {
-    font-size: 2.25rem;
-    font-weight: 700;
-    margin: 0 0 12px;
-    font-family: 'Inter', 'Roboto', sans-serif;
-    background: $primary-gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.2;
-  }
-
-  .rr-section-subtitle {
-    font-size: 1.125rem;
-    color: $text-secondary;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
-}
-
-// ————— Experience List —————
-.rr-experience__list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 28px;
-}
-
-.rr-experience-card {
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  transition: box-shadow 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.15);
-  }
-
-  ::ng-deep .mat-mdc-card-content {
-    padding: 20px;
-  }
-}
-
-.rr-experience-card__header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.rr-experience-card__info {
-  flex: 1;
-}
-
-.rr-experience-card__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: $text-primary;
-  margin: 0 0 6px;
-}
-
-.rr-experience-card__company {
-  font-size: 1rem;
-  color: $text-secondary;
-  margin: 0 0 8px;
-}
-
-.rr-experience-card__meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: $text-muted;
-  font-size: 0.9375rem;
-  margin-bottom: 12px;
-
-  .rr-meta-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: #667eea;
-  }
-}
-
-.rr-experience-card__bullets {
-  padding-left: 20px;
-  margin: 0;
-  color: $text-secondary;
-
-  li {
-    margin-bottom: 6px;
-    line-height: 1.5;
-  }
-}
-
-.rr-experience-card__actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  button {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-// ————— Empty State —————
-.rr-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-  color: $text-muted;
-  margin: 0 auto 28px;
-
-  .rr-empty-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: rgba(102, 126, 234, 0.3);
-    margin-bottom: 16px;
-  }
-
-  h3 {
-    font-size: 1.25rem;
-    color: $text-primary;
-    margin: 0 0 8px;
-  }
-
-  p {
-    font-size: 1rem;
-    max-width: 400px;
-  }
-}
-
-// ————— Form —————
-.rr-experience__form {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 28px;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  margin-bottom: 24px;
-
-  ::ng-deep .mat-mdc-form-field {
-    width: 100%;
-
-    .mat-mdc-text-field-wrapper {
-      border-radius: 12px;
-      background: rgba(248, 250, 252, 0.6);
-    }
-
-    mat-icon {
-      color: #667eea;
-    }
-
-    textarea {
-      resize: vertical;
-    }
-  }
-}
-
-.rr-form-row {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 16px;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    gap: 16px;
-  }
-}
-
-.rr-checkbox {
-  margin: 12px 0 24px;
-  font-size: 0.9375rem;
-  color: $text-secondary;
-
-  ::ng-deep .mdc-checkbox {
-    margin-right: 12px;
-  }
-}
-
-// ————— Bullets Section —————
-.rr-bullets-section {
-  margin-top: 20px;
-}
-
-.rr-bullets-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    align-items: flex-start;
+/* =========================================
+   SECTION HEADER
+   ========================================= */
+.section-header {
+  padding: 0;
+  .header-content {
+    display: flex;
+    align-items: center;
     gap: 12px;
+    margin-bottom: $spacing-md;
   }
-}
-
-.rr-bullets-label {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: $text-primary;
-}
-
-.rr-ai-button {
-  height: 36px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 12px;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
-
-  &:hover {
-    background: rgba(102, 126, 234, 0.2);
+  .header-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: $primary-color;
   }
-
-  mat-spinner {
+  .section-title {
     margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .section-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
   }
 }
 
-.rr-bullets-list {
+.section-divider {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 0 0 $spacing-md 0;
+}
+
+/* =========================================
+   EXPERIENCE LIST (mat-card)
+   ========================================= */
+.list-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
 }
 
-.rr-bullet-item {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
+.experience-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid $primary-color; /* Left accent border */
+  border-radius: $radius-md;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 
-  .rr-bullet-field {
-    flex: 1;
-    min-width: 0;
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 
-    ::ng-deep textarea {
-      font-size: 14px;
-      padding: 12px;
-      line-height: 1.5;
+  mat-card-content {
+    padding: $spacing-md !important;
+  }
+
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-md;
+    margin-bottom: 8px;
+  }
+
+  &__title {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__company {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 4px;
+
+    .date-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: $primary-color;
     }
   }
 
-  .rr-bullet-remove {
-    margin-top: 8px;
-    color: #ef4444;
-    width: 36px;
-    height: 36px;
+  &__bullets {
+    padding-left: 20px;
+    margin: 10px 0 0;
+
+    li {
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: var(--text-primary);
+
+        &::marker {
+            color: $primary-color;
+        }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+
+    .delete-btn {
+        color: var(--error-color);
+    }
   }
 }
 
-.rr-add-bullet-button {
-  height: 40px;
-  font-size: 0.9375rem;
-  color: #667eea;
-  font-weight: 600;
-  border-radius: 12px;
-  width: fit-content;
+/* =========================================
+   EDITOR FORM & ACTIONS
+   ========================================= */
+.editor-form {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    margin-bottom: $spacing-md;
+}
 
-  &:hover {
-    background: rgba(102, 126, 234, 0.08);
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+}
+
+.date-row {
+  grid-column: 1 / -1; /* Full width row for dates and checkbox */
+  display: grid;
+  grid-template-columns: 1fr 1fr auto; /* Start | End | Checkbox */
+  align-items: center;
+  gap: $spacing-md;
+
+  .current-checkbox {
+      margin-top: -15px; /* Adjust vertical alignment with form fields */
   }
 }
 
-// ————— Form Actions —————
-.rr-form-actions {
+/* --- Bullet Section --- */
+.bullets-section {
+    grid-column: 1 / -1;
+    margin-top: $spacing-md;
+    padding-top: $spacing-md;
+    border-top: 1px dashed var(--border-color);
+}
+
+.bullets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.bullets-label {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.ai-button {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    mat-spinner {
+        margin-right: -4px;
+    }
+}
+
+.bullets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: $spacing-md;
+}
+
+.bullet-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+    .bullet-number {
+        padding-top: 10px; /* Align with textarea */
+        color: $primary-color;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .bullet-field {
+        flex-grow: 1;
+
+        /* Reduce padding inside textarea for bullet points */
+        ::ng-deep textarea.mat-mdc-input-element {
+            padding: 8px 16px !important;
+            min-height: 48px;
+        }
+    }
+
+    .bullet-remove {
+        color: var(--error-color);
+        margin-top: 4px; /* Align with textarea */
+        flex-shrink: 0;
+    }
+}
+
+.form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
-  margin-top: 24px;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-  }
+  gap: $spacing-md;
+  margin-top: $spacing-md;
 
   button {
-    height: 44px;
-    font-weight: 600;
-    border-radius: 12px;
-    padding: 0 24px;
-
-    &.mat-mdc-stroked-button {
-      color: $text-primary;
-      border-color: rgba(102, 126, 234, 0.3);
-    }
-
-    &.mat-mdc-flat-button {
-      background: $primary-gradient;
-      color: white;
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
-      }
-
-      &:disabled {
-        opacity: 0.7;
-        transform: none;
-        box-shadow: none;
-      }
-    }
+      min-width: 120px;
   }
 }
 
-// ————— Add Button —————
-.rr-add-button {
-  display: block;
-  margin: 0 auto;
-  background: $primary-gradient;
-  color: white;
-  font-weight: 600;
-  border-radius: 12px;
-  padding: 0 28px;
+.add-button {
+  width: 100%;
   height: 48px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-  transition: all 0.3s ease;
+  font-size: 1rem;
+}
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+/* =========================================
+   EMPTY STATE
+   ========================================= */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  margin-bottom: $spacing-md;
+  border: 2px dashed var(--border-color);
+  border-radius: $radius-md;
+  background: var(--bg-secondary);
+
+  .empty-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
   }
 
-  mat-icon {
-    margin-right: 8px;
+  .empty-title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+  }
+
+  .empty-description {
+    margin: 5px 0 0;
+    color: var(--text-secondary);
   }
 }
 
-// ————— Responsive —————
-@media (max-width: 600px) {
-  .rr-section-header {
-    padding: 0 16px;
-  }
-
-  .rr-section-title {
-    font-size: 1.875rem;
-  }
-
-  .rr-section-subtitle {
-    font-size: 1rem;
-  }
-
-  .rr-experience-card__header {
+/* =========================================
+   RESPONSIVENESS
+   ========================================= */
+@media (max-width: 768px) {
+  .experience-card__content {
     flex-direction: column;
+    align-items: stretch;
   }
 
-  .rr-experience-card__actions {
-    flex-direction: row;
+  .experience-card__actions {
     justify-content: flex-end;
+    margin-top: 10px;
   }
 
-  .rr-experience__form {
-    padding: 20px 16px;
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .date-row {
+    grid-template-columns: 1fr;
+
+    .current-checkbox {
+        margin-top: 0;
+    }
+  }
+
+  .form-actions {
+      flex-direction: column-reverse;
+
+      button {
+          width: 100%;
+          margin: 0 !important;
+      }
+  }
+
+  .bullets-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
   }
 }

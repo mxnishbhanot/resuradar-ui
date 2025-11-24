@@ -1,0 +1,166 @@
+<div class="summary-container">
+
+  <div class="section-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">description</mat-icon>
+      <div class="header-text">
+        <h2 class="section-title">Professional Summary</h2>
+        <p class="section-subtitle">Create a compelling overview of your experience.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <div class="summary-content-wrapper">
+
+    <mat-card class="summary-card" *ngIf="summary && !isEditing">
+      <mat-card-content>
+        <div class="summary-card__header">
+          <div class="summary-card__icon">
+            <mat-icon class="success-color">summarize</mat-icon>
+            <span class="summary-card__label">Current Summary</span>
+          </div>
+          <div class="summary-card__actions">
+            <button mat-icon-button (click)="editSummary()">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteSummary()" class="delete-btn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        <p class="summary-card__text">{{ summary }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="empty-state empty-state--compact" *ngIf="!summary && !isEditing">
+      <mat-icon class="empty-icon">summarize</mat-icon>
+      <h3 class="empty-title">No summary yet</h3>
+      <p class="empty-description">A strong professional summary can make your resume stand out.</p>
+      <div class="empty-state__actions">
+        <button mat-flat-button color="primary" (click)="startManualEdit()">
+          <mat-icon>edit</mat-icon>
+          Write Summary
+        </button>
+        <button mat-stroked-button color="primary" (click)="generateWithAI()"
+                [disabled]="isGenerating">
+          <mat-icon>auto_awesome</mat-icon>
+          Generate with AI
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="editor-form" *ngIf="isEditing">
+      <mat-form-field appearance="outline" class="form-field span-full">
+        <mat-label>Professional Summary</mat-label>
+        <textarea matInput formControlName="summary" rows="8"
+                  placeholder="Write a compelling summary that highlights your key strengths, experience, and career goals..."></textarea>
+        <mat-hint align="end">{{ form.get('summary')?.value?.length || 0 }} / 500 characters</mat-hint>
+      </mat-form-field>
+
+      <div class="summary-tips">
+        <h4 class="tips-title">
+          <mat-icon>lightbulb</mat-icon>
+          Writing Tips
+        </h4>
+        <ul class="tips-list">
+          <li>Start with your current role or strongest qualification.</li>
+          <li>Highlight 2-3 key achievements with quantifiable results.</li>
+          <li>Mention your career goals or what you're looking for.</li>
+          <li>Keep it concise (aim for 3-5 sentences).</li>
+        </ul>
+      </div>
+
+      <div class="form-actions form-actions--full">
+        <button mat-stroked-button type="button" (click)="cancelEdit()">
+          <mat-icon>close</mat-icon>
+          Cancel
+        </button>
+        <button mat-stroked-button color="primary" type="button"
+                (click)="generateWithAI()" [disabled]="isGenerating"
+                class="ai-button">
+          <mat-spinner *ngIf="isGenerating" diameter="16" class="spinner"></mat-spinner>
+          <mat-icon *ngIf="!isGenerating">auto_awesome</mat-icon>
+          {{ isGenerating ? 'Generating...' : 'Generate with AI' }}
+        </button>
+        <button mat-flat-button color="primary" (click)="saveSummary()">
+          <mat-icon>save</mat-icon>
+          Save Summary
+        </button>
+      </div>
+    </form>
+
+    <div class="review-dashboard" *ngIf="!isEditing">
+      <h3 class="review-title">Resume Review Dashboard</h3>
+
+      <div class="review-stats-grid">
+        <div class="stat-card stat-card--total">
+          <mat-icon class="stat-icon stat-icon--total">donut_large</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Sections Complete</span>
+            <span class="stat-value">{{ completedSections }} / 5</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <mat-icon class="stat-icon stat-icon--experience">work</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Experience Entries</span>
+            <span class="stat-value">{{ experienceCount }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <mat-icon class="stat-icon stat-icon--education">school</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Education Entries</span>
+            <span class="stat-value">{{ educationCount }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <mat-icon class="stat-icon stat-icon--skills">stars</mat-icon>
+          <div class="stat-content">
+            <span class="stat-label">Skills Listed</span>
+            <span class="stat-value">{{ skillsCount }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-checklist">
+        <h4 class="checklist-title">Completion Checklist</h4>
+        <div class="checklist-items">
+          <div class="checklist-item" [class.checklist-item--complete]="hasPersonalInfo">
+            <mat-icon>{{ hasPersonalInfo ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>Personal info (Name, Email)</span>
+          </div>
+          <div class="checklist-item" [class.checklist-item--complete]="hasSummary">
+            <mat-icon>{{ hasSummary ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>Professional summary added</span>
+          </div>
+          <div class="checklist-item" [class.checklist-item--complete]="hasExperience">
+            <mat-icon>{{ hasExperience ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>At least one work experience</span>
+          </div>
+          <div class="checklist-item" [class.checklist-item--complete]="hasEducation">
+            <mat-icon>{{ hasEducation ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>Education background added</span>
+          </div>
+          <div class="checklist-item" [class.checklist-item--complete]="hasSkills">
+            <mat-icon>{{ hasSkills ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>Skills listed (at least 3)</span>
+          </div>
+        </div>
+
+        <div class="completion-bar-container">
+          <div class="completion-bar"
+               [style.width.%]="completionPercentage"></div>
+        </div>
+        <p class="completion-text">
+          Progress: **{{ completionPercentage }}% Complete**
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

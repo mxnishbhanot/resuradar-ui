@@ -276,6 +276,7 @@
   color: $text-primary;
   margin: 0;
   letter-spacing: -0.01em;
+  line-height: 1em;
 }
 
 .scan-state-desc {
@@ -474,10 +475,9 @@
   padding: $spacing-md $spacing-lg;
   background: $hover-bg;
   border-radius: $radius-md;
-  width: 100%;
-  max-width: 400px;
   border: 1px solid $border-color;
   transition: all 0.3s ease;
+  width: -webkit-fill-available;
 
   &:hover {
     border-color: $accent-color;
@@ -580,7 +580,7 @@
     }
 
     mat-label {
-      color: $text-secondary;
+      color: $text-inverse;
       font-weight: 500;
     }
 
@@ -591,7 +591,7 @@
       padding: $spacing-sm 0;
       resize: none;
       background: transparent;
-      color: $text-primary;
+      color: $text-inverse;
     }
 
     mat-hint {
@@ -701,6 +701,7 @@
 }
 
 @media (max-width: 640px) {
+
   .scan-section {
     min-height: auto;
     padding-top: $spacing-lg;
@@ -709,7 +710,7 @@
 
   .jd-section {
     .analyze-btn {
-      width: 100%;
+      // width: 100%;
     }
   }
 }

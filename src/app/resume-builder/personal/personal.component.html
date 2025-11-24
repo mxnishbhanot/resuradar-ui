@@ -1,0 +1,78 @@
+<div class="personal-container">
+
+  <div class="section-hint">
+    <mat-icon>info</mat-icon>
+    <p>This information will appear at the top of your resume.</p>
+  </div>
+
+  <form [formGroup]="form" class="personal-form">
+
+    <div class="form-grid">
+
+      <mat-form-field appearance="outline">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName" placeholder="Ex. Jane" />
+        <mat-icon matPrefix>person_outline</mat-icon>
+        <mat-error *ngIf="form.get('firstName')?.hasError('required')">Required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="lastName" placeholder="Ex. Doe" />
+        <mat-icon matPrefix>person_outline</mat-icon>
+        <mat-error *ngIf="form.get('lastName')?.hasError('required')">Required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="span-full">
+        <mat-label>Professional Headline</mat-label>
+        <input matInput formControlName="headline" placeholder="Ex. Senior Full Stack Engineer" />
+        <mat-icon matPrefix>badge</mat-icon>
+        <mat-hint>A punchy one-line description of who you are.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email Address</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="jane@example.com" />
+        <mat-icon matPrefix>mail_outline</mat-icon>
+        <mat-error *ngIf="form.get('email')?.hasError('email')">Invalid email</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Phone Number</mat-label>
+        <input matInput formControlName="phone" type="tel" placeholder="+1 (555) 000-0000" />
+        <mat-icon matPrefix>phone_iphone</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="span-full">
+        <mat-label>Location</mat-label>
+        <input matInput formControlName="location" placeholder="City, Country" />
+        <mat-icon matPrefix>place</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>LinkedIn URL</mat-label>
+        <input matInput formControlName="linkedin" placeholder="linkedin.com/in/..." />
+        <mat-icon matPrefix>link</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>GitHub URL</mat-label>
+        <input matInput formControlName="github" placeholder="github.com/..." />
+        <mat-icon matPrefix>code</mat-icon>
+      </mat-form-field>
+
+    </div>
+
+    <div class="status-bar" [class.active]="isSaving || showSaved">
+      <div class="status-content" *ngIf="isSaving">
+        <mat-spinner diameter="16"></mat-spinner>
+        <span>Saving changes...</span>
+      </div>
+      <div class="status-content success" *ngIf="showSaved">
+        <mat-icon>check_circle</mat-icon>
+        <span>Saved</span>
+      </div>
+    </div>
+
+  </form>
+</div>

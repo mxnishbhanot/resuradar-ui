@@ -6,6 +6,19 @@
 @use 'theme/themes';
 @use '@angular/material' as mat;
 
+// ==============================
+// GLOBAL RESETS & BOX-SIZING
+// ==============================
+
+// Apply box-sizing to all elements
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 html {
   @include mat.theme((color: (primary: mat.$magenta-palette,
         tertiary: mat.$violet-palette,
@@ -14,6 +27,10 @@ html {
       density: 0,
     ));
   scroll-behavior: smooth;
+  box-sizing: border-box;
+  overflow-x: hidden; // Prevent horizontal scrolling
+  width: 100%;
+  height: 100%;
 }
 
 body {
@@ -31,32 +48,52 @@ body {
 
   // Reset the user agent margin.
   margin: 0;
-}
-
-/* You can add global styles to this file, and also import other style files */
-
-html,
-body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden; // Prevent horizontal scrolling on body
+  width: 100%;
+  min-height: 100vh;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+// ==============================
+// MAIN APP CONTAINER
+// ==============================
+
+#root,
+app-root,
+router-outlet + * {
+  display: block;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+// ==============================
+// MATERIAL ICONS
+// ==============================
 
 .mat-icon {
   overflow: visible !important;
 }
 
+// ==============================
+// SNACKBAR CUSTOMIZATION
+// ==============================
+
 .custom-snackbar-panel {
   padding: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
+  max-width: 100%;
+  box-sizing: border-box;
 
   .mat-mdc-snackbar-surface {
     padding-right: 0px !important;
     border-radius: 20px !important;
+    max-width: 100%;
+    box-sizing: border-box;
 
     .mdc-snackbar__label {
       padding: 0 !important;
@@ -64,13 +101,22 @@ body {
   }
 }
 
+// ==============================
+// RIPPLE EFFECTS
+// ==============================
+
 .mat-mdc-button-persistent-ripple,
 .mat-mdc-button-ripple {
   display: none !important;
 }
 
-// Modal container styling
+// ==============================
+// MODAL/DIALOG CONTAINER STYLING
+// ==============================
+
 .cdk-overlay-container {
+  box-sizing: border-box;
+
   .mat-mdc-dialog-container {
     padding: 0 !important;
     border-radius: 16px;
@@ -79,6 +125,8 @@ body {
       0 25px 50px -12px rgba(0, 0, 0, 0.25),
       0 0 0 1px rgba(0, 0, 0, 0.05);
     background: transparent;
+    box-sizing: border-box;
+    max-width: 100%;
 
     // Desktop: Fixed size, no scrolling
     @media (min-width: 769px) {
@@ -105,10 +153,14 @@ body {
     background: transparent;
     box-shadow: none;
     max-height: 100%;
+    box-sizing: border-box;
   }
 }
 
-// Backdrop styling
+// ==============================
+// BACKDROP STYLING
+// ==============================
+
 .cdk-overlay-backdrop {
   background-color: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
@@ -120,11 +172,16 @@ body {
   to { opacity: 1; }
 }
 
-// Overlay positioning
+// ==============================
+// OVERLAY POSITIONING
+// ==============================
+
 .cdk-overlay-pane {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  max-width: 100vw;
 
   // Desktop: Centered
   @media (min-width: 769px) {
@@ -137,17 +194,24 @@ body {
     align-items: flex-start;
     justify-content: center;
     height: 100vh;
+    width: 100vw;
   }
 }
 
-// Prevent body scroll when modal is open
+// ==============================
+// PREVENT BODY SCROLL WHEN MODAL IS OPEN
+// ==============================
+
 .cdk-global-scrollblock {
   position: fixed;
   width: 100%;
   overflow-y: hidden;
 }
 
-// Smooth animations
+// ==============================
+// SMOOTH ANIMATIONS
+// ==============================
+
 .cdk-overlay-container {
   .mat-mdc-dialog-container {
     animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -165,7 +229,10 @@ body {
   }
 }
 
-// Responsive breakpoints
+// ==============================
+// RESPONSIVE BREAKPOINTS
+// ==============================
+
 @media (max-width: 480px) {
   .cdk-overlay-pane {
     .mat-mdc-dialog-container {
@@ -195,4 +262,185 @@ body {
       height: auto !important;
     }
   }
+}
+
+// ==============================
+// MATERIAL FORM FIELDS FIX
+// ==============================
+
+.mat-mdc-form-field {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  .mat-mdc-text-field-wrapper {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mat-mdc-form-field-infix {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  textarea,
+  input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+// ==============================
+// MATERIAL CARDS FIX
+// ==============================
+
+.mat-mdc-card,
+mat-card {
+  max-width: 100%;
+  box-sizing: border-box;
+
+  .mat-mdc-card-content,
+  mat-card-content {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+// ==============================
+// IMAGE & MEDIA RESPONSIVENESS
+// ==============================
+
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// ==============================
+// PREVENT TEXT OVERFLOW
+// ==============================
+
+h1, h2, h3, h4, h5, h6, p, span, div {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+// ==============================
+// SCROLLBAR CUSTOMIZATION (Optional)
+// ==============================
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+}
+
+// ==============================
+// UTILITY CLASSES
+// ==============================
+
+.no-scroll {
+  overflow: hidden !important;
+}
+
+.full-width {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 0 12px;
+  }
+}
+
+/* We target the mat-form-field and map its internal MDC variables
+   to your global theme variables (defined in styles.scss).
+   This works automatically for Light AND Dark mode.
+*/
+.mat-mdc-form-field {
+
+  /* 1. TEXT COLORS */
+  --mdc-outlined-text-field-input-text-color: $text-inverse;
+  --mdc-outlined-text-field-label-text-color: $text-inverse;
+  --mdc-outlined-text-field-hover-label-text-color: $text-inverse;
+
+  /* 2. BORDER COLORS */
+  /* Default border */
+  --mdc-outlined-text-field-outline-color: var(--text-inverse);
+  /* Hover border */
+  --mdc-outlined-text-field-hover-outline-color: var(--text-inverse);
+
+  /* 3. FOCUS STATE (Your Accent Color) */
+  --mdc-outlined-text-field-focus-outline-color: var(--text-inverse);
+  --mdc-outlined-text-field-focus-label-text-color: var(--text-inverse);
+  --mdc-outlined-text-field-caret-color: var(--text-inverse);
+
+  /* 4. ERROR STATE */
+  --mdc-outlined-text-field-error-outline-color: var(--error-color);
+  --mdc-outlined-text-field-error-label-text-color: var(--error-color);
+  --mdc-outlined-text-field-error-caret-color: var(--error-color);
+
+  .mat-mdc-floating-label{
+     color: var(--text-inverse) !important;
+  }
+
+  ::placeholder {
+    color: var(--text-muted) !important;
+  }
+
+  /* 5. ICON COLORS */
+  .mat-mdc-form-field-icon-prefix {
+    color: var(--text-muted);
+    padding-right: 8px;
+  }
+
+  /* Change icon color when focused */
+  &.mat-focused .mat-mdc-form-field-icon-prefix {
+    color: var(--accent-color);
+  }
+
+  text-area{
+    color: var(--text-inverse) !important;
+  }
+  input{
+    color: var(--text-inverse) !important;
+  }
+}
+
+.mat-mdc-checkbox{
+  .mdc-label{
+    color: var(--text-inverse);
+    width: max-content;
+  }
+}
+
+.mat-stepper-horizontal{
+  background: none !important;
 }

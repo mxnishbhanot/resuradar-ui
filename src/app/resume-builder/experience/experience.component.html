@@ -1,0 +1,144 @@
+<div class="experience-container">
+
+  <div class="section-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">work</mat-icon>
+      <div class="header-text">
+        <h2 class="section-title">Work Experience</h2>
+        <p class="section-subtitle">Showcase your professional journey and key achievements.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <div class="list-wrapper" *ngIf="experiences.length > 0">
+    <mat-card *ngFor="let exp of experiences; let i = index" class="experience-card">
+      <mat-card-content>
+        <div class="experience-card__content">
+          <div class="experience-card__primary">
+            <h3 class="experience-card__title">{{ exp.title }}</h3>
+            <p class="experience-card__company">{{ exp.company }}</p>
+
+            <div class="experience-card__meta">
+              <mat-icon class="date-icon">calendar_today</mat-icon>
+              <span>{{ exp.startDate }} - {{ exp.isCurrent ? 'Present' : exp.endDate }}</span>
+            </div>
+          </div>
+
+          <div class="experience-card__actions">
+            <button mat-icon-button (click)="editExperience(i)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteExperience(i)" class="delete-btn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <ul class="experience-card__bullets" *ngIf="exp.bullets && exp.bullets.length > 0">
+          <li *ngFor="let bullet of exp.bullets">{{ bullet }}</li>
+        </ul>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="empty-state" *ngIf="experiences.length === 0 && !showForm">
+    <mat-icon class="empty-icon">work</mat-icon>
+    <h3 class="empty-title">Time to get to work!</h3>
+    <p class="empty-description">Add your professional work history and achievements.</p>
+  </div>
+
+  <form [formGroup]="form" class="editor-form" *ngIf="showForm">
+    <div class="form-grid">
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Job Title</mat-label>
+        <input matInput formControlName="title" placeholder="Senior Software Engineer" />
+        <mat-icon matPrefix>badge</mat-icon>
+        <mat-error *ngIf="form.get('title')?.hasError('required')">Job title is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Company</mat-label>
+        <input matInput formControlName="company" placeholder="Tech Corp Inc." />
+        <mat-icon matPrefix>business</mat-icon>
+      </mat-form-field>
+
+      <div class="date-row span-full">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Start Date</mat-label>
+          <input matInput formControlName="startDate" placeholder="Jan 2020" />
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>End Date</mat-label>
+          <input matInput formControlName="endDate" placeholder="Dec 2023"
+                 [disabled]="form.get('isCurrent')?.value" />
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+      </div>
+
+        <div class="date-row span-full">
+          <mat-checkbox formControlName="isCurrent" class="current-checkbox">
+          I currently work here
+        </mat-checkbox>
+        </div>
+
+    </div>
+
+    <div class="bullets-section">
+      <div class="bullets-header">
+        <label class="bullets-label">Key Achievements & Responsibilities</label>
+        <!-- <button mat-stroked-button type="button" (click)="generateBulletsWithAI()"
+                [disabled]="isGenerating || form.get('title')?.invalid"
+                class="ai-button">
+          <mat-icon *ngIf="!isGenerating">auto_awesome</mat-icon>
+          <mat-spinner *ngIf="isGenerating" diameter="16"></mat-spinner>
+          {{ isGenerating ? 'Generating...' : 'Generate with AI' }}
+        </button> -->
+      </div>
+
+      <div formArrayName="bullets" class="bullets-list">
+        <div *ngFor="let bullet of bullets.controls; let i = index"
+             class="bullet-item">
+          <span class="bullet-number">{{ i + 1 }}.</span>
+          <mat-form-field appearance="outline" class="bullet-field">
+            <textarea matInput [formControlName]="i" rows="2"
+                      placeholder="Start with an action verb (e.g., Developed, Managed, Achieved)..."></textarea>
+          </mat-form-field>
+          <button mat-icon-button type="button" (click)="removeBullet(i)"
+                  color="warn" class="bullet-remove">
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <button mat-stroked-button type="button" (click)="addBullet()"
+              class="add-bullet-button">
+        <mat-icon>add</mat-icon>
+        Add Bullet Point
+      </button>
+    </div>
+
+    <div class="form-actions">
+      <button mat-stroked-button type="button" (click)="cancelForm()">
+        <mat-icon>close</mat-icon>
+        Cancel
+      </button>
+      <button mat-flat-button color="primary" (click)="saveExperience()"
+              [disabled]="form.invalid">
+        <mat-icon>{{ editingIndex !== null ? 'save' : 'add' }}</mat-icon>
+        {{ editingIndex !== null ? 'Update' : 'Add' }} Experience
+      </button>
+    </div>
+  </form>
+
+  <button mat-flat-button color="primary" class="add-button"
+          *ngIf="!showForm" (click)="showAddForm()">
+    <mat-icon>add</mat-icon>
+    Add Experience
+  </button>
+</div>

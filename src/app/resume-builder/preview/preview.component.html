@@ -1,0 +1,153 @@
+    <div class="preview-wrapper" id="rr-resume-preview">
+      <!-- Header Section -->
+      <div class="resume-header">
+        <h1 class="resume-name">
+          {{ s.personal.firstName || 'Your Name' }}
+          {{ s.personal.lastName || '' }}
+        </h1>
+
+        <p class="resume-headline" *ngIf="s.personal.headline">
+          {{ s.personal.headline }}
+        </p>
+
+        <div class="resume-contact" *ngIf="hasContactInfo">
+          <span class="contact-item" *ngIf="s.personal.email">
+            <mat-icon>email</mat-icon>
+            {{ s.personal.email }}
+          </span>
+          <span class="contact-item" *ngIf="s.personal.phone">
+            <mat-icon>phone</mat-icon>
+            {{ s.personal.phone }}
+          </span>
+          <span class="contact-item" *ngIf="s.personal.location">
+            <mat-icon>location_on</mat-icon>
+            {{ s.personal.location }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Summary Section -->
+      <section class="resume-section" *ngIf="s.personal.summary">
+        <div class="section-header">
+          <mat-icon class="section-icon">person</mat-icon>
+          <h2 class="section-title">Professional Summary</h2>
+        </div>
+        <p class="section-text">{{ s.personal.summary }}</p>
+      </section>
+
+      <!-- Experience Section -->
+      <section class="resume-section" *ngIf="s.experiences?.length">
+        <div class="section-header">
+          <mat-icon class="section-icon">work</mat-icon>
+          <h2 class="section-title">Professional Experience</h2>
+        </div>
+        <div class="section-content">
+          <div *ngFor="let exp of s.experiences; let last = last"
+               class="content-item"
+               [class.content-item--last]="last">
+            <div class="item-header">
+              <div class="item-main">
+                <h3 class="item-title">{{ exp.title }}</h3>
+                <p class="item-subtitle" *ngIf="exp.company">{{ exp.company }}</p>
+              </div>
+              <p class="item-date" *ngIf="exp.startDate">
+                {{ exp.startDate }} - {{ exp.isCurrent ? 'Present' : exp.endDate }}
+              </p>
+            </div>
+            <ul class="item-list" *ngIf="exp.bullets?.length">
+              <li *ngFor="let b of exp.bullets">{{ b }}</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Education Section -->
+      <section class="resume-section" *ngIf="s.educations?.length">
+        <div class="section-header">
+          <mat-icon class="section-icon">school</mat-icon>
+          <h2 class="section-title">Education</h2>
+        </div>
+        <div class="section-content">
+          <div *ngFor="let edu of s.educations; let last = last"
+               class="content-item"
+               [class.content-item--last]="last">
+            <div class="item-header">
+              <div class="item-main">
+                <h3 class="item-title">{{ edu.school }}</h3>
+                <p class="item-subtitle" *ngIf="edu.degree || edu.field">
+                  {{ edu.degree }}{{ edu.field ? ' in ' + edu.field : '' }}
+                </p>
+              </div>
+              <p class="item-date" *ngIf="edu.startYear">
+                {{ edu.startYear }} - {{ edu.endYear || 'Present' }}
+              </p>
+            </div>
+            <p class="item-description" *ngIf="edu.description">{{ edu.description }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Skills Section -->
+      <section class="resume-section" *ngIf="s.skills?.length">
+        <div class="section-header">
+          <mat-icon class="section-icon">stars</mat-icon>
+          <h2 class="section-title">Skills</h2>
+        </div>
+        <div class="skills-grid">
+          <span class="skill-tag" *ngFor="let skill of s.skills">
+            {{ skill.name }}
+          </span>
+        </div>
+      </section>
+
+      <!-- Projects Section -->
+      <section class="resume-section" *ngIf="s.projects?.length">
+        <div class="section-header">
+          <mat-icon class="section-icon">folder</mat-icon>
+          <h2 class="section-title">Projects</h2>
+        </div>
+        <div class="section-content">
+          <div *ngFor="let proj of s.projects; let last = last"
+               class="content-item"
+               [class.content-item--last]="last">
+            <h3 class="item-title">{{ proj.title }}</h3>
+            <p class="item-link" *ngIf="proj.link">
+              <mat-icon>link</mat-icon>
+              {{ proj.link }}
+            </p>
+            <p class="item-description" *ngIf="proj.description">{{ proj.description }}</p>
+            <div class="project-tech" *ngIf="proj.tech?.length">
+              <span class="tech-label">Technologies:</span>
+              <div class="tech-tags">
+                <span class="tech-tag" *ngFor="let tech of proj.tech">{{ tech }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="isEmpty">
+        <div class="empty-icon-wrapper">
+          <mat-icon class="empty-icon">description</mat-icon>
+        </div>
+        <h3 class="empty-title">Your Professional Resume</h3>
+        <p class="empty-description">
+          Your beautifully formatted resume will appear here as you add information.
+        </p>
+        <div class="empty-steps">
+          <div class="empty-step">
+            <mat-icon>person</mat-icon>
+            <span>Add personal details</span>
+          </div>
+          <div class="empty-step">
+            <mat-icon>work</mat-icon>
+            <span>Include experience</span>
+          </div>
+          <div class="empty-step">
+            <mat-icon>school</mat-icon>
+            <span>List education</span>
+          </div>
+        </div>
+      </div>
+    </div>

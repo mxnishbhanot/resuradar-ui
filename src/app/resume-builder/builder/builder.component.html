@@ -1,0 +1,154 @@
+<div class="modern-builder">
+  <!-- Top Navigation -->
+  <nav class="top-navbar">
+    <div class="navbar-content">
+      <div class="brand-section">
+        <div class="brand-icon-wrapper">
+          <mat-icon class="brand-icon">description</mat-icon>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">ResuRadar</h1>
+          <span class="brand-subtitle">Professional CV Creator</span>
+        </div>
+      </div>
+
+      <div class="navbar-actions">
+        <button
+          mat-stroked-button
+          class="preview-btn"
+          (click)="togglePreview()"
+        >
+          <mat-icon>visibility</mat-icon>
+          <span>Preview</span>
+        </button>
+
+        <button
+          mat-flat-button
+          color="primary"
+          class="download-btn"
+          (click)="exportPDF()"
+          [disabled]="isExporting"
+        >
+          <mat-icon>{{ isExporting ? 'sync' : 'download' }}</mat-icon>
+          <span>{{ isExporting ? 'Generating...' : 'Download PDF' }}</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Secondary Navigation with Tabs -->
+  <div class="tab-navigation">
+    <div class="tab-nav-content">
+      <button
+        *ngFor="let tab of tabs; let i = index"
+        class="tab-item"
+        [class.active]="currentTab === i"
+        (click)="navigateToTab(i)"
+      >
+        <mat-icon class="tab-icon">{{ tab.icon }}</mat-icon>
+        <span class="tab-label">{{ tab.label }}</span>
+      </button>
+
+      <div class="tab-indicator" [style.transform]="'translateX(' + (currentTab * 100) + '%)'"></div>
+    </div>
+
+    <div class="progress-indicator">
+      <span class="progress-text">{{ completionPercentage }}% Complete</span>
+      <mat-progress-bar
+        mode="determinate"
+        [value]="completionPercentage"
+        class="compact-progress"
+      ></mat-progress-bar>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="content-area">
+    <div class="content-wrapper">
+      <mat-stepper
+        linear
+        #stepper
+        [selectedIndex]="currentTab"
+        (selectionChange)="onStepChange($event)"
+        class="hidden-stepper"
+      >
+        <!-- Personal Info Step -->
+        <mat-step>
+          <div class="form-section">
+            <rr-personal></rr-personal>
+          </div>
+        </mat-step>
+
+        <!-- Education Step -->
+        <mat-step>
+          <div class="form-section">
+            <rr-education></rr-education>
+          </div>
+        </mat-step>
+
+        <!-- Experience Step -->
+        <mat-step>
+          <div class="form-section">
+            <rr-experience></rr-experience>
+          </div>
+        </mat-step>
+
+        <!-- Skills & Projects Step -->
+        <mat-step>
+          <div class="form-section">
+            <rr-skills-projects></rr-skills-projects>
+          </div>
+        </mat-step>
+
+        <!-- Review Step -->
+        <mat-step>
+          <div class="form-section">
+            <rr-summary></rr-summary>
+          </div>
+        </mat-step>
+      </mat-stepper>
+
+      <!-- Navigation Buttons -->
+      <div class="navigation-footer">
+        <button
+          mat-stroked-button
+          class="nav-button"
+          (click)="previousStep()"
+          [disabled]="currentTab === 0"
+        >
+          <mat-icon>arrow_back</mat-icon>
+          <span>Back</span>
+        </button>
+
+        <button
+          mat-flat-button
+          color="primary"
+          class="nav-button"
+          (click)="nextStep()"
+          *ngIf="currentTab < tabs.length - 1"
+        >
+          <span>Next Step</span>
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Preview Modal Overlay -->
+  <div class="preview-overlay" *ngIf="showPreview" (click)="togglePreview()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+      <div class="preview-header">
+        <h2 class="preview-title">Resume Preview</h2>
+        <button mat-icon-button class="close-btn" (click)="togglePreview()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="preview-body">
+        <div class="preview-paper" id="rr-resume-preview">
+          <rr-preview></rr-preview>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

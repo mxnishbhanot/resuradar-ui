@@ -53,8 +53,8 @@ export class ResumeService {
     this.latestAnalysis = null;
   }
 
-  getResumeHistory(): Observable<any> {
+  getResumeHistory(type: 'jd'| 'ats'): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.get(`${environment.apiUrl}/resumes`, { headers });
+    return this.http.get(`${environment.apiUrl}/resumes/${type}`, { headers });
   }
 }
