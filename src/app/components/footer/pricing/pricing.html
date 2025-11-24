@@ -29,33 +29,26 @@
 
         <ul class="features-list">
           <li *ngFor="let f of plan.features">
-            <mat-icon class="feature-icon">check</mat-icon>
+            <div class="feature-icon-wrapper">
+              <mat-icon class="feature-icon">check</mat-icon>
+            </div>
             {{ f }}
           </li>
         </ul>
 
-        <!-- <button
-          *ngIf="!plan.comingSoon"
-          mat-raised-button
-          class="plan-cta"
-          [class.highlight-cta]="plan.highlight"
-          (click)="selectPlan(plan)"
-        >
-          {{ plan.type === 'free' ? 'Get Started' : 'Subscribe' }}
-        </button> -->
         <ng-container *ngIf="!plan.comingSoon">
-          <button *ngIf="plan.type === 'free'" mat-raised-button class="plan-cta" (click)="selectPlan(plan)">
+          <button *ngIf="plan.type === 'free'" mat-flat-button class="plan-cta" (click)="selectPlan(plan)">
             Get Started
           </button>
 
-          <button *ngIf="plan.type === 'pro' && !isPro" mat-raised-button class="plan-cta highlight-cta"
+          <button *ngIf="plan.type === 'pro' && !isPro" mat-flat-button class="plan-cta highlight-cta"
             (click)="selectPlan(plan)">
             Subscribe
           </button>
 
           <div *ngIf="plan.type === 'pro' && isPro" class="pro-status-badge">
             <mat-icon>check_circle</mat-icon>
-            <span>You’re a Pro Member!</span>
+            <span>You're a Pro Member!</span>
           </div>
         </ng-container>
 
@@ -68,7 +61,9 @@
 
     <!-- Legacy Note -->
     <div class="legacy-note">
-      <mat-icon>info</mat-icon>
+      <div class="note-icon">
+        <mat-icon>info</mat-icon>
+      </div>
       <p>Users who purchased lifetime access before Feb 2026 retain full Premium benefits.</p>
     </div>
   </div>

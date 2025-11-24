@@ -43,11 +43,11 @@
           <mat-icon>edit</mat-icon>
           Write Summary
         </button>
-        <button mat-stroked-button color="primary" (click)="generateWithAI()"
+        <!-- <button mat-stroked-button color="primary" (click)="generateWithAI()"
                 [disabled]="isGenerating">
           <mat-icon>auto_awesome</mat-icon>
           Generate with AI
-        </button>
+        </button> -->
       </div>
     </div>
 
@@ -77,13 +77,13 @@
           <mat-icon>close</mat-icon>
           Cancel
         </button>
-        <button mat-stroked-button color="primary" type="button"
+        <!-- <button mat-stroked-button color="primary" type="button"
                 (click)="generateWithAI()" [disabled]="isGenerating"
                 class="ai-button">
           <mat-spinner *ngIf="isGenerating" diameter="16" class="spinner"></mat-spinner>
           <mat-icon *ngIf="!isGenerating">auto_awesome</mat-icon>
           {{ isGenerating ? 'Generating...' : 'Generate with AI' }}
-        </button>
+        </button> -->
         <button mat-flat-button color="primary" (click)="saveSummary()">
           <mat-icon>save</mat-icon>
           Save Summary
@@ -153,13 +153,10 @@
           </div>
         </div>
 
-        <div class="completion-bar-container">
+        <!-- <div class="completion-bar-container">
           <div class="completion-bar"
                [style.width.%]="completionPercentage"></div>
-        </div>
-        <p class="completion-text">
-          Progress: **{{ completionPercentage }}% Complete**
-        </p>
+        </div> -->
       </div>
     </div>
   </div>

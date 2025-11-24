@@ -387,20 +387,20 @@ h1, h2, h3, h4, h5, h6, p, span, div {
 .mat-mdc-form-field {
 
   /* 1. TEXT COLORS */
-  --mdc-outlined-text-field-input-text-color: $text-inverse;
-  --mdc-outlined-text-field-label-text-color: $text-inverse;
-  --mdc-outlined-text-field-hover-label-text-color: $text-inverse;
+  --mdc-outlined-text-field-input-text-color: $text-theme-inverse;
+  --mdc-outlined-text-field-label-text-color: $text-theme-inverse;
+  --mdc-outlined-text-field-hover-label-text-color: $text-theme-inverse;
 
   /* 2. BORDER COLORS */
   /* Default border */
-  --mdc-outlined-text-field-outline-color: var(--text-inverse);
+  --mdc-outlined-text-field-outline-color: var(--text-theme-inverse);
   /* Hover border */
-  --mdc-outlined-text-field-hover-outline-color: var(--text-inverse);
+  --mdc-outlined-text-field-hover-outline-color: var(--text-theme-inverse);
 
   /* 3. FOCUS STATE (Your Accent Color) */
-  --mdc-outlined-text-field-focus-outline-color: var(--text-inverse);
-  --mdc-outlined-text-field-focus-label-text-color: var(--text-inverse);
-  --mdc-outlined-text-field-caret-color: var(--text-inverse);
+  --mdc-outlined-text-field-focus-outline-color: var(--text-theme-inverse);
+  --mdc-outlined-text-field-focus-label-text-color: var(--text-theme-inverse);
+  --mdc-outlined-text-field-caret-color: var(--text-theme-inverse);
 
   /* 4. ERROR STATE */
   --mdc-outlined-text-field-error-outline-color: var(--error-color);
@@ -408,7 +408,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   --mdc-outlined-text-field-error-caret-color: var(--error-color);
 
   .mat-mdc-floating-label{
-     color: var(--text-inverse) !important;
+     color: var(--text-theme-inverse) !important;
   }
 
   ::placeholder {
@@ -427,16 +427,16 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   }
 
   text-area{
-    color: var(--text-inverse) !important;
+    color: var(--text-theme-inverse) !important;
   }
   input{
-    color: var(--text-inverse) !important;
+    color: var(--text-theme-inverse) !important;
   }
 }
 
 .mat-mdc-checkbox{
   .mdc-label{
-    color: var(--text-inverse);
+    color: var(--text-theme-inverse);
     width: max-content;
   }
 }

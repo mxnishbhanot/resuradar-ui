@@ -19,7 +19,7 @@
       </p>
 
       <div class="hero-cta">
-        <button mat-raised-button class="cta-primary" routerLink="{{ ctaRoute }}">
+        <button mat-flat-button class="cta-primary" routerLink="{{ ctaRoute }}">
           <mat-icon>auto_awesome</mat-icon>
           {{ isPro ? 'Go to Dashboard' : 'Try ' + freeLimit + ' Free Analyses' }}
         </button>
@@ -92,7 +92,7 @@
         </ul>
 
         <ng-container *ngIf="!isPro">
-          <button mat-raised-button class="premium-cta" (click)="openUpgradeModal()">
+          <button mat-flat-button class="premium-cta" (click)="openUpgradeModal()">
             <mat-icon>rocket_launch</mat-icon>
             Upgrade Now — {{ premiumPrice }}
           </button>

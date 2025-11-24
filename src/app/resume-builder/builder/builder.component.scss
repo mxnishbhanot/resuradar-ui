@@ -245,6 +245,7 @@
 .content-area {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   background-color: var(--bg-primary);
 
   &::-webkit-scrollbar {

@@ -1,202 +1,226 @@
-// Design System from Home
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$card-bg: rgba(255, 255, 255, 0.95);
-$text-primary: #1a1f36;
-$text-secondary: #5d6b82;
-$text-muted: #8f9bb3;
+@use '../../../../theme/variables' as *;
 
-@keyframes float {
+// ==============================
+// TUTORIAL COMPONENT STYLES (unified theme)
+// ==============================
 
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-15px);
-  }
-}
-
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// Hero
 .tutorial-hero {
   position: relative;
-  padding: 80px 0 60px;
-  margin-bottom: 60px;
+  padding: $spacing-3xl 0;
+  background: $card-bg;
   overflow: hidden;
-}
 
-.hero-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      var(--primary-angle),
+      rgba(var(--primary-start), 0.085) 0%,
+      rgba(var(--primary-end), 0.085) 50%,
+      rgba(var(--secondary-start), 0.085) 100%
+    );
+    z-index: -2;
 
-.gradient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.4;
-  animation: float 20s ease-in-out infinite;
+    .gradient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.3;
 
-  &.orb-1 {
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, #667eea 0%, transparent 70%);
-    top: -100px;
-    left: -100px;
+      &.orb-1 {
+        width: 300px;
+        height: 300px;
+        background: $primary-gradient;
+        top: 20%;
+        left: 10%;
+      }
+
+      &.orb-2 {
+        width: 250px;
+        height: 250px;
+        background: $secondary-gradient;
+        bottom: 20%;
+        right: 10%;
+      }
+    }
+
+    .mesh-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+    }
   }
-
-  &.orb-2 {
-    width: 350px;
-    height: 350px;
-    background: radial-gradient(circle, #4facfe 0%, transparent 70%);
-    bottom: -80px;
-    right: -80px;
-    animation-delay: -10s;
-  }
-}
-
-.mesh-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    linear-gradient(rgba(102, 126, 234, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(102, 126, 234, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-  opacity: 0.5;
-}
-
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0 24px;
-  position: relative;
-  z-index: 1;
-}
-
-.hero-content {
-  text-align: center;
-  animation: slide-in 0.6s ease-out;
-}
-
-.hero-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: $text-primary;
-  margin-bottom: 16px;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  background: $primary-gradient;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1.2;
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  color: $text-secondary;
-  max-width: 700px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-// Content
-.tutorial-content {
-  margin-bottom: 80px;
 
   .container {
-    padding: 0px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+
+    @media (max-width: 768px) {
+      padding: 0 $spacing-md;
+    }
   }
-}
 
-.content-card {
-  background: $card-bg;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  animation: slide-in 0.7s ease-out;
-}
+  .hero-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
 
-.video-wrapper {
-  margin-bottom: 40px;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-  background: #000;
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 $spacing-lg 0;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
 
-  iframe {
-    width: 100%;
-    height: 0;
-    padding-bottom: 56.25%;
-    /* 16:9 aspect ratio */
-    display: block;
-    border: none;
-  }
-}
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: $text-secondary;
+      margin: 0;
+      line-height: 1.6;
 
-.steps-section h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: $text-primary;
-  margin: 0 0 24px;
-  font-family: 'Inter', 'Roboto', sans-serif;
-}
-
-.steps-list {
-  padding-left: 24px;
-  font-size: 1.125rem;
-  color: $text-secondary;
-  line-height: 2;
-
-  li {
-    margin-bottom: 16px;
-
-    strong {
-      color: $text-primary;
-      font-weight: 700;
+      @media (max-width: 768px) {
+        font-size: 1.125rem;
+      }
     }
   }
 }
 
-// Responsive
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 2rem;
-  }
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -30px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+}
 
-  .hero-subtitle {
-    font-size: 1.125rem;
+// Tutorial Content
+.tutorial-content {
+  padding: $spacing-3xl 0;
+  background: $bg-primary;
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+
+    @media (max-width: 768px) {
+      padding: 0 $spacing-md;
+    }
   }
 
   .content-card {
-    padding: 32px 24px;
-  }
+    background: $card-bg;
+    border-radius: $radius-xl;
+    box-shadow: $shadow-xl;
+    border: 1px solid $accent-overlay-10;
+    padding: $spacing-xl;
+    transition: all 0.3s ease;
 
-  .video-wrapper {
-    iframe {
-      padding-bottom: 60%;
+    &:hover {
+      box-shadow: 0 25px 35px rgba(var(--shadow-rgb), 0.12), 0 15px 15px rgba(var(--shadow-rgb), 0.06);
+      transform: translateY(-4px);
+    }
+
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      overflow: hidden;
+      border-radius: $radius-lg;
+      margin-bottom: $spacing-xl;
+
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    }
+
+    .steps-section {
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0 0 $spacing-lg 0;
+        padding-bottom: $spacing-sm;
+        border-bottom: 2px solid $accent-color;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+
+        @media (max-width: 768px) {
+          font-size: 1.25rem;
+        }
+      }
+
+      .steps-list {
+        list-style: none;
+        counter-reset: step-counter;
+        padding: 0;
+
+        li {
+          position: relative;
+          padding: $spacing-md $spacing-lg $spacing-md 50px;
+          margin-bottom: $spacing-md;
+          background: $hover-bg;
+          border-radius: $radius-md;
+          border-left: 4px solid $accent-color;
+          color: $text-primary;
+          font-size: 1rem;
+          line-height: 1.6;
+
+          &:before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: $spacing-md;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: $primary-gradient;
+            color: $text-inverse;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.875rem;
+          }
+
+          strong {
+            color: $text-primary;
+            font-weight: 600;
+            margin-left: 10px;
+          }
+
+          @media (max-width: 768px) {
+            padding: $spacing-sm $spacing-md $spacing-sm 40px;
+            font-size: 0.875rem;
+
+            &:before {
+              width: 28px;
+              height: 28px;
+              left: $spacing-sm;
+              font-size: 0.75rem;
+            }
+          }
+        }
+      }
     }
   }
 }

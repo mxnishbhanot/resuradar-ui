@@ -8,57 +8,71 @@
 :root.light-theme,
 body.light-theme {
   --primary-angle: 135deg;
-  --primary-start: 38, 132, 255;   /* Corporate blue */
-  --primary-end:   72, 106, 255;   /* Slightly deeper blue */
+  --primary-start: 38, 132, 255;
+  /* Corporate blue */
+  --primary-end: 72, 106, 255;
+  /* Slightly deeper blue */
 
   --secondary-angle: 135deg;
-  --secondary-start: 255, 142, 142; /* Soft coral */
-  --secondary-end:   255, 102, 102; /* Slightly stronger red */
+  --secondary-start: 255, 142, 142;
+  /* Soft coral */
+  --secondary-end: 255, 102, 102;
+  /* Slightly stronger red */
 
   --success-angle: 135deg;
-  --success-start: 72, 187, 120;    /* Modern green */
-  --success-end:   56, 178, 103;    /* Slightly darker green */
+  --success-start: 72, 187, 120;
+  /* Modern green */
+  --success-end: 56, 178, 103;
+  /* Slightly darker green */
 
   --accent-color: #4a90e2;
-  --accent-rgb: 74,144,226;
+  --accent-rgb: 74, 144, 226;
 
   --accent-secondary: #357ABD;
-  --accent-secondary-rgb: 53,122,189;
+  --accent-secondary-rgb: 53, 122, 189;
 
-  --bg-primary: #ffffff;            /* Clean white background */
-  --bg-primary-rgb: 255,255,255;
+  --bg-primary: #ffffff;
+  /* Clean white background */
+  --bg-primary-rgb: 255, 255, 255;
 
-  --bg-secondary: #f4f6f8;          /* Light surface */
-  --bg-secondary-rgb: 244,246,248;
+  --bg-secondary: #f4f6f8;
+  /* Light surface */
+  --bg-secondary-rgb: 244, 246, 248;
 
-  --bg-glass: rgba(255,255,255,0.85); /* Light overlay effect */
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  /* Light overlay effect */
 
-  --text-primary: #1a202c;          /* Main text */
-  --text-primary-rgb: 26,32,44;
+  --text-primary: #1a202c;
+  /* Main text */
+  --text-primary-rgb: 26, 32, 44;
 
-  --text-secondary: #4a5568;        /* Secondary text */
-  --text-secondary-rgb: 74,85,104;
+  --text-secondary: #4a5568;
+  /* Secondary text */
+  --text-secondary-rgb: 74, 85, 104;
 
-  --text-muted: #718096;            /* Muted text */
-  --text-muted-rgb: 113,128,150;
+  --text-muted: #718096;
+  /* Muted text */
+  --text-muted-rgb: 113, 128, 150;
 
-  --text-inverse: #000000;
-  --text-inverse-rgb: 0, 0, 0;
+  --text-inverse: #ffffff;
+  --text-inverse-rgb: 255, 255, 255;
+
+  --text-theme-inverse: #000000;
+  --text-theme-inverse-rgb: 0, 0, 0;
 
   --border-color: #e2e8f0;
-  --border-color-rgb: 226,232,240;
+  --border-color-rgb: 226, 232, 240;
 
   --error-color: #e53e3e;
-  --error-rgb: 229,62,62;
+  --error-rgb: 229, 62, 62;
 
   --success-color: #48bb78;
-  --success-rgb: 72,187,120;
+  --success-rgb: 72, 187, 120;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.12);
-  --shadow-xl: 0 20px 25px rgba(0,0,0,0.18);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.18);
 
-  --shadow-rgb: 0,0,0;
+  --shadow-rgb: 0, 0, 0;
 }
-

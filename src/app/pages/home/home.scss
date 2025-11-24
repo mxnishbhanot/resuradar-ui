@@ -683,7 +683,7 @@
       flex: 1;
       font-size: 0.9375rem;
       font-weight: 500;
-      color: var(--text-inverse);
+      color: var(--text-theme-inverse);
     }
 
     .menu-item-arrow {
@@ -881,7 +881,7 @@
   }
 
   .mobile-logout-btn{
-    color: var(--text-inverse);
+    color: var(--text-theme-inverse);
 
      background: rgba(var(--error-rgb), 0.08);
      border: 1px solid var(--border-color);
