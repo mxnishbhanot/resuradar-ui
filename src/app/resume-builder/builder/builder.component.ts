@@ -4,8 +4,8 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { PersonalComponent } from '../personal/personal.component';
 import { EducationComponent } from '../education/education.component';
@@ -13,7 +13,7 @@ import { ExperienceComponent } from '../experience/experience.component';
 import { SkillsProjectsComponent } from '../skills-projects/skills-projects.component';
 import { SummaryComponent } from '../summary/summary.component';
 import { PreviewComponent } from '../preview/preview.component';
-import html2pdf from 'html2pdf.js';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'rr-resume-builder',
@@ -31,7 +31,6 @@ import html2pdf from 'html2pdf.js';
     ExperienceComponent,
     SkillsProjectsComponent,
     SummaryComponent,
-    PreviewComponent,
   ],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
@@ -41,6 +40,7 @@ export class ResumeBuilderComponent implements OnInit {
   isExporting = false;
   completionPercentage = 0;
   currentTab = 0;
+  resumeId = null;
 
   tabs = [
     { label: 'CONTACT', icon: 'person' },
@@ -57,8 +57,14 @@ export class ResumeBuilderComponent implements OnInit {
 
   constructor(
     private resumeBuilder: ResumeBuilderService,
-    private snackBar: MatSnackBar
-  ) {}
+    private dialog: MatDialog,
+    private route: ActivatedRoute
+  ) {
+
+    this.route.queryParams.subscribe(params => {
+      this.resumeId = params['resumeId'];
+    });
+  }
 
   ngOnInit(): void {
     this.resumeBuilder.state$.subscribe(state => {
@@ -105,45 +111,37 @@ export class ResumeBuilderComponent implements OnInit {
     }
   }
 
-  togglePreview(): void {
-    this.showPreview = !this.showPreview;
-  }
+  openPreview(): void {
+    const dialogConfig: MatDialogConfig = {
+      width: '100%',
+      minWidth: 'fit-content',
+      maxWidth: 'none',
+      height: '90vh',
+      maxHeight: '90vh',
+      panelClass: 'preview-modal-container',
+      autoFocus: false,
+      restoreFocus: true,
+      disableClose: false,
+      hasBackdrop: true,
+      backdropClass: 'preview-modal-backdrop',
+      data: { resumeId: this.resumeId },
+      enterAnimationDuration: '300ms',
+      exitAnimationDuration: '250ms'
+    };
 
-  exportPDF(): void {
-    this.isExporting = true;
-
-    const element = document.getElementById('rr-resume-preview');
-    if (!element) {
-      this.isExporting = false;
-      this.snackBar.open('Resume preview not found.', 'Close', { duration: 3000 });
-      return;
+    // Responsive configuration
+    if (window.innerWidth <= 768) {
+      dialogConfig.maxWidth = '100vw';
+      dialogConfig.maxHeight = '100vh';
+      dialogConfig.width = '100vw';
+      dialogConfig.height = '100vh';
+      dialogConfig.panelClass = 'preview-modal-container-mobile';
     }
 
-    const state = this.resumeBuilder.snapshot;
-    const firstName = state.personal?.firstName || 'resume';
-    const lastName = state.personal?.lastName || 'document';
-    const filename = `${firstName}_${lastName}_Resume.pdf`;
+    const dialogRef = this.dialog.open(PreviewComponent, dialogConfig);
 
-    const opt = {
-      margin: [0.5, 0.5, 0.5, 0.5],
-      filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-    } as any;
-
-    html2pdf()
-      .set(opt)
-      .from(element)
-      .save()
-      .then(() => {
-        this.isExporting = false;
-        this.snackBar.open('Resume downloaded successfully!', 'Close', { duration: 3000 });
-      })
-      .catch(() => {
-        this.isExporting = false;
-        this.snackBar.open('Error generating PDF. Please try again.', 'Close', { duration: 3000 });
-      });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Preview modal closed with result:', result);
+    });
   }
 }

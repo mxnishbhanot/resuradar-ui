@@ -16,13 +16,13 @@
         <button
           mat-stroked-button
           class="preview-btn"
-          (click)="togglePreview()"
+          (click)="openPreview()"
         >
           <mat-icon>visibility</mat-icon>
           <span>Preview</span>
         </button>
 
-        <button
+        <!-- <button
           mat-flat-button
           color="primary"
           class="download-btn"
@@ -31,7 +31,7 @@
         >
           <mat-icon>{{ isExporting ? 'sync' : 'download' }}</mat-icon>
           <span>{{ isExporting ? 'Generating...' : 'Download PDF' }}</span>
-        </button>
+        </button> -->
       </div>
     </div>
   </nav>
@@ -135,7 +135,7 @@
   </main>
 
   <!-- Preview Modal Overlay -->
-  <div class="preview-overlay" *ngIf="showPreview" (click)="togglePreview()">
+  <!-- <div class="preview-overlay" *ngIf="showPreview" (click)="togglePreview()">
     <div class="preview-modal" (click)="$event.stopPropagation()">
       <div class="preview-header">
         <h2 class="preview-title">Resume Preview</h2>
@@ -150,5 +150,5 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>

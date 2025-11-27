@@ -8,6 +8,7 @@ import {
   ResumeBuilderState,
 } from '../../shared/models/resume-builder.model';
 import { environment } from '../../../environments/environment';
+import { ActivatedRoute, Router } from '@angular/router';
 
 const STORAGE_KEY = 'rr_resume_builder_state_v1';
 
@@ -19,7 +20,7 @@ export class ResumeBuilderService {
   private autoSaveEnabled = true;
   private isDirty = false;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router) {
     this.loadFromLocal();
     this.setupAutoSave();
   }
@@ -101,6 +102,16 @@ export class ResumeBuilderService {
       })
     ).subscribe((response: any) => {
       this.isDirty = false;
+      // Only set param if it DOESN’T already exist
+      const currentId = this.route.snapshot.queryParamMap.get('resumeId');
+
+      if (!currentId) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { resumeId: response.resume._id },
+          queryParamsHandling: 'merge'
+        });
+      }
       console.log('✅ Draft auto-saved at', response?.savedAt);
     });
   }
@@ -174,7 +185,7 @@ export class ResumeBuilderService {
   clearLocal(): void {
     try {
       localStorage.removeItem(STORAGE_KEY);
-    } catch (e) {}
+    } catch (e) { }
     this.stateSubject.next(EMPTY_RESUME_STATE);
   }
 
@@ -223,4 +234,17 @@ export class ResumeBuilderService {
   disableAutoSave(): void {
     this.autoSaveEnabled = false;
   }
+
+
+  exportPdf(template: string, resumeId: string): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/custom-resume/pdf`, {
+      headers: this.getHeaders(),
+      params: {
+        resumeId,
+        template
+      },
+      responseType: 'blob' as 'json'
+    });
+  }
+
 }

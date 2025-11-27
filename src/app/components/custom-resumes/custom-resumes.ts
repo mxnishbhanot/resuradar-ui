@@ -231,7 +231,7 @@ export class CustomResumesComponent implements OnInit {
       this.resumeBuilderService.getResume(resume.id).subscribe({
         next: (data: any) => {
           this.resumeBuilderService.replace(data.resume);
-          this.router.navigate(['/build']);
+          this.router.navigate(['/build'], { queryParams: { resumeId: resume.id } });
         },
         error: (err) => console.error('Failed to load resume', err)
       });
