@@ -1,5 +1,5 @@
 <div class="modern-builder">
-  <!-- Top Navigation -->
+  <!-- Fixed Top Navigation -->
   <nav class="top-navbar">
     <div class="navbar-content">
       <div class="brand-section">
@@ -21,15 +21,16 @@
     </div>
   </nav>
 
-  <!-- Secondary Navigation with Tabs -->
+  <!-- Fixed Tab Navigation -->
   <div class="tab-navigation">
     <div class="tab-nav-content">
-      <button *ngFor="let tab of tabs; let i = index" class="tab-item" [class.active]="currentTab === i"
-        (click)="navigateToTab(i)">
+      <button *ngFor="let tab of tabs; let i = index"
+              class="tab-item"
+              [class.active]="currentTab === i"
+              (click)="navigateToTab(i)">
         <mat-icon class="tab-icon">{{ tab.icon }}</mat-icon>
         <span class="tab-label">{{ tab.label }}</span>
       </button>
-
       <div class="tab-indicator" [style.transform]="'translateX(' + (currentTab * 100) + '%)'"></div>
     </div>
 
@@ -39,59 +40,60 @@
     </div>
   </div>
 
-  <!-- Main Content Area -->
+  <!-- Scrollable Content Area (Only this scrolls) -->
   <main class="content-area">
-    <div class="content-wrapper">
-      <mat-stepper linear #stepper [selectedIndex]="currentTab" (selectionChange)="onStepChange($event)"
-        class="hidden-stepper">
-        <!-- Personal Info Step -->
-        <mat-step>
-          <div class="form-section">
-            <rr-personal></rr-personal>
-          </div>
-        </mat-step>
-
-        <!-- Education Step -->
-        <mat-step>
-          <div class="form-section">
-            <rr-education></rr-education>
-          </div>
-        </mat-step>
-
-        <!-- Experience Step -->
-        <mat-step>
-          <div class="form-section">
-            <rr-experience></rr-experience>
-          </div>
-        </mat-step>
-
-        <!-- Skills & Projects Step -->
-        <mat-step>
-          <div class="form-section">
-            <rr-skills-projects></rr-skills-projects>
-          </div>
-        </mat-step>
-
-        <!-- Review Step -->
-        <mat-step>
-          <div class="form-section">
-            <rr-summary></rr-summary>
-          </div>
-        </mat-step>
-      </mat-stepper>
-
-      <!-- Navigation Buttons -->
-      <div class="navigation-footer">
-        <button mat-stroked-button class="ghost-cancel-button" (click)="previousStep()" [disabled]="currentTab === 0">
-          <mat-icon>arrow_back</mat-icon>
-          <span>Back</span>
-        </button>
-
-        <button mat-flat-button class="next-button" (click)="nextStep()" *ngIf="currentTab < tabs.length - 1">
-          <span>Next</span>
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
+    <div class="content-scroll-wrapper">
+      <div class="content-inner">
+        <!-- Form Sections -->
+        <div class="form-section" *ngIf="currentTab === 0">
+          <rr-personal></rr-personal>
+        </div>
+        <div class="form-section" *ngIf="currentTab === 1">
+          <rr-education></rr-education>
+        </div>
+        <div class="form-section" *ngIf="currentTab === 2">
+          <rr-experience></rr-experience>
+        </div>
+        <div class="form-section" *ngIf="currentTab === 3">
+          <rr-skills-projects></rr-skills-projects>
+        </div>
+        <div class="form-section" *ngIf="currentTab === 4">
+          <rr-summary></rr-summary>
+        </div>
       </div>
     </div>
   </main>
+
+  <!-- Fixed Bottom Navigation -->
+  <footer class="navigation-footer">
+    <div class="footer-content">
+      <button mat-stroked-button
+              class="nav-button back-button"
+              (click)="previousStep()"
+              [disabled]="currentTab === 0">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Back</span>
+      </button>
+
+      <div class="step-indicator">
+        <span class="step-text">Step {{ currentTab + 1 }} of {{ tabs.length }}</span>
+      </div>
+
+      <button mat-flat-button
+              class="nav-button next-button"
+              (click)="nextStep()"
+              *ngIf="currentTab < tabs.length - 1">
+        <span>Next</span>
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+      <button mat-flat-button
+              class="nav-button finish-button"
+              (click)="openPreview()"
+              *ngIf="currentTab === tabs.length - 1">
+        <span>Finish & Preview</span>
+        <mat-icon>check_circle</mat-icon>
+      </button>
+    </div>
+  </footer>
 </div>
