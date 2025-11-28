@@ -155,3 +155,46 @@ $z-popover: 20;
 $z-modal: 30;
 $z-notification: 40;
 $z-fixed: 50;
+
+// ==============================
+// BUTTON COLOR VARIABLES (works for both themes)
+// ==============================
+
+// Cancel/Back Button Colors
+$cancel-bg-light: rgba(var(--text-secondary-rgb), 0.1); // Subtle gray in light theme
+$cancel-border-light: rgba(var(--text-secondary-rgb), 0.3);
+$cancel-text-light: var(--text-secondary);
+$cancel-hover-bg-light: rgba(var(--text-secondary-rgb), 0.2);
+
+$cancel-bg-dark: rgba(var(--text-secondary-rgb), 0.15); // Slightly more visible in dark
+$cancel-border-dark: rgba(var(--text-secondary-rgb), 0.4);
+$cancel-text-dark: var(--text-secondary);
+$cancel-hover-bg-dark: rgba(var(--text-secondary-rgb), 0.25);
+
+// Done/Next Button Colors (Uses primary gradient)
+$done-bg-gradient: linear-gradient(
+  var(--primary-angle),
+  rgb(var(--primary-start)) 0%,
+  rgb(var(--primary-end)) 100%
+);
+$done-text: var(--text-inverse);
+$done-hover-transform: translateY(-2px);
+$done-shadow: var(--shadow-md);
+$done-hover-shadow: var(--shadow-lg);
+
+// Define CSS custom properties for easy switching
+:root.light-theme,
+body.light-theme {
+  --cancel-bg: #{$cancel-bg-light};
+  --cancel-border: #{$cancel-border-light};
+  --cancel-text: #{$cancel-text-light};
+  --cancel-hover-bg: #{$cancel-hover-bg-light};
+}
+
+:root.dark-theme,
+body.dark-theme {
+  --cancel-bg: #{$cancel-bg-dark};
+  --cancel-border: #{$cancel-border-dark};
+  --cancel-text: #{$cancel-text-dark};
+  --cancel-hover-bg: #{$cancel-hover-bg-dark};
+}

@@ -5,6 +5,7 @@
 // custom components at https://material.angular.dev/guide/theming
 @use 'theme/themes';
 @use '@angular/material' as mat;
+@use './theme/variables' as *;
 
 // ==============================
 // GLOBAL RESETS & BOX-SIZING
@@ -62,7 +63,7 @@ body {
 
 #root,
 app-root,
-router-outlet + * {
+router-outlet+* {
   display: block;
   width: 100%;
   max-width: 100vw;
@@ -168,8 +169,13 @@ router-outlet + * {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 // ==============================
@@ -223,6 +229,7 @@ router-outlet + * {
     opacity: 0;
     transform: translateY(20px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -325,7 +332,15 @@ iframe {
 // PREVENT TEXT OVERFLOW
 // ==============================
 
-h1, h2, h3, h4, h5, h6, p, span, div {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div {
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
@@ -388,6 +403,7 @@ h1, h2, h3, h4, h5, h6, p, span, div {
 
   /* 1. TEXT COLORS */
   --mdc-outlined-text-field-input-text-color: $text-theme-inverse;
+  --mat-form-field-outlined-outline-color: $text-theme-inverse;
   --mdc-outlined-text-field-label-text-color: $text-theme-inverse;
   --mdc-outlined-text-field-hover-label-text-color: $text-theme-inverse;
 
@@ -407,8 +423,8 @@ h1, h2, h3, h4, h5, h6, p, span, div {
   --mdc-outlined-text-field-error-label-text-color: var(--error-color);
   --mdc-outlined-text-field-error-caret-color: var(--error-color);
 
-  .mat-mdc-floating-label{
-     color: var(--text-theme-inverse) !important;
+  .mat-mdc-floating-label {
+    color: var(--text-muted) !important;
   }
 
   ::placeholder {
@@ -426,21 +442,154 @@ h1, h2, h3, h4, h5, h6, p, span, div {
     color: var(--accent-color);
   }
 
-  text-area{
-    color: var(--text-theme-inverse) !important;
+  text-area {
+    color: var(--text-muted) !important;
   }
-  input{
-    color: var(--text-theme-inverse) !important;
+
+  input {
+    color: var(--text-muted) !important;
   }
 }
 
-.mat-mdc-checkbox{
-  .mdc-label{
+.mat-mdc-checkbox {
+  .mdc-label {
     color: var(--text-theme-inverse);
     width: max-content;
   }
 }
 
-.mat-stepper-horizontal{
+.mat-stepper-horizontal {
   background: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   BASE BUTTON RESET
+--------------------------------------------------------- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md-20;
+  border-radius: $radius-md;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-size: 0.95rem;
+  border: none;
+  text-decoration: none;
+  user-select: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   CANCEL / BACK (neutral + theme-adaptive)
+--------------------------------------------------------- */
+
+.back-button {
+  background: var(--cancel-bg) !important;
+  color: var(--cancel-text) !important;
+  border: 1px solid var(--cancel-border) !important;
+  padding: $spacing-sm $spacing-md !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  transition: all 0.3s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: $spacing-xs !important;
+
+  &:hover {
+    background: var(--cancel-hover-bg) !important;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   DONE / NEXT (primary gradient, theme-aware via variables)
+--------------------------------------------------------- */
+
+.next-button {
+  background: $primary-gradient !important;
+  color: $text-inverse !important;
+  padding: $spacing-sm $spacing-md !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  box-shadow: $done-shadow !important;
+  transition: all 0.3s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: $spacing-xs !important;
+  flex-direction: row-reverse !important;
+
+  &:hover {
+    box-shadow: $done-hover-shadow !important;
+    transform: $done-hover-transform;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+  }
+
+  mat-icon {
+    margin: 0px !important;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+
+.ghost-cancel-button {
+  background: transparent !important;
+  color: var(--cancel-text) !important;
+  border: 1px solid var(--cancel-border) !important;
+  padding: $spacing-sm $spacing-md !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  transition: all 0.3s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: $spacing-xs !important;
+
+  &:hover {
+    background: var(--cancel-bg) !important;
+    transform: translateY(-2px);
+    box-shadow: $shadow-sm;
+  }
+
+   &:disabled {
+    opacity: 0.4;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
