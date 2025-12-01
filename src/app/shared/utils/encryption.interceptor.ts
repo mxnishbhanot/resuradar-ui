@@ -50,11 +50,35 @@ export const EncryptionInterceptor: HttpInterceptorFn = (req, next) => {
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(GoogleAuthService);
+  const encSvc = inject(EncryptionService);
 
   return next(req).pipe(
     catchError(err => {
-      console.log(err, 'AuthInterceptor Error');
+      console.log('Raw error from backend:', err);
 
+      // If the backend returned encrypted error structure (iv + data)
+      if (err.error?.iv && err.error?.data) {
+        return from(encSvc.decryptToObject(err.error)).pipe(
+          switchMap((decryptedErrorBody: any) => {
+            console.log('Decrypted error body:', decryptedErrorBody);
+
+            // Replace encrypted error body with decrypted one
+            err = {
+              ...err,
+              error: decryptedErrorBody
+            };
+
+            // Now run your token-expired check
+            if (err.status === 401 && err.error?.message === 'Invalid or expired token') {
+              auth.logout();
+            }
+
+            return throwError(() => err);
+          })
+        );
+      }
+
+      // Normal (unencrypted) error handling fallback
       if (err.status === 401 && err.error?.message === 'Invalid or expired token') {
         auth.logout();
       }
