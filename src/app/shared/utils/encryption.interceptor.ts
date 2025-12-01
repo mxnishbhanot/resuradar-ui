@@ -1,7 +1,9 @@
 import { HttpInterceptorFn, HttpEvent, HttpHandlerFn, HttpRequest, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { from, map, switchMap, of } from 'rxjs';
+import { from, map, switchMap, of, catchError, throwError } from 'rxjs';
 import { EncryptionService } from '../../core/services/encryption';
+import { GoogleAuthService } from '../../core/services/google-auth';
+import { Router } from '@angular/router';
 
 export const EncryptionInterceptor: HttpInterceptorFn = (req, next) => {
   const encSvc = inject(EncryptionService);
@@ -43,6 +45,22 @@ export const EncryptionInterceptor: HttpInterceptorFn = (req, next) => {
           return of(event);
         })
       );
+    })
+  );
+};
+
+export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
+  const auth = inject(GoogleAuthService);
+  const router = inject(Router);
+
+  return next(req).pipe(
+    catchError(err => {
+      if (err.status === 401 && err.error?.message === 'Invalid or expired token') {
+        auth.logout();
+        router.navigate(['/login'], { queryParams: { sessionExpired: true } });
+      }
+
+      return throwError(() => err);
     })
   );
 };

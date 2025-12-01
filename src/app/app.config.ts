@@ -4,13 +4,13 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { iloadersInterceptor } from 'sc-angular-loader';
-import { EncryptionInterceptor } from './shared/utils/encryption.interceptor';
+import { AuthInterceptor, EncryptionInterceptor } from './shared/utils/encryption.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withFetch(), withInterceptors([iloadersInterceptor, EncryptionInterceptor]))
+    provideHttpClient(withFetch(), withInterceptors([iloadersInterceptor, EncryptionInterceptor, AuthInterceptor]))
   ]
 };
