@@ -10,7 +10,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
-import { Experience } from '../../shared/models/resume-builder.model';
+import { Experience } from '../../shared/models/resume-builder.model';  // CHANGED: Import from model
 
 @Component({
   selector: 'rr-experience',
@@ -103,7 +103,7 @@ export class ExperienceComponent implements OnInit {
 
     this.bullets.clear();
     if (exp.bullets && exp.bullets.length > 0) {
-      exp.bullets.forEach(bullet => {
+      exp.bullets.forEach((bullet: string) => {  // CHANGED: Typed as string
         this.bullets.push(this.fb.control(bullet));
       });
     } else {
@@ -154,20 +154,16 @@ export class ExperienceComponent implements OnInit {
       updatedExperiences = [...this.experiences, experience];
     }
 
-    this.store.replace({
-      ...this.store.snapshot,
-      experiences: updatedExperiences
-    });
+    // CHANGED: Use update() instead of replace() to trigger autosave consistently
+    this.store.update({ experiences: updatedExperiences });
 
     this.cancelForm();
   }
 
   deleteExperience(index: number): void {
     const updatedExperiences = this.experiences.filter((_, i) => i !== index);
-    this.store.replace({
-      ...this.store.snapshot,
-      experiences: updatedExperiences
-    });
+    // CHANGED: Use update() instead of replace()
+    this.store.update({ experiences: updatedExperiences });
   }
 
   // --- AI Generation Logic ---
@@ -208,6 +204,7 @@ export class ExperienceComponent implements OnInit {
         res.bullets.forEach((bullet: string) => {
           this.bullets.push(this.fb.control(bullet));
         });
+        // CHANGED: Form changes now trigger autosave via state$
       }
     }, 1500); // Simulate API delay
   }

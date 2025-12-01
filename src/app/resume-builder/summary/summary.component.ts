@@ -36,6 +36,7 @@ export class SummaryComponent implements OnInit {
   completedSections = 0;
   experienceCount = 0;
   educationCount = 0;
+  projectsCount = 0;
   skillsCount = 0;
   completionPercentage = 0;
 
@@ -44,6 +45,7 @@ export class SummaryComponent implements OnInit {
   hasSummary = false;
   hasExperience = false;
   hasEducation = false;
+  hasProjects = false;
   hasSkills = false;
 
   constructor(
@@ -60,14 +62,17 @@ export class SummaryComponent implements OnInit {
       this.summary = state.personal?.summary || '';
       this.experienceCount = state.experiences?.length || 0;
       this.educationCount = state.educations?.length || 0;
-      this.skillsCount = state.skills?.length || 0;
+      this.projectsCount = state.projects?.length || 0;
+      // CHANGED: Compute total skills across categories
+      this.skillsCount = state.skills?.reduce((sum: number, cat: any) => sum + (cat.skills?.length || 0), 0) || 0;
 
       // Update checklist
       this.hasPersonalInfo = !!(state.personal?.firstName && state.personal?.email);
       this.hasSummary = !!this.summary;
       this.hasExperience = this.experienceCount > 0;
       this.hasEducation = this.educationCount > 0;
-      this.hasSkills = this.skillsCount >= 3;
+      this.hasProjects = this.projectsCount > 0;
+      this.hasSkills = this.skillsCount >= 3;  // CHANGED: Use total count
 
       // Calculate completion
       const checks = [
@@ -75,10 +80,11 @@ export class SummaryComponent implements OnInit {
         this.hasSummary,
         this.hasExperience,
         this.hasEducation,
+        this.hasProjects,
         this.hasSkills
       ];
       this.completedSections = checks.filter(Boolean).length;
-      this.completionPercentage = Math.round((this.completedSections / 5) * 100);
+      this.completionPercentage = Math.round((this.completedSections / 6) * 100);
 
       if (this.isEditing && !this.form.dirty) {
         this.form.patchValue({ summary: this.summary }, { emitEvent: false });
@@ -110,7 +116,7 @@ export class SummaryComponent implements OnInit {
         ...this.store.snapshot.personal,
         summary: summaryValue
       }
-    });
+    });  // Triggers autosave
 
     this.isEditing = false;
   }
@@ -121,7 +127,7 @@ export class SummaryComponent implements OnInit {
         ...this.store.snapshot.personal,
         summary: ''
       }
-    });
+    });  // Triggers autosave
   }
 
   generateWithAI(): void {
@@ -131,7 +137,8 @@ export class SummaryComponent implements OnInit {
       personal: this.store.snapshot.personal,
       experiences: this.store.snapshot.experiences,
       skills: this.store.snapshot.skills,
-      educations: this.store.snapshot.educations
+      educations: this.store.snapshot.educations,
+      projects: this.store.snapshot.projects
     };
 
     this.store.generateWithAI('summary', ctx).subscribe({
@@ -140,6 +147,8 @@ export class SummaryComponent implements OnInit {
         if (res?.summary) {
           this.form.patchValue({ summary: res.summary });
           this.isEditing = true;
+          // CHANGED: Auto-save after generation (triggers autosave)
+          this.saveSummary();
         }
       },
       error: () => {

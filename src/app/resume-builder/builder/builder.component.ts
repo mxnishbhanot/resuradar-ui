@@ -6,14 +6,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule, MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { PersonalComponent } from '../personal/personal.component';
 import { EducationComponent } from '../education/education.component';
 import { ExperienceComponent } from '../experience/experience.component';
-import { SkillsProjectsComponent } from '../skills-projects/skills-projects.component';
 import { SummaryComponent } from '../summary/summary.component';
 import { PreviewComponent } from '../preview/preview.component';
 import { ActivatedRoute } from '@angular/router';
+import { ProjectsComponent } from '../projects/projects';
+import { SkillsComponent } from '../skills/skills.component';
 
 @Component({
   selector: 'rr-resume-builder',
@@ -26,11 +28,13 @@ import { ActivatedRoute } from '@angular/router';
     MatProgressBarModule,
     MatSnackBarModule,
     MatDialogModule,
+    MatTooltipModule,
     PersonalComponent,
     EducationComponent,
     ExperienceComponent,
-    SkillsProjectsComponent,
     SummaryComponent,
+    ProjectsComponent,
+    SkillsComponent
   ],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
@@ -43,30 +47,36 @@ export class ResumeBuilderComponent implements OnInit {
   resumeId = null;
 
   tabs = [
-    { label: 'CONTACT', icon: 'person' },
+    { label: 'CONTACT INFO', icon: 'person' },
     { label: 'EDUCATION', icon: 'school' },
     { label: 'EXPERIENCE', icon: 'work' },
-    { label: 'PROJECT', icon: 'folder' },
-    { label: 'SUMMARY', icon: 'star' },
+    { label: 'PROJECTS', icon: 'folder_open' },
+    { label: 'SKILLS', icon: 'stars' },
+    { label: 'SUMMARY', icon: 'description' },
   ];
 
   hasPersonalInfo = false;
   hasEducation = false;
   hasExperience = false;
+  hasProjects = false;
   hasSkills = false;
+  hasSummary = false;
 
   constructor(
     private resumeBuilder: ResumeBuilderService,
     private dialog: MatDialog,
     private route: ActivatedRoute
   ) {
-
     this.route.queryParams.subscribe(params => {
       this.resumeId = params['resumeId'];
     });
   }
 
   ngOnInit(): void {
+    if (this.resumeId) {
+      this.resumeBuilder.loadDraftFromServer();
+    }
+
     this.resumeBuilder.state$.subscribe(state => {
       this.updateCompletionStatus(state);
     });
@@ -76,14 +86,20 @@ export class ResumeBuilderComponent implements OnInit {
     this.hasPersonalInfo = !!(state.personal?.firstName && state.personal?.email);
     this.hasEducation = (state.educations?.length || 0) > 0;
     this.hasExperience = (state.experiences?.length || 0) > 0;
-    this.hasSkills = (state.skills?.length || 0) >= 3;
+    this.hasProjects = (state.projects?.length || 0) > 0;
+    this.hasSummary = !!state.personal?.summary;
+
+    // Compute total skills across categories for hasSkills
+    const totalSkills = state.skills?.reduce((acc: number, cat: any) => acc + (cat.skills?.length || 0), 0) || 0;
+    this.hasSkills = totalSkills >= 3;
 
     const checks = [
       this.hasPersonalInfo,
-      !!state.personal?.summary,
-      this.hasExperience,
       this.hasEducation,
-      this.hasSkills
+      this.hasExperience,
+      this.hasProjects,
+      this.hasSkills,
+      this.hasSummary
     ];
 
     this.completionPercentage = Math.round(
@@ -91,12 +107,23 @@ export class ResumeBuilderComponent implements OnInit {
     );
   }
 
-  navigateToTab(index: number): void {
-    this.currentTab = index;
+  /**
+   * Helper function to check if a specific tab is completed.
+   */
+  getTabCompletion(index: number): boolean {
+    switch (index) {
+      case 0: return this.hasPersonalInfo;
+      case 1: return this.hasEducation;
+      case 2: return this.hasExperience;
+      case 3: return this.hasProjects;
+      case 4: return this.hasSkills;
+      case 5: return this.hasSummary;
+      default: return false;
+    }
   }
 
-  onStepChange(event: any): void {
-    this.currentTab = event.selectedIndex;
+  navigateToTab(index: number): void {
+    this.currentTab = index;
   }
 
   nextStep(): void {

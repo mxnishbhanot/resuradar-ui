@@ -1,117 +1,204 @@
 <div class="education-container">
 
   <div class="section-header">
-    <div class="header-content">
+    <div class="header-icon-wrapper">
       <mat-icon class="header-icon">school</mat-icon>
-      <div class="header-text">
-        <h2 class="section-title">Educational Background</h2>
-        <p class="section-subtitle">List your degrees, certifications, and courses.</p>
-      </div>
+    </div>
+    <div class="header-content">
+      <h2 class="section-title">Education & Certifications</h2>
+      <p class="section-subtitle">List your academic history, degrees, and relevant professional certifications.</p>
     </div>
   </div>
 
-  <hr class="section-divider" />
+  <div class="education-list" *ngIf="educationEntries.length > 0 && !showForm">
+    <div *ngFor="let entry of educationEntries; let i = index" class="education-card">
+      <div class="card-header">
+        <div class="card-badge">
+          <mat-icon>menu_book</mat-icon>
+        </div>
+        <div class="card-title-section">
+          <h3 class="card-title">{{ entry.institution }}</h3>
+          <p class="card-degree">{{ entry.degree }} in {{ entry.major }}</p>
+        </div>
+        <div class="card-actions">
+          <button mat-icon-button (click)="editEntry(i)" class="action-btn edit-btn" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteEntry(i)" class="action-btn delete-btn" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
 
-  <div class="list-wrapper" *ngIf="educations.length > 0">
-    <mat-card *ngFor="let edu of educations; let i = index" class="education-card">
-      <mat-card-content>
-        <div class="education-card__content">
-          <div class="education-card__primary">
-            <h3 class="education-card__school">{{ edu.school }}</h3>
-            <p class="education-card__meta">
-              <span class="degree-info">{{ edu.degree }}<span *ngIf="edu.field"> in {{ edu.field }}</span></span>
+      <div class="card-meta">
+        <div class="meta-item">
+          <mat-icon class="meta-icon">calendar_today</mat-icon>
+          <span>{{ entry.startDate }} - {{ entry.isCurrent ? 'Expected ' : '' }} {{ entry.endDate }}</span>
+        </div>
+        <div class="meta-item meta-gpa" *ngIf="entry.gpa">
+          <mat-icon class="meta-icon">trending_up</mat-icon>
+          <span>**GPA/Result:** {{ entry.gpa }}</span>
+        </div>
+        <div class="meta-badge" *ngIf="entry.isCurrent">
+          <mat-icon>pending</mat-icon>
+          <span>In Progress</span>
+        </div>
+      </div>
 
-              <span class="education-card__years">
-                <mat-icon class="date-icon">calendar_today</mat-icon>
-                {{ edu.startYear }} - {{ edu.endYear || 'Present' }}
-              </span>
-            </p>
-          </div>
+      <div class="card-bullets" *ngIf="entry.bullets && entry.bullets.length > 0">
+        <ul class="bullets-list">
+          <li *ngFor="let bullet of entry.bullets" class="bullet-item">
+            <mat-icon class="bullet-icon">star</mat-icon>
+            <span>{{ bullet }}</span>
+          </li>
+        </ul>
+      </div>
 
-          <div class="education-card__actions">
-            <button mat-icon-button (click)="editEducation(i)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button (click)="deleteEducation(i)" class="delete-btn">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="educationEntries.length === 0 && !showForm">
+    <div class="empty-state-icon">
+      <mat-icon>history_edu</mat-icon>
+    </div>
+    <h3 class="empty-state-title">No Education Details Added</h3>
+    <p class="empty-state-description">Add your highest degree first, followed by relevant certifications or secondary degrees.</p>
+    <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
+      <mat-icon>add_circle</mat-icon>
+      Add Education Entry
+    </button>
+  </div>
+
+  <button mat-stroked-button class="add-more-button" *ngIf="educationEntries.length > 0 && !showForm" (click)="showAddForm()">
+    <mat-icon>add</mat-icon>
+    Add Another Entry
+  </button>
+
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <div class="form-header-icon">
+        <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
+      </div>
+      <div class="form-header-text">
+        <h3 class="form-title">{{ editingIndex !== null ? 'Edit Education' : 'Add New Education Entry' }}</h3>
+        <p class="form-subtitle">{{ editingIndex !== null ? 'Update degree or certificate details' : 'Detail your academic background' }}</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="education-form">
+
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <mat-icon>business</mat-icon>
+          Institution Details
+        </h4>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Institution Name</mat-label>
+            <input matInput formControlName="institution" placeholder="e.g., Stanford University, Coursera" />
+            <mat-icon matPrefix>school</mat-icon>
+            <mat-error *ngIf="form.get('institution')?.hasError('required')">Institution name is required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="form-row form-row-two">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Degree/Certification</mat-label>
+            <input matInput formControlName="degree" placeholder="e.g., Master of Science, PMP Certificate" />
+            <mat-icon matPrefix>badge</mat-icon>
+            <mat-error *ngIf="form.get('degree')?.hasError('required')">Degree is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Major/Field of Study</mat-label>
+            <input matInput formControlName="major" placeholder="e.g., Computer Science, Project Management" />
+            <mat-icon matPrefix>auto_stories</mat-icon>
+            <mat-error *ngIf="form.get('major')?.hasError('required')">Major is required</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <mat-icon>date_range</mat-icon>
+          Timeline & Result
+        </h4>
+
+        <div class="form-row form-row-three">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Start Date</mat-label>
+            <input matInput formControlName="startDate" placeholder="e.g., Aug 2018" />
+            <mat-icon matPrefix>event_available</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field" [class.disabled-field]="form.get('isCurrent')?.value">
+            <mat-label>End Date/Expected</mat-label>
+            <input matInput formControlName="endDate" placeholder="e.g., May 2020" [disabled]="form.get('isCurrent')?.value" />
+            <mat-icon matPrefix>event_busy</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>GPA/Result (Optional)</mat-label>
+            <input matInput formControlName="gpa" placeholder="e.g., 3.8/4.0, First Class" />
+            <mat-icon matPrefix>grade</mat-icon>
+          </mat-form-field>
         </div>
 
-        <p class="education-card__description" *ngIf="edu.description">
-          {{ edu.description }}
+        <div class="form-row">
+          <mat-checkbox formControlName="isCurrent" class="current-checkbox" color="primary">
+            <span class="checkbox-label">
+              This education is currently ongoing
+            </span>
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <div class="form-section bullets-section">
+        <div class="bullets-section-header">
+          <h4 class="form-section-title">
+            <mat-icon>military_tech</mat-icon>
+            Honors & Relevant Coursework
+          </h4>
+        </div>
+
+        <p class="bullets-hint">
+          <mat-icon class="hint-icon">lightbulb</mat-icon>
+          Include distinctions, scholarships, or relevant project work/course titles.
         </p>
-      </mat-card-content>
-    </mat-card>
+
+        <div formArrayName="bullets" class="bullets-container">
+          <div *ngFor="let bullet of bullets.controls; let i = index" class="bullet-row">
+            <div class="bullet-number-badge">{{ i + 1 }}</div>
+            <mat-form-field appearance="outline" class="bullet-field">
+              <mat-label>Achievement Point {{ i + 1 }}</mat-label>
+              <textarea matInput [formControlName]="i" rows="3"
+                        placeholder="e.g., Dean's List (4 semesters), Relevant Course: Data Structures (A+)"
+                        cdkTextareaAutosize
+                        cdkAutosizeMinRows="2"
+                        cdkAutosizeMaxRows="5"></textarea>
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removeBullet(i)" class="bullet-delete-btn" matTooltip="Remove">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <button mat-stroked-button type="button" (click)="addBullet()" class="add-bullet-btn">
+            <mat-icon>add</mat-icon>
+            Add Another Point
+          </button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
+          <mat-icon>close</mat-icon>
+          Cancel
+        </button>
+        <button mat-flat-button color="primary" (click)="saveEntry()" [disabled]="form.invalid" class="save-btn">
+          <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
+          {{ editingIndex !== null ? 'Update Entry' : 'Add Entry' }}
+        </button>
+      </div>
+    </form>
   </div>
 
-  <div class="empty-state" *ngIf="educations.length === 0 && !showForm">
-    <mat-icon class="empty-icon">school</mat-icon>
-    <h3 class="empty-title">Ready to Learn</h3>
-    <p class="empty-description">Start adding your educational achievements here.</p>
-  </div>
-
-  <form [formGroup]="form" class="editor-form" *ngIf="showForm">
-    <div class="form-grid">
-      <mat-form-field appearance="outline" class="form-field span-full">
-        <mat-label>School / University</mat-label>
-        <input matInput formControlName="school" placeholder="Harvard University" />
-        <mat-icon matPrefix>school</mat-icon>
-        <mat-error *ngIf="form.get('school')?.hasError('required')">School name is required</mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Degree / Certificate</mat-label>
-        <input matInput formControlName="degree" placeholder="Bachelor of Science" />
-        <mat-icon matPrefix>military_tech</mat-icon>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Field of Study</mat-label>
-        <input matInput formControlName="field" placeholder="Computer Science" />
-        <mat-icon matPrefix>library_books</mat-icon>
-      </mat-form-field>
-
-      <div class="date-row span-full">
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Start Year</mat-label>
-          <input matInput formControlName="startYear" placeholder="2018" maxlength="4" />
-          <mat-icon matPrefix>event</mat-icon>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>End Year</mat-label>
-          <input matInput formControlName="endYear" placeholder="2022" maxlength="4"
-            [disabled]="form.get('isCurrent')?.value" />
-          <mat-icon matPrefix>event</mat-icon>
-        </mat-form-field>
-      </div>
-      <div class="date-row span-full">
-        <mat-checkbox formControlName="isCurrent" class="current-checkbox">
-          Currently studying here
-        </mat-checkbox>
-      </div>
-      <mat-form-field appearance="outline" class="form-field span-full">
-        <mat-label>Description (Optional)</mat-label>
-        <textarea matInput formControlName="description" rows="3"
-          placeholder="Relevant coursework, achievements, GPA, honors..."></textarea>
-      </mat-form-field>
-    </div>
-
-    <div class="form-actions">
-      <button mat-stroked-button type="button" (click)="cancelForm()">
-        <mat-icon>close</mat-icon>
-        Cancel
-      </button>
-      <button mat-flat-button color="primary" (click)="saveEducation()" [disabled]="form.invalid">
-        <mat-icon>{{ editingIndex !== null ? 'save' : 'add' }}</mat-icon>
-        {{ editingIndex !== null ? 'Update' : 'Add' }} Education
-      </button>
-    </div>
-  </form>
-
-  <button mat-flat-button color="primary" class="add-button" *ngIf="!showForm" (click)="showAddForm()">
-    <mat-icon>add</mat-icon>
-    Add Education
-  </button>
 </div>

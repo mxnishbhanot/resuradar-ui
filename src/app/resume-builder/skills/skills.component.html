@@ -1,0 +1,133 @@
+<div class="skills-container">
+
+  <div class="section-header">
+    <div class="header-icon-wrapper">
+      <mat-icon class="header-icon">tips_and_updates</mat-icon>
+    </div>
+    <div class="header-content">
+      <h2 class="section-title">Skills & Expertise</h2>
+      <p class="section-subtitle">Highlight your technical proficiencies and core competencies grouped by category.</p>
+    </div>
+  </div>
+
+  <div class="skills-list" *ngIf="skillCategories.length > 0 && !showForm">
+    <div *ngFor="let category of skillCategories; let i = index" class="skill-card">
+      <div class="card-header">
+        <div class="card-badge">
+          <mat-icon>category</mat-icon>
+        </div>
+        <div class="card-title-section">
+          <h3 class="card-title">{{ category.name }}</h3>
+          <p class="card-subtitle">
+            {{ category.skills.length }} skill{{ category.skills.length !== 1 ? 's' : '' }}
+          </p>
+        </div>
+        <div class="card-actions">
+          <button mat-icon-button (click)="editCategory(i)" class="action-btn edit-btn" matTooltip="Edit Category">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteCategory(i)" class="action-btn delete-btn" matTooltip="Delete Category">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="card-skills-content" *ngIf="category.skills && category.skills.length > 0">
+        <mat-chip-set role="list" class="read-only-chip-set">
+          <mat-chip *ngFor="let skill of category.skills" role="listitem" class="skill-chip">
+            {{ skill }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="skillCategories.length === 0 && !showForm">
+    <div class="empty-state-icon">
+      <mat-icon>psychology_alt</mat-icon>
+    </div>
+    <h3 class="empty-state-title">No Skills Added Yet</h3>
+    <p class="empty-state-description">Start adding your professional skills. Grouping them into categories (like "Frontend" or "Tools") helps organizers read your resume faster.</p>
+    <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
+      <mat-icon>add_circle</mat-icon>
+      Add skill category
+    </button>
+  </div>
+
+  <button mat-stroked-button class="add-more-button" *ngIf="skillCategories.length > 0 && !showForm" (click)="showAddForm()">
+    <mat-icon>add</mat-icon>
+    Add Another Category
+  </button>
+
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <div class="form-header-icon">
+        <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
+      </div>
+      <div class="form-header-text">
+        <h3 class="form-title">{{ editingIndex !== null ? 'Edit Category' : 'Add New Category' }}</h3>
+        <p class="form-subtitle">{{ editingIndex !== null ? 'Update expertise group' : 'Create a new group for your skills' }}</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="skills-form">
+      <div class="form-section">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Category Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g., Frontend Development, DevOps, Soft Skills" />
+            <mat-icon matPrefix>label</mat-icon>
+            <mat-hint>Name the group of skills you are about to add</mat-hint>
+            <mat-error *ngIf="form.get('name')?.hasError('required')">Category name is required</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="form-section chips-input-section">
+        <div class="section-header-simple">
+           <h4 class="form-section-title">
+            <mat-icon>stars</mat-icon>
+            Skills List
+          </h4>
+        </div>
+
+        <p class="chips-hint">
+          <mat-icon class="hint-icon">lightbulb</mat-icon>
+          Type a skill and press Enter or comma to add it.
+        </p>
+
+        <mat-form-field appearance="outline" class="form-field full-width chip-form-field">
+          <mat-label>Add Skills...</mat-label>
+          <mat-chip-grid #chipGrid aria-label="Enter skills">
+             <mat-chip-row *ngFor="let skillCtrl of skillsControls; let i = index"
+                          (removed)="removeSkill(i)"
+                          [editable]="true"
+                          (edited)="editSkill(i, $event)">
+              {{skillCtrl.value}}
+              <button matChipRemove [attr.aria-label]="'remove ' + skillCtrl.value">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-row>
+            <input placeholder="New skill..."
+                   [matChipInputFor]="chipGrid"
+                   [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                   (matChipInputTokenEnd)="addSkill($event)"/>
+          </mat-chip-grid>
+           <mat-icon matPrefix>code</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
+          <mat-icon>close</mat-icon>
+          Cancel
+        </button>
+        <button mat-flat-button color="primary" (click)="saveCategory()" [disabled]="form.invalid || skillsArray.length === 0" class="save-btn">
+          <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
+          {{ editingIndex !== null ? 'Update Category' : 'Add Category' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>

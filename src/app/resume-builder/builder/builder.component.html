@@ -1,72 +1,66 @@
 <div class="modern-builder">
-  <!-- Fixed Top Navigation -->
-  <nav class="top-navbar">
-    <div class="navbar-content">
-      <div class="brand-section">
-        <div class="brand-icon-wrapper">
-          <mat-icon class="brand-icon">description</mat-icon>
-        </div>
-        <div class="brand-text">
-          <h1 class="brand-title">ResuRadar</h1>
-          <span class="brand-subtitle">Professional CV Creator</span>
-        </div>
-      </div>
 
-      <div class="navbar-actions">
-        <button mat-stroked-button class="preview-btn" (click)="openPreview()">
-          <mat-icon>visibility</mat-icon>
-          <span>Preview</span>
-        </button>
+  <aside class="sidebar-nav">
+    <div class="brand-section">
+      <div class="brand-icon-wrapper">
+        <mat-icon class="brand-icon">description</mat-icon>
+      </div>
+      <div class="brand-text">
+        <h1 class="brand-title">ResuRadar</h1>
+        <span class="brand-subtitle">Professional CV Builder</span>
       </div>
     </div>
-  </nav>
 
-  <!-- Fixed Tab Navigation -->
-  <div class="tab-navigation">
-    <div class="tab-nav-content">
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="progress-text">Builder Progress</span>
+        <span class="progress-percentage">{{ completionPercentage }}%</span>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="completionPercentage" class="main-progress-bar"></mat-progress-bar>
+    </div>
+
+    <nav class="tab-list">
       <button *ngFor="let tab of tabs; let i = index"
               class="tab-item"
               [class.active]="currentTab === i"
               (click)="navigateToTab(i)">
         <mat-icon class="tab-icon">{{ tab.icon }}</mat-icon>
         <span class="tab-label">{{ tab.label }}</span>
+        <mat-icon class="status-icon"
+                  [class.completed]="getTabCompletion(i)"
+                  [matTooltip]="getTabCompletion(i) ? 'Section Completed' : 'Incomplete'">
+          {{ getTabCompletion(i) ? 'check_circle' : 'circle' }}
+        </mat-icon>
       </button>
-      <div class="tab-indicator" [style.transform]="'translateX(' + (currentTab * 100) + '%)'"></div>
-    </div>
+    </nav>
+  </aside>
 
-    <div class="progress-indicator">
-      <span class="progress-text">{{ completionPercentage }}% Complete</span>
-      <mat-progress-bar mode="determinate" [value]="completionPercentage" class="compact-progress"></mat-progress-bar>
-    </div>
-  </div>
-
-  <!-- Scrollable Content Area (Only this scrolls) -->
   <main class="content-area">
     <div class="content-scroll-wrapper">
+      <div class="content-header-mobile">
+        <h2 class="current-tab-title">{{ tabs[currentTab].label }}</h2>
+        <span class="step-indicator-mobile">Step {{ currentTab + 1 }} of {{ tabs.length }}</span>
+      </div>
+
       <div class="content-inner">
-        <!-- Form Sections -->
-        <div class="form-section" *ngIf="currentTab === 0">
-          <rr-personal></rr-personal>
-        </div>
-        <div class="form-section" *ngIf="currentTab === 1">
-          <rr-education></rr-education>
-        </div>
-        <div class="form-section" *ngIf="currentTab === 2">
-          <rr-experience></rr-experience>
-        </div>
-        <div class="form-section" *ngIf="currentTab === 3">
-          <rr-skills-projects></rr-skills-projects>
-        </div>
-        <div class="form-section" *ngIf="currentTab === 4">
-          <rr-summary></rr-summary>
-        </div>
+        <div class="form-section" *ngIf="currentTab === 0"> <rr-personal></rr-personal> </div>
+        <div class="form-section" *ngIf="currentTab === 1"> <rr-education></rr-education> </div>
+        <div class="form-section" *ngIf="currentTab === 2"> <rr-experience></rr-experience> </div>
+        <div class="form-section" *ngIf="currentTab === 3"> <rr-projects></rr-projects> </div>
+        <div class="form-section" *ngIf="currentTab === 4"> <rr-skills></rr-skills> </div>
+        <div class="form-section" *ngIf="currentTab === 5"> <rr-summary></rr-summary> </div>
       </div>
     </div>
   </main>
 
-  <!-- Fixed Bottom Navigation -->
-  <footer class="navigation-footer">
-    <div class="footer-content">
+  <aside class="preview-area">
+    <div class="preview-placeholder">
+      <mat-icon class="preview-icon">desktop_windows</mat-icon>
+      <h3 class="placeholder-title">Live Preview</h3>
+      <p class="placeholder-text">Click the button below to see your resume rendered instantly.</p>
+    </div>
+
+    <div class="preview-actions">
       <button mat-stroked-button
               class="nav-button back-button"
               (click)="previousStep()"
@@ -75,15 +69,11 @@
         <span>Back</span>
       </button>
 
-      <div class="step-indicator">
-        <span class="step-text">Step {{ currentTab + 1 }} of {{ tabs.length }}</span>
-      </div>
-
       <button mat-flat-button
               class="nav-button next-button"
               (click)="nextStep()"
               *ngIf="currentTab < tabs.length - 1">
-        <span>Next</span>
+        <span>Next Step</span>
         <mat-icon>arrow_forward</mat-icon>
       </button>
 
@@ -93,6 +83,43 @@
               *ngIf="currentTab === tabs.length - 1">
         <span>Finish & Preview</span>
         <mat-icon>check_circle</mat-icon>
+      </button>
+
+      <button mat-stroked-button class="view-preview-btn" (click)="openPreview()">
+        <mat-icon>visibility</mat-icon>
+        View Full Preview
+      </button>
+    </div>
+  </aside>
+
+  <footer class="mobile-navigation-footer">
+    <div class="footer-content">
+      <button mat-stroked-button
+              class="nav-button back-button mobile-icon-only"
+              (click)="previousStep()"
+              [disabled]="currentTab === 0">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Back</span>
+      </button>
+
+      <div class="step-indicator">
+        <span class="step-text">{{ tabs[currentTab].label }}</span>
+      </div>
+
+      <button mat-flat-button
+              class="nav-button next-button mobile-icon-only"
+              (click)="nextStep()"
+              *ngIf="currentTab < tabs.length - 1">
+        <span>Next</span>
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+      <button mat-flat-button
+              class="nav-button next-button mobile-icon-only"
+              (click)="openPreview()"
+              *ngIf="currentTab === tabs.length - 1">
+        <span>Preview</span>
+        <mat-icon>visibility</mat-icon>
       </button>
     </div>
   </footer>

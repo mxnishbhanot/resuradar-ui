@@ -523,8 +523,28 @@ div {
     font-size: 18px;
     width: 18px;
     height: 18px;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
   }
 }
+
+/* 🔥 Universal Mobile Icon-Only Design */
+@media (max-width: 600px) {
+  .mobile-icon-only {
+    padding: $spacing-sm !important;
+    border-radius: 50% !important;
+    min-width: 40px !important;
+    width: 40px;
+    height: 40px;
+    justify-content: center !important;
+    gap: 0 !important;
+
+    .btn-label {
+      display: none !important; /* Hide text on mobile */
+    }
+  }
+}
+
 
 
 /* ---------------------------------------------------------
@@ -559,7 +579,7 @@ div {
   }
 
   mat-icon {
-    margin: 0px !important;
+    margin-right: 0px !important;
     font-size: 18px;
     width: 18px;
     height: 18px;

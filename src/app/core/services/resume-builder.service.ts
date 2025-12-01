@@ -1,6 +1,6 @@
 // services/resume-builder.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, timer } from 'rxjs';
+import { BehaviorSubject, Observable, timer, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { debounce, tap, catchError } from 'rxjs/operators';
 import {
@@ -40,13 +40,15 @@ export class ResumeBuilderService {
 
   // Resume Management Methods
   loadDraftFromServer(): void {
-
+    // CHANGED: Handle empty response by falling back to EMPTY state
     this.http.get(`${environment.apiUrl}/custom-resume/draft`, {
       headers: this.getHeaders()
     }).pipe(
       catchError(error => {
         console.error('Failed to load draft:', error);
-        return [];
+        this.stateSubject.next(EMPTY_RESUME_STATE);  // CHANGED: Set empty on error
+        this.saveToLocal();
+        return of(EMPTY_RESUME_STATE);
       })
     ).subscribe((response: any) => {
       if (response?.resume) {
@@ -60,6 +62,10 @@ export class ResumeBuilderService {
         };
         this.stateSubject.next(state);
         this.saveToLocal(); // Also save locally as backup
+      } else {
+        // CHANGED: Handle no resume (new draft)
+        this.stateSubject.next(EMPTY_RESUME_STATE);
+        this.saveToLocal();
       }
     });
   }
@@ -71,7 +77,7 @@ export class ResumeBuilderService {
     this.saveToLocal();
   }
 
-  replace(state: ResumeBuilderState): void {
+  replace(state: ResumeBuilderState): void {  // Kept for backward compat, but prefer update()
     this.stateSubject.next(state);
     this.isDirty = true;
     this.saveToLocal();
@@ -98,7 +104,7 @@ export class ResumeBuilderService {
         console.error('Auto-save failed:', error);
         // Still save locally as fallback
         this.saveToLocal();
-        return [];
+        return of(EMPTY_RESUME_STATE);
       })
     ).subscribe((response: any) => {
       this.isDirty = false;

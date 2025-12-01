@@ -1,5 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';  // CHANGED: Added inject import
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule, KeyValue } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators, FormControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -7,27 +7,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule, MatChipInputEvent } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 // Assuming data service and model exist (adjust paths if needed)
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { Project } from '../../shared/models/resume-builder.model';  // CHANGED: Import from model
 
-// Local Model Definition (matches global model now)
-export interface EducationEntry {
-  id: string;
-  institution: string;
-  degree: string;
-  major: string;
-  startDate: string;
-  endDate: string;
-  isCurrent: boolean;
-  gpa?: string;
-  bullets: string[];
-}
-
+// Local Model Definition (matches global now, removed duplicate)
 @Component({
-  selector: 'rr-education',
+  selector: 'rr-projects',
   standalone: true,
   imports: [
     CommonModule,
@@ -39,18 +30,21 @@ export interface EducationEntry {
     MatIconModule,
     MatCardModule,
     MatCheckboxModule,
+    MatChipsModule,
     MatTooltipModule,
-    CdkTextareaAutosize
+    CdkTextareaAutosize // Required for auto-sizing textarea
   ],
-  templateUrl: './education.component.html',
-  styleUrl: './education.component.scss',
+  templateUrl: './projects.html',
+  styleUrl: './projects.scss',
 })
-export class EducationComponent implements OnInit {
+export class ProjectsComponent implements OnInit {
+  // Key codes for adding chips (Tech Stack)
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   form!: FormGroup;
   showForm = false;
   editingIndex: number | null = null;
-  educationEntries: EducationEntry[] = [];  // CHANGED: Typed to EducationEntry[]
+  projects: Project[] = [];  // CHANGED: Typed to Project[]
 
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);  // CHANGED: Use inject() for standalone
@@ -63,13 +57,13 @@ export class EducationComponent implements OnInit {
   // === Form Setup ===
   private initForm(): void {
     this.form = this.fb.group({
-      institution: ['', Validators.required],
-      degree: ['', Validators.required],
-      major: ['', Validators.required],
+      title: ['', Validators.required],
+      role: [''],
+      link: [''],
       startDate: [''],
       endDate: [''],
       isCurrent: [false],
-      gpa: [''],
+      techStack: this.fb.array([]),
       bullets: this.fb.array([])
     });
   }
@@ -92,11 +86,19 @@ export class EducationComponent implements OnInit {
     return this.form.get('bullets') as FormArray;
   }
 
+  get techStackArray(): FormArray {
+    return this.form.get('techStack') as FormArray;
+  }
+
+  get techStackControls(): FormControl[] {
+    return this.techStackArray.controls as FormControl[];
+  }
+
   // === Component Lifecycle ===
   ngOnInit(): void {
-    // CHANGED: Typed to EducationEntry[] and handle empty array
+    // CHANGED: Typed to Project[]
     this.store.state$.subscribe(state => {
-      this.educationEntries = state.educations || [];
+      this.projects = state.projects || [];
     });
   }
 
@@ -109,12 +111,26 @@ export class EducationComponent implements OnInit {
     this.bullets.removeAt(index);
   }
 
+  // === Tech Stack Chip Management (Reused from Skills) ===
+  addTech(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+    if (value) {
+      this.techStackArray.push(this.fb.control(value));
+    }
+    event.chipInput!.clear();
+  }
+
+  removeTech(index: number): void {
+    this.techStackArray.removeAt(index);
+  }
+
   // === UI & CRUD Handlers ===
   showAddForm(): void {
     this.showForm = true;
     this.editingIndex = null;
     this.form.reset({ isCurrent: false });
     this.bullets.clear();
+    this.techStackArray.clear();
     this.addBullet(); // Start with one empty bullet point
   }
 
@@ -123,29 +139,34 @@ export class EducationComponent implements OnInit {
     this.editingIndex = null;
     this.form.reset({ isCurrent: false });
     this.bullets.clear();
+    this.techStackArray.clear();
   }
 
-  editEntry(index: number): void {
+  editProject(index: number): void {
     this.editingIndex = index;
-    const entry = this.educationEntries[index];
-    const isOngoing = entry.isCurrent;
+    const proj = this.projects[index];
+    const isOngoing = proj.isCurrent;
 
-    // Clear and populate FormArray
+    // Clear and populate FormArrays
     this.bullets.clear();
-    if (entry.bullets && entry.bullets.length > 0) {
-      entry.bullets.forEach((bullet: string) => this.bullets.push(this.fb.control(bullet)));  // CHANGED: Typed bullet as string
+    if (proj.bullets && proj.bullets.length > 0) {
+      proj.bullets.forEach((bullet: string) => this.bullets.push(this.fb.control(bullet)));  // CHANGED: Typed as string
     } else {
       this.addBullet();
     }
 
+    this.techStackArray.clear();
+    if (proj.techStack && proj.techStack.length > 0) {
+      proj.techStack.forEach((tech: string) => this.techStackArray.push(this.fb.control(tech)));  // CHANGED: Typed as string
+    }
+
     this.form.patchValue({
-      institution: entry.institution,
-      degree: entry.degree,
-      major: entry.major,
-      startDate: entry.startDate,
-      endDate: entry.endDate,
-      isCurrent: isOngoing,
-      gpa: entry.gpa
+      title: proj.title,
+      role: proj.role,
+      link: proj.link,
+      startDate: proj.startDate,
+      endDate: proj.endDate,
+      isCurrent: isOngoing
     });
 
     // Manually ensure controls are enabled/disabled
@@ -158,41 +179,41 @@ export class EducationComponent implements OnInit {
     this.showForm = true;
   }
 
-  deleteEntry(index: number): void {
-    const updatedEntries = [...this.educationEntries];
-    updatedEntries.splice(index, 1);
-    this.store.update({ educations: updatedEntries });  // Triggers autosave
+  deleteProject(index: number): void {
+    const updatedProjects = [...this.projects];
+    updatedProjects.splice(index, 1);
+    this.store.update({ projects: updatedProjects });  // Triggers autosave
   }
 
-  saveEntry(): void {
+  saveProject(): void {
     if (this.form.invalid) return;
 
     const formValue = this.form.getRawValue();
     const filteredBullets = formValue.bullets.filter((b: string) => b && b.trim());
 
-    const entryData: EducationEntry = {
-      id: this.editingIndex !== null ? this.educationEntries[this.editingIndex].id : Date.now().toString(),
-      institution: formValue.institution,
-      degree: formValue.degree,
-      major: formValue.major,
+    const projectData: Project = {
+      id: this.editingIndex !== null ? this.projects[this.editingIndex].id : Date.now().toString(),
+      title: formValue.title,
+      role: formValue.role,
+      link: formValue.link,
       startDate: formValue.startDate,
       endDate: formValue.isCurrent ? '' : formValue.endDate,
       isCurrent: formValue.isCurrent,
-      gpa: formValue.gpa,
+      techStack: formValue.techStack.filter((t: string) => t && t.trim()),  // CHANGED: Filter empty tech
       bullets: filteredBullets
     };
 
-    let updatedEntries = [...this.educationEntries];
+    let updatedProjects = [...this.projects];
 
     if (this.editingIndex !== null) {
       // Update existing
-      updatedEntries[this.editingIndex] = entryData;
+      updatedProjects[this.editingIndex] = projectData;
     } else {
       // Add new
-      updatedEntries.push(entryData);
+      updatedProjects.push(projectData);
     }
 
-    this.store.update({ educations: updatedEntries });  // Triggers autosave
+    this.store.update({ projects: updatedProjects });  // Triggers autosave
 
     // Reset UI
     this.cancelForm();
