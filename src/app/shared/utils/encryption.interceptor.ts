@@ -56,13 +56,11 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     catchError(err => {
       console.log('Raw error from backend:', err);
 
-      // If the backend returned encrypted error structure (iv + data)
       if (err.error?.iv && err.error?.data) {
         return from(encSvc.decryptToObject(err.error)).pipe(
           switchMap((decryptedErrorBody: any) => {
-            console.log('Decrypted error body:', decryptedErrorBody);
+            // console.log('Decrypted error body:', decryptedErrorBody);
 
-            // Replace encrypted error body with decrypted one
             err = {
               ...err,
               error: decryptedErrorBody
@@ -78,7 +76,6 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
         );
       }
 
-      // Normal (unencrypted) error handling fallback
       if (err.status === 401 && err.error?.message === 'Invalid or expired token') {
         auth.logout();
       }
