@@ -46,6 +46,8 @@ export class Home {
   profileMenuOpen = false;
   isMobileView = false;
   isIpadView = false;
+  showBackToTop = false;
+
 
   constructor(
     private router: Router,
@@ -58,6 +60,11 @@ export class Home {
   @HostListener('window:resize', [])
   onResize() {
     this.checkScreenSize();
+  }
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    // Show button if scrolled down more than 300px
+    this.showBackToTop = window.scrollY > 300;
   }
 
   ngOnInit() {
@@ -221,5 +228,12 @@ openUpgradeModal(): void {
   setActiveTab(tab: string) {
     this.activeTab = tab;
     localStorage.setItem('activeTab', tab);
+  }
+
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
 }

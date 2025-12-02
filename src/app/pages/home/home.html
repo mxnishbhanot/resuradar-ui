@@ -353,6 +353,16 @@
       </div>
     </div>
   </footer>
+
+  <button
+    class="scroll-to-top-btn"
+    [class.visible]="showBackToTop"
+    (click)="scrollToTop()"
+    mat-fab
+    aria-label="Scroll to top"
+    matTooltip="Back to Top">
+    <mat-icon>arrow_upward</mat-icon>
+  </button>
 </div>
 
 <sc-angular-loader type="spinner" class="dots-3" color="#667eea" background="rgba(0,0,0,0.3)" width="50px" height="50px">

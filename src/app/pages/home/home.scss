@@ -16,6 +16,11 @@
   /* fallback via SCSS var */
   color: #{ $text-primary };
   transition: background 0.25s ease, color 0.25s ease;
+  padding-top: 70px;
+
+  @media (max-width: $tablet) {
+    padding-top: 64px;
+  }
 }
 
 /* Animated Background */
@@ -107,14 +112,18 @@
 
 /* Header */
 .app-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 1000;
   backdrop-filter: blur(20px);
-  background: var(--bg-glass);
+  background: rgba(var(--bg-glass-rgb), 0.95);
   border-bottom: 1px solid rgba(var(--accent-rgb), 0.08);
   box-shadow: #{ $shadow-md };
   animation: slideDown 0.5s ease-out;
+  transition: all 0.3s ease;
 
   .header-container {
     max-width: 1400px;
@@ -749,7 +758,7 @@
   box-shadow: #{ $shadow-xl };
   transform: translateX(100%);
   transition: transform 0.3s ease;
-  z-index: 999;
+  z-index: 1001;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1332,5 +1341,65 @@ body.mobile-nav-open {
 
   .main-content {
     margin: inherit;
+  }
+}
+
+.mobile-nav-overlay{
+  z-index: 1000;
+}
+
+.scroll-to-top-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 900; /* Below modals (999+), above content */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  /* Gradient matching your brand */
+  background: linear-gradient(var(--primary-angle),
+              rgba(var(--primary-start), 1),
+              rgba(var(--primary-end), 1));
+  color: var(--text-inverse);
+  box-shadow: 0 4px 14px rgba(var(--primary-start), 0.4);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Animation states */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Hover Effect */
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(var(--primary-start), 0.6);
+  }
+
+  /* Active Class added via TS */
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Mobile adjustment */
+  @media (max-width: $tablet) {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
   }
 }
