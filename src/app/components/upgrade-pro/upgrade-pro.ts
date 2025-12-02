@@ -39,7 +39,7 @@ export class UpgradePro implements OnInit {
     private router: Router,
     public dialogRef: MatDialogRef<UpgradePro>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.userName = this.data?.userName || 'User';
@@ -52,7 +52,13 @@ export class UpgradePro implements OnInit {
     const amount = 1000; // ₹10 in paise
 
     if (!(window as any).PhonePeCheckout) {
-      this.toast.warning('Payment system not loaded. Please refresh and try again');
+      this.toast.show(
+        'warning',
+        'System Warning',
+        'Payment system not loaded. Please refresh and try again',
+        5000
+      );
+
       this.isLoading = false;
       return;
     }
@@ -64,12 +70,22 @@ export class UpgradePro implements OnInit {
 
         const callback = (response: string) => {
           if (response === 'USER_CANCEL') {
-            this.toast.info('Payment cancelled by user');
+            this.toast.show(
+              'info',
+              'Payment Cancelled',
+              'Payment cancelled by user',
+            );
+
           } else if (response === 'CONCLUDED') {
             this.verifyPayment(orderId);
           } else {
             console.error('Payment error:', response);
-            this.toast.error('Payment failed. Please try again.');
+            this.toast.show(
+              'error',
+              'Payment Failed',
+              'Payment failed. Please try again.',
+            );
+
           }
         };
 
@@ -81,7 +97,11 @@ export class UpgradePro implements OnInit {
       },
       error: (err) => {
         console.error('Failed to initiate payment:', err);
-        this.toast.error('Failed to start payment. Please try again.');
+        this.toast.show(
+          'error',
+          'Payment Error',
+          'Failed to start payment. Please try again.',
+        );
         this.isLoading = false;
       }
     });
@@ -91,18 +111,34 @@ export class UpgradePro implements OnInit {
     this.paymentService.verifyPayment(orderId).subscribe({
       next: (verifyRes: any) => {
         if (verifyRes.success && verifyRes.data.status === 'COMPLETED') {
-          this.toast.success(`Payment successful! Transaction ID: ${verifyRes.data.transactionId}`);
+          this.toast.show(
+            'success',
+            'Payment Successful',
+            `Payment successful! Transaction ID: ${verifyRes.data.transactionId}`,
+          );
           this.userService.fetchCurrentUser().subscribe();
           this.router.navigate(['/upload', { txId: verifyRes.data.transactionId }]);
         } else if (verifyRes.data.status === 'PENDING') {
-          this.toast.warning('Payment is processing. Please wait...');
+          this.toast.show(
+            'warning',
+            'Payment Processing',
+            'Payment is processing. Please wait...',
+          );
         } else {
-          this.toast.error(`Payment failed: ${verifyRes.data.errorCode || 'Unknown error'}`);
+          this.toast.show(
+            'error',
+            'Payment Failed',
+            `Payment failed: ${verifyRes.data.errorCode || 'Unknown error'}`
+          );
         }
       },
       error: (err) => {
         console.error('Verification failed:', err);
-        this.toast.error('Verification failed. Please contact support.');
+        this.toast.show(
+          'error',
+          'Verification Failed',
+          'Verification failed. Please contact support.',
+        );
       }
     });
   }

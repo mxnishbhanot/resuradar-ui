@@ -1,4 +1,3 @@
-import { UserProfile } from './../../core/services/user';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';

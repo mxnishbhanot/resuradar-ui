@@ -1403,3 +1403,110 @@ body.mobile-nav-open {
     height: 45px;
   }
 }
+
+.content-loading {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+// .home-container:not(.content-loading) {
+//   animation: contentFadeIn 0.5s ease-out forwards;
+// }
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Loading indicator styles
+.skeleton-loading-indicator {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(var(--accent-rgb), 0.1);
+  z-index: 1001;
+  overflow: hidden;
+
+  @media (max-width: $tablet) {
+    top: 64px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 30%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(var(--primary-start), 1),
+      rgba(var(--primary-end), 1),
+      transparent
+    );
+    animation: loading-bar 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+}
+
+@keyframes loading-bar {
+  0% {
+    left: -30%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+// Smooth transition for all interactive elements during load
+// .home-container:not(.content-loading) {
+//   .app-header,
+//   .main-content,
+//   .app-footer {
+//     animation: slideInFromTop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+//   }
+
+//   .main-content {
+//     animation-delay: 0.1s;
+//   }
+
+//   .app-footer {
+//     animation-delay: 0.2s;
+//   }
+// }
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Enhanced skeleton appearance
+app-skeleton-loader {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: var(--bg-primary);
+}

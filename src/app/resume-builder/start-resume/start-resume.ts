@@ -5,11 +5,11 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { ToastService } from '../../core/services/toast';
 
 @Component({
   selector: 'rr-start-resume',
@@ -35,8 +35,8 @@ export class StartResumeComponent {
     private router: Router,
     private store: ResumeBuilderService,
     private http: HttpClient,
-    private snackBar: MatSnackBar
-  ) {}
+    private toast: ToastService
+  ) { }
 
   startFromScratch(): void {
     this.store.clearLocal();
@@ -80,7 +80,12 @@ export class StartResumeComponent {
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      this.snackBar.open('Please upload a PDF or DOCX file.', 'Close', { duration: 3000 });
+      this.toast.show(
+        'warning',
+        'Upload Warning',
+        'Please upload a PDF or DOCX file.',
+        5000
+      );
       return;
     }
 
@@ -110,7 +115,13 @@ export class StartResumeComponent {
           }
         },
         error: () => {
-          this.snackBar.open('Failed to parse resume. Please try again or start from scratch.', 'Close', { duration: 4000 });
+          this.toast.show(
+            'error',
+            'Parsing Failed',
+            'Failed to parse resume. Please try again or start from scratch.',
+            5000
+          );
+
           this.resetUpload();
         },
         complete: () => {

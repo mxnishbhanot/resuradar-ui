@@ -80,7 +80,13 @@ export class ScanResume {
       if (file.type === 'application/pdf') {
         this.processFile(file);
       } else {
-        this.toast.warning('Please upload a PDF file');
+        this.toast.show(
+          'warning',
+          'Upload Warning',
+          'Please upload a PDF file',
+          5000
+        );
+
       }
     }
   }
@@ -97,7 +103,13 @@ export class ScanResume {
 
   private processFile(file: File) {
     if (file.size > 5 * 1024 * 1024) {
-      this.toast.warning('File must be under 5MB');
+      this.toast.show(
+        'warning',
+        'Upload Warning',
+        'File must be under 5MB',
+        5000
+      );
+
       return;
     }
     this.fileName = file.name;
@@ -108,7 +120,12 @@ export class ScanResume {
   analyzeMatch() {
     if (this.wordCount === 0 || this.wordCount > 500) {
       this.jdError = true;
-      this.toast.warning('Job description must be 1–500 words');
+      this.toast.show(
+        'warning',
+        'Input Warning',
+        'Job description must be 1–500 words',
+      );
+
       return;
     }
     this.jdError = false;
@@ -125,7 +142,12 @@ export class ScanResume {
     this.resumeService.matchResume(formData).subscribe({
       next: (res) => {
         this.loading = false;
-        this.toast.success('Match analysis complete!');
+        this.toast.show(
+          'success',
+          'Analysis Complete',
+          'Match analysis complete!',
+        );
+
         // Store result (adjust based on your service)
         console.log(res.data);
 
@@ -155,7 +177,11 @@ export class ScanResume {
             }
           });
         } else {
-          this.toast.error('Analysis failed. Please try again.');
+          this.toast.show(
+            'error',
+            'Analysis Failed',
+            'Analysis failed. Please try again.',
+          );
         }
         this.resetFile();
       }

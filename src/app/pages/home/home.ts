@@ -1,3 +1,4 @@
+// home.component.ts - Updated with skeleton loading
 import { Component, HostListener, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -11,9 +12,11 @@ import { GoogleAuthService } from '../../core/services/google-auth';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { UserService } from '../../core/services/user';
-import { ScAngularLoader } from 'sc-angular-loader';
 import { MatRippleModule } from '@angular/material/core';
 import { filter } from 'rxjs';
+import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader';
+import { SkeletonService } from '../../core/services/skeleton';
+import { ToastContainerComponent } from '../../shared/components/toast-container/toast-container';
 
 @Component({
   selector: 'app-home',
@@ -27,9 +30,9 @@ import { filter } from 'rxjs';
     MatDividerModule,
     RouterOutlet,
     MatTooltipModule,
-    ScAngularLoader,
     MatRippleModule,
-    RouterModule
+    RouterModule,
+    SkeletonLoaderComponent,
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
@@ -48,26 +51,37 @@ export class Home {
   isIpadView = false;
   showBackToTop = false;
 
+  // Loading state
+  isLoading = true;
 
   constructor(
     private router: Router,
     public googleAuth: GoogleAuthService,
     public dialog: MatDialog,
     private userService: UserService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private skeletonService: SkeletonService
   ) { }
 
   @HostListener('window:resize', [])
   onResize() {
     this.checkScreenSize();
   }
+
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    // Show button if scrolled down more than 300px
     this.showBackToTop = window.scrollY > 300;
   }
 
   ngOnInit() {
+    // Subscribe to loading state
+    this.skeletonService.loading$.subscribe(loading => {
+      this.isLoading = loading;
+    });
+
+    // Initialize with loading
+    this.skeletonService.setLoading(true);
+
     // Initialize Google Auth
     setTimeout(() => {
       this.googleAuth.initialize('159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com');
@@ -82,11 +96,16 @@ export class Home {
         this.userName = u.name || 'Guest User';
         this.userEmail = u.email || '';
         this.avatar = u.picture || '';
-        this.userService.fetchCurrentUser().subscribe();
+        this.userService.fetchCurrentUser().subscribe(() => {
+          // Stop loading after user data is fetched
+          this.stopLoadingWithDelay();
+        });
       } else {
         this.userName = 'Guest User';
         this.userEmail = '';
         this.avatar = '';
+        // Stop loading even if no user
+        this.stopLoadingWithDelay();
       }
     });
 
@@ -109,28 +128,34 @@ export class Home {
     this.checkScreenSize();
   }
 
+  private stopLoadingWithDelay() {
+    // Minimum display time for skeleton to avoid flash
+    setTimeout(() => {
+      this.skeletonService.setLoading(false);
+    }, 800);
+  }
+
   ngOnDestroy() {
-    // Remove body class if component is destroyed with nav open
     if (this.mobileNavOpen) {
       this.renderer.removeClass(document.body, 'mobile-nav-open');
     }
 
-    // Close profile menu if open
     if (this.profileMenuOpen) {
       this.profileMenuOpen = false;
     }
+
+    // Clean up any loading-related classes
+    this.renderer.removeClass(document.body, 'loading-active');
   }
 
   checkScreenSize() {
     this.isMobileView = window.innerWidth <= 768;
     this.isIpadView = window.innerWidth <= 820;
 
-    // Close mobile nav if screen becomes desktop
     if (!this.isMobileView && this.mobileNavOpen) {
       this.closeMobileNav();
     }
 
-    // Close profile menu on mobile
     if (this.isMobileView && this.profileMenuOpen) {
       this.profileMenuOpen = false;
     }
@@ -139,12 +164,10 @@ export class Home {
   toggleMobileNav() {
     this.mobileNavOpen = !this.mobileNavOpen;
 
-    // Close profile menu if mobile nav opens
     if (this.mobileNavOpen && this.profileMenuOpen) {
       this.profileMenuOpen = false;
     }
 
-    // Prevent body scroll when mobile nav is open
     if (this.mobileNavOpen) {
       this.renderer.addClass(document.body, 'mobile-nav-open');
     } else {
@@ -160,7 +183,6 @@ export class Home {
   toggleProfileMenu() {
     this.profileMenuOpen = !this.profileMenuOpen;
 
-    // Close mobile nav if profile menu opens
     if (this.profileMenuOpen && this.mobileNavOpen) {
       this.closeMobileNav();
     }
@@ -174,48 +196,32 @@ export class Home {
     this.googleAuth.signIn();
   }
 
-  // openUpgradeModal() {
-  //   this.dialog.open(UpgradePro, {
-  //     width: '100%',
-  //     maxWidth: '520px',
-  //     maxHeight: '90vh',
-  //     panelClass: 'upgrade-pro-dialog',
-  //     hasBackdrop: true,
-  //     disableClose: false,
-  //   });
-  // }
-openUpgradeModal(): void {
-  const dialogConfig: MatDialogConfig = {
-    width: '100%',
-    // Desktop: Fixed height, mobile: Full height
-    height: 'auto',
-    panelClass: 'upgrade-modal-container',
-    autoFocus: false,
-    restoreFocus: true,
-    disableClose: false, // Allow closing by clicking outside
-    hasBackdrop: true,
-    backdropClass: 'upgrade-modal-backdrop',
-    data: {
-      userName: 'John Doe',
-      userEmail: 'john@example.com'
-    },
-    // Smooth entrance animation
-    enterAnimationDuration: '300ms',
-    exitAnimationDuration: '250ms',
+  openUpgradeModal(): void {
+    const dialogConfig: MatDialogConfig = {
+      width: '100%',
+      height: 'auto',
+      panelClass: 'upgrade-modal-container',
+      autoFocus: false,
+      restoreFocus: true,
+      disableClose: false,
+      hasBackdrop: true,
+      backdropClass: 'upgrade-modal-backdrop',
+      data: {
+        userName: 'John Doe',
+        userEmail: 'john@example.com'
+      },
+      enterAnimationDuration: '300ms',
+      exitAnimationDuration: '250ms',
+      maxWidth: window.innerWidth > 768 ? '500px' : '90vw',
+      maxHeight: window.innerWidth > 768 ? 'fit-content' : '90vh',
+    };
 
-    // Desktop-specific settings
-    maxWidth: window.innerWidth > 768 ? '500px' : '90vw',
-    maxHeight: window.innerWidth > 768 ? 'fit-content' : '90vh',
-  };
+    const dialogRef = this.dialog.open(UpgradePro, dialogConfig);
 
-  const dialogRef = this.dialog.open(UpgradePro, dialogConfig);
-
-  // Handle modal close
-  dialogRef.afterClosed().subscribe(result => {
-    console.log('Modal closed with result:', result);
-    // Handle any post-close logic
-  });
-}
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Modal closed with result:', result);
+    });
+  }
 
   exteranlLink(type: string) {
     if (type === 'site') {

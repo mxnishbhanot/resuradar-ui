@@ -7,11 +7,11 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
-import { ToastService } from '../../core/services/toast';
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
 import { UpgradePro } from '../upgrade-pro/upgrade-pro';
 import { MatDialog } from '@angular/material/dialog';
+import { ToastService } from '../../core/services/toast';
 
 @Component({
   selector: 'app-upload-resume',
@@ -61,7 +61,7 @@ export class UploadResume {
       if (this.isValidFileType(file)) {
         this.processFile(file);
       } else {
-        this.toast.warning('Please upload a PDF file');
+        this.toast.show('warning', 'Upload Warning', 'Please upload a PDF file');
       }
     }
   }
@@ -82,12 +82,20 @@ export class UploadResume {
     if (!this.isLoggedIn) return;
 
     if (!this.isValidFileType(file)) {
-      this.toast.warning('Please upload a PDF file (max 5MB)');
+      this.toast.show(
+        'warning',
+        'Upload Warning',
+        'Please upload a PDF file (max 5MB)'
+      );
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      this.toast.warning('File size must be less than 5MB');
+      this.toast.show(
+        'warning',
+        'Upload Warning',
+        'File size must be less than 5MB'
+      );
       return;
     }
 
@@ -98,7 +106,11 @@ export class UploadResume {
     this.resumeService.uploadResume(file).subscribe({
       next: (res) => {
         this.loading = false;
-        this.toast.success('Resume analyzed successfully.');
+        this.toast.show(
+          'success',
+          'Success',
+          'Resume analyzed successfully.'
+        );
         this.resumeService.setLatestAnalysis(res.data);
         this.router.navigate(['/analysis']);
       },
@@ -129,7 +141,7 @@ export class UploadResume {
           this.resetFile();
         } else {
           console.error('Upload failed:', err);
-          this.toast.error('Analysis failed. Please try again.');
+          this.toast.show('error', 'Upload Failed', 'An error occurred while uploading your resume. Please try again.');
           this.resetFile();
         }
       }

@@ -32,7 +32,13 @@ export class Contact {
 
   onSubmit() {
     if (!this.name || !this.email || !this.message) {
-      this.toast.error('Please fill all fields.');
+      this.toast.show(
+        'error',
+        'Validation Error',
+        'Please fill all fields.',
+        5000
+      );
+
       return;
     }
 
@@ -45,7 +51,13 @@ export class Contact {
         this.submitted = true;
       },
       error: (err) => {
-        this.toast.error('Something went wrong, please try again later.');
+        this.toast.show(
+          'error',
+          'Error',
+          'Something went wrong, please try again later.',
+          5000
+        );
+
       }
     });
   }

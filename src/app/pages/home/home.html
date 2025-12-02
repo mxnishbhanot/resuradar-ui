@@ -1,4 +1,8 @@
-<div class="home-container">
+<app-skeleton-loader *ngIf="isLoading" [isMobile]="isMobileView"></app-skeleton-loader>
+
+<div class="skeleton-loading-indicator" *ngIf="isLoading"></div>
+
+<div class="home-container" >
   <!-- Animated Background -->
   <div class="background-wrapper">
     <div class="gradient-orb orb-1"></div>
@@ -365,5 +369,4 @@
   </button>
 </div>
 
-<sc-angular-loader type="spinner" class="dots-3" color="#667eea" background="rgba(0,0,0,0.3)" width="50px" height="50px">
-</sc-angular-loader>
+<!-- <app-toast-container></app-toast-container> -->

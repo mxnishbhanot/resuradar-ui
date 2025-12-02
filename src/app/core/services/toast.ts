@@ -1,23 +1,36 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { CustomSnackbarComponent, CustomSnackBarData } from '../../shared/components/snackbar/snackbar';
+import { BehaviorSubject } from 'rxjs';
+
+export interface Toast {
+  id: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+  title: string;
+  message: string;
+  duration?: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  constructor(private snackBar: MatSnackBar) {}
+  // Store the list of active toasts
+  private toastsSubject = new BehaviorSubject<Toast[]>([]);
+  public toasts$ = this.toastsSubject.asObservable();
 
-  open(message: string, type: CustomSnackBarData['type'] = 'info') {
-    this.snackBar.openFromComponent(CustomSnackbarComponent, {
-      data: { message, type },
-      duration: 4000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: ['custom-snackbar-panel']
-    });
+  show(type: Toast['type'], title: string, message: string, duration: number = 5000) {
+    const id = Date.now().toString();
+    const newToast: Toast = { id, type, title, message, duration };
+
+    // Add to top of stack
+    const currentToasts = this.toastsSubject.value;
+    this.toastsSubject.next([...currentToasts, newToast]);
+
+    // Auto-remove
+    setTimeout(() => {
+      this.remove(id);
+    }, duration);
   }
 
-  success(message: string) { this.open(message, 'success'); }
-  error(message: string) { this.open(message, 'error'); }
-  info(message: string) { this.open(message, 'info'); }
-  warning(message: string) { this.open(message, 'warning'); }
+  remove(id: string) {
+    const currentToasts = this.toastsSubject.value;
+    this.toastsSubject.next(currentToasts.filter(t => t.id !== id));
+  }
 }
