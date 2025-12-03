@@ -32,6 +32,7 @@ html {
   overflow-x: hidden; // Prevent horizontal scrolling
   width: 100%;
   height: 100%;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -77,29 +78,6 @@ router-outlet+* {
 
 .mat-icon {
   overflow: visible !important;
-}
-
-// ==============================
-// SNACKBAR CUSTOMIZATION
-// ==============================
-
-.custom-snackbar-panel {
-  padding: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  max-width: 100%;
-  box-sizing: border-box;
-
-  .mat-mdc-snackbar-surface {
-    padding-right: 0px !important;
-    border-radius: 20px !important;
-    max-width: 100%;
-    box-sizing: border-box;
-
-    .mdc-snackbar__label {
-      padding: 0 !important;
-    }
-  }
 }
 
 // ==============================

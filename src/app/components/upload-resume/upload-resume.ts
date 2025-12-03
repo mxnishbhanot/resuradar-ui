@@ -81,7 +81,8 @@ export class UploadResume {
   private processFile(file: File) {
     if (!this.isLoggedIn) return;
 
-    if (!this.isValidFileType(file)) {
+    // Validate file
+    if (!this.isValidFileType(file) || file.size > 5 * 1024 * 1024) {
       this.toast.show(
         'warning',
         'Upload Warning',
@@ -90,62 +91,62 @@ export class UploadResume {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      this.toast.show(
-        'warning',
-        'Upload Warning',
-        'File size must be less than 5MB'
-      );
-      return;
-    }
-
-    this.fileName = file.name;
-    this.fileSize = this.formatFileSize(file.size);
+    this.setFileMeta(file);
     this.loading = true;
 
     this.resumeService.uploadResume(file).subscribe({
       next: (res) => {
         this.loading = false;
-        this.toast.show(
-          'success',
-          'Success',
-          'Resume analyzed successfully.'
-        );
+        this.toast.show('success', 'Success', 'Resume analyzed successfully.');
         this.resumeService.setLatestAnalysis(res.data);
         this.router.navigate(['/analysis']);
       },
+
       error: (err) => {
         this.loading = false;
+
         if (err.status === 403) {
-          const message = err.error?.message || 'You’ve used all your free analyses.';
-          const modalRef = this.dialog.open(QuotaExhaustedModal, {
-            data: { message },
-            width: '100%',
-            maxWidth: '520px',
-            panelClass: 'quota-modal-dialog'
-          });
-
-          modalRef.afterClosed().subscribe((result: any) => {
-            if (result === 'upgrade') {
-              // Open your existing upgrade popup
-                const dialogConfig = new MatDialogConfig();
-                // This connects to the global CSS above
-                dialogConfig.panelClass = 'responsive-dialog-wrapper';
-
-                dialogConfig.maxWidth = '100vw';
-                dialogConfig.width = '100%';
-                dialogConfig.height = '100%';
-                dialogConfig.disableClose = true; // We handle closing manually
-
-                this.dialog.open(UpgradePro, dialogConfig);
-            }
-          });
-          this.resetFile();
+          this.handleQuotaExceeded(err);
         } else {
           console.error('Upload failed:', err);
-          this.toast.show('error', 'Upload Failed', 'An error occurred while uploading your resume. Please try again.');
-          this.resetFile();
+          this.toast.show(
+            'error',
+            'Upload Failed',
+            'An error occurred while uploading your resume. Please try again.'
+          );
         }
+
+        this.resetFile();
+      }
+    });
+  }
+
+  private setFileMeta(file: File) {
+    this.fileName = file.name;
+    this.fileSize = this.formatFileSize(file.size);
+  }
+
+  private getFullScreenDialogConfig(data?: any): MatDialogConfig {
+    return {
+      panelClass: 'responsive-dialog-wrapper',
+      maxWidth: '100vw',
+      width: '100%',
+      height: '100%',
+      disableClose: true,
+      data
+    };
+  }
+
+  private handleQuotaExceeded(err: any) {
+    const message = err.error?.message || 'You’ve used all your free analyses.';
+    const modalRef = this.dialog.open(
+      QuotaExhaustedModal,
+      this.getFullScreenDialogConfig({ message })
+    );
+
+    modalRef.afterClosed().subscribe((result) => {
+      if (result === 'upgrade') {
+        this.dialog.open(UpgradePro, this.getFullScreenDialogConfig());
       }
     });
   }

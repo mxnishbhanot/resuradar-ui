@@ -30,6 +30,7 @@ export class QuotaExhaustedModal implements OnInit {
   }
 
   checkScreenSize() {
+    // Breakpoint at 768px (Standard Tablet/Mobile cutoff)
     this.isMobile = window.innerWidth < 768;
   }
 

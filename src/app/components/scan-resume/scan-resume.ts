@@ -118,77 +118,72 @@ export class ScanResume {
   }
 
   analyzeMatch() {
-    if (this.wordCount === 0 || this.wordCount > 500) {
+    if (this.wordCount < 1 || this.wordCount > 500) {
       this.jdError = true;
-      this.toast.show(
-        'warning',
-        'Input Warning',
-        'Job description must be 1–500 words',
-      );
-
+      this.toast.show('warning', 'Input Warning', 'Job description must be 1–500 words');
       return;
     }
+
     this.jdError = false;
     this.loading = true;
 
     const formData = new FormData();
-    const input = document.querySelector('#fileInput') as HTMLInputElement;
-
-    if (this.file) {
-      formData.append('resume', this.file);
-    }
+    if (this.file) formData.append('resume', this.file);
     formData.append('jobDescription', this.jobDescription);
 
     this.resumeService.matchResume(formData).subscribe({
       next: (res) => {
         this.loading = false;
-        this.toast.show(
-          'success',
-          'Analysis Complete',
-          'Match analysis complete!',
-        );
-
-        // Store result (adjust based on your service)
-        console.log(res.data);
+        this.toast.show('success', 'Analysis Complete', 'Match analysis complete!');
 
         this.resumeService.setLatestMatchAnalysis(res.data);
         this.router.navigate(['/match-results']);
       },
+
       error: (err) => {
         this.loading = false;
+
         if (err.status === 403) {
-          const message = err.error?.message || 'JD matching is a Pro feature.';
-          const modalRef = this.dialog.open(QuotaExhaustedModal, {
-            data: { message },
-            width: '100%',
-            maxWidth: '520px',
-            panelClass: 'quota-modal-dialog'
-          });
-          modalRef.afterClosed().subscribe(result => {
-            if (result === 'upgrade') {
-              const dialogConfig = new MatDialogConfig();
-              // This connects to the global CSS above
-              dialogConfig.panelClass = 'responsive-dialog-wrapper';
-
-              dialogConfig.maxWidth = '100vw';
-              dialogConfig.width = '100%';
-              dialogConfig.height = '100%';
-              dialogConfig.disableClose = true; // We handle closing manually
-
-              this.dialog.open(UpgradePro, dialogConfig);
-            }
-          });
-        } else {
-          this.toast.show(
-            'error',
-            'Analysis Failed',
-            'Analysis failed. Please try again.',
+          this.handleQuotaExceeded(
+            err,
+            'JD matching is a Pro feature.'
           );
+        } else {
+          this.toast.show('error', 'Analysis Failed', 'Analysis failed. Please try again.');
         }
+
         this.resetFile();
       }
     });
   }
+
+  private getFullScreenDialogConfig(data?: any): MatDialogConfig {
+    return {
+      panelClass: 'responsive-dialog-wrapper',
+      maxWidth: '100vw',
+      width: '100%',
+      height: '100%',
+      disableClose: true,
+      data
+    };
+  }
+
+  private handleQuotaExceeded(err: any, fallbackMsg: string) {
+    const message = err.error?.message || fallbackMsg;
+
+    const modalRef = this.dialog.open(
+      QuotaExhaustedModal,
+      this.getFullScreenDialogConfig({ message })
+    );
+
+    modalRef.afterClosed().subscribe(result => {
+      if (result === 'upgrade') {
+        this.dialog.open(UpgradePro, this.getFullScreenDialogConfig());
+      }
+    });
+  }
+
+
 
   resetFile() {
     this.fileName = '';
