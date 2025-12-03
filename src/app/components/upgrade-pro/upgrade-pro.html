@@ -1,106 +1,138 @@
-<div class="upgrade-wrapper">
-  <!-- Animated Background -->
-  <div class="background-gradient"></div>
+<div class="upgrade-container">
+  <div class="backdrop" [class.fade-out]="isClosing" (click)="close()"></div>
 
-  <div class="upgrade-card">
-    <!-- Close Button -->
-    <button
-      mat-icon-button
-      class="close-btn"
-      (click)="close()"
-      matTooltip="Close"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
+  @if (!isMobile) {
+    <div class="desktop-card" [class.scale-out]="isClosing" (click)="$event.stopPropagation()">
+      <div class="glow-orb"></div>
 
-    <!-- Header Badge -->
-    <div class="header-badge">
-      <mat-icon>workspace_premium</mat-icon>
-      <span>Premium Plan</span>
+      <button mat-icon-button class="close-btn" (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div class="content-wrapper">
+        <div class="left-pane">
+          <div class="badge-pill">
+            <mat-icon>verified</mat-icon> Premium Access
+          </div>
+
+          <h1>Unlock your full <br><span class="highlight-text">Potential</span></h1>
+
+          <div class="price-tag">
+            <span class="currency">$</span>10
+            <span class="details">/ one-time</span>
+          </div>
+
+          <p class="guarantee">
+            <mat-icon>lock</mat-icon> Secure payment. Lifetime access.
+          </p>
+        </div>
+
+        <div class="right-pane">
+          <h3>What's included</h3>
+          <ul class="feature-list">
+            <li class="highlight-feature">
+              <div class="icon-box ai-icon"><mat-icon>auto_awesome</mat-icon></div>
+              <span>Build unlimited AI Resumes</span>
+            </li>
+            <li>
+              <div class="icon-box"><mat-icon>block</mat-icon></div>
+              <span>Remove all ads</span>
+            </li>
+            <li>
+              <div class="icon-box"><mat-icon>analytics</mat-icon></div>
+              <span>Deep Resume Analysis</span>
+            </li>
+            <li>
+              <div class="icon-box"><mat-icon>rocket_launch</mat-icon></div>
+              <span>ATS Score Optimization</span>
+            </li>
+            <li>
+              <div class="icon-box"><mat-icon>support_agent</mat-icon></div>
+              <span>Priority Support</span>
+            </li>
+          </ul>
+
+          <button class="cta-btn pulse-animation" (click)="startCheckout()" [disabled]="isLoading">
+            {{ isLoading ? 'Processing...' : 'Upgrade Now' }}
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
     </div>
+  }
 
-    <!-- Logo -->
-    <!-- <div class="logo">
-      <span class="logo-wrapper">
-        <img class="logo-icon" src="resuradar.png" alt="ResuRadar Logo">
-      </span>
-      <span class="logo-text">ResuRadar</span>
-    </div> -->
+  @if (isMobile) {
+    <div class="mobile-sheet" [class.slide-down]="isClosing" (click)="$event.stopPropagation()">
 
-    <!-- Header -->
-    <div class="header">
-      <!-- <h1>Upgrade to Pro</h1> -->
-      <p>Unlock lifetime access with a one-time payment</p>
-    </div>
+      <div class="sheet-handle"></div>
 
-    <!-- Plan Card -->
-    <mat-card class="plan-card">
-      <div class="plan-header">
-        <h2>Pro Plan</h2>
-        <div class="price">
-          <span class="amount">$10</span>
-          <span class="period">one-time</span>
+      <div class="decorative-header">
+        <div class="header-content">
+          <div class="badge-pill mobile">Pro Plan</div>
+          <button mat-icon-button class="mobile-close" (click)="close()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="main-title-row">
+           <h2>Upgrade to Pro</h2>
+           <div class="price-bubble">
+             $10
+           </div>
+        </div>
+        <p class="sub-title">Unlock the full power of AI for your career.</p>
+      </div>
+
+      <div class="mobile-scroll-content">
+        <div class="mobile-features">
+
+          <div class="feature-card highlight-card">
+            <div class="card-icon ai-gradient">
+              <mat-icon>auto_awesome</mat-icon>
+            </div>
+            <div class="card-text">
+              <span class="title">Unlimited AI Resumes</span>
+              <span class="desc">Generate resumes with AI</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon"><mat-icon>block</mat-icon></div>
+            <div class="card-text">
+              <span class="title">Ad-free experience</span>
+              <span class="desc">Focus on your work</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon"><mat-icon>analytics</mat-icon></div>
+            <div class="card-text">
+              <span class="title">Deep Analysis</span>
+              <span class="desc">Detailed performance insights</span>
+            </div>
+          </div>
+
+           <div class="feature-card">
+            <div class="card-icon"><mat-icon>rocket_launch</mat-icon></div>
+            <div class="card-text">
+              <span class="title">ATS Optimization</span>
+              <span class="desc">Get noticed by recruiters</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <mat-divider></mat-divider>
-
-      <ul class="features-list">
-        <li class="feature-item">
-          <div class="feature-icon-wrapper">
-            <mat-icon class="feature-icon">check</mat-icon>
-          </div>
-          <span>Ad-free experience</span>
-        </li>
-        <li class="feature-item">
-          <div class="feature-icon-wrapper">
-            <mat-icon class="feature-icon">check</mat-icon>
-          </div>
-          <span>Lifetime access</span>
-        </li>
-        <li class="feature-item">
-          <div class="feature-icon-wrapper">
-            <mat-icon class="feature-icon">check</mat-icon>
-          </div>
-          <span>Full resume analysis</span>
-        </li>
-        <li class="feature-item">
-          <div class="feature-icon-wrapper">
-            <mat-icon class="feature-icon">check</mat-icon>
-          </div>
-          <span>Keyword optimization</span>
-        </li>
-        <li class="feature-item">
-          <div class="feature-icon-wrapper">
-            <mat-icon class="feature-icon">check</mat-icon>
-          </div>
-          <span>Priority support</span>
-        </li>
-      </ul>
-    </mat-card>
-
-    <!-- Checkout Button -->
-    <button
-      mat-flat-button
-      color="primary"
-      class="checkout-btn"
-      (click)="startCheckout()"
-      [disabled]="isLoading"
-    >
-      <mat-icon *ngIf="!isLoading">workspace_premium</mat-icon>
-      <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-      <span>{{ isLoading ? 'Processing...' : 'Upgrade Now' }}</span>
-    </button>
-
-    <!-- Trust Notice -->
-    <div class="trust-notice">
-      <div class="trust-icon">
-        <mat-icon>verified_user</mat-icon>
-      </div>
-      <div class="trust-content">
-        <!-- <strong>Secure Payment</strong> -->
-        <span>Payments secured by PhonePe • No recurring charges</span>
+      <div class="mobile-footer">
+        <button class="cta-btn" (click)="startCheckout()" [disabled]="isLoading">
+          <span>Upgrade Now</span>
+          <span class="sep">•</span>
+          <span>$10 Lifetime</span>
+        </button>
+        <div class="secure-label">
+          <mat-icon>gpp_good</mat-icon> Secure Payment via PhonePe
+        </div>
       </div>
     </div>
-  </div>
+  }
 </div>

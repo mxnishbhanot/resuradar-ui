@@ -1,435 +1,294 @@
 @use '../../../theme/variables' as *;
 
-// ==============================
-// UPGRADE PRO STYLES (unified theme)
-// ==============================
+// --- UTILS ---
+@mixin glass-panel {
+  background: rgba(var(--bg-primary-rgb), 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--border-color-rgb), 0.5);
+}
 
-.upgrade-wrapper {
-  position: relative;
+.upgrade-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  // padding: $spacing-lg $spacing-lg;
-  background: transparent;
-
-  // For desktop - no scrolling needed
-  @media (min-width: 769px) {
-    // padding: $spacing-xl $spacing-lg;
-    min-height: fit-content;
-    height: auto;
-  }
-
-  // For mobile devices
-  @media (max-width: 768px) {
-    padding: $spacing-lg $spacing-md;
-    min-height: 100vh;
-    height: 100%;
-    overflow-y: auto;
-  }
+  z-index: 1000;
 }
 
-// Animated Background (same as other components)
-.background-gradient {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    var(--primary-angle),
-    rgba(var(--primary-start), 0.085) 0%,
-    rgba(var(--primary-end), 0.085) 50%,
-    rgba(var(--secondary-start), 0.085) 100%
-  );
+.backdrop {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   z-index: -1;
-  animation: gradientShift 15s ease infinite;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%);
-    animation: float 20s ease-in-out infinite;
-  }
+  animation: fadeIn 0.4s ease-out forwards;
+  &.fade-out { animation: fadeOut 0.4s ease-in forwards; }
 }
 
-@keyframes gradientShift {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(30px, -30px) rotate(120deg); }
-  66% { transform: translate(-20px, 20px) rotate(240deg); }
-}
-
-.upgrade-card {
-  background: $card-bg;
+// =========================================================
+// DESKTOP STYLES
+// =========================================================
+.desktop-card {
+  width: 850px; // Slightly wider for new content
+  height: 520px;
+  @include glass-panel;
   border-radius: $radius-xl;
-  box-shadow: $shadow-xl;
-  border: 1px solid $accent-overlay-10;
-  overflow: hidden;
-  width: 100%;
-  max-width: 480px;
-  padding: $spacing-xl;
+  box-shadow: 0 25px 80px -20px rgba(0,0,0,0.4);
   position: relative;
-  z-index: 1;
-  transition: all 0.3s ease;
-  margin: 0 auto;
+  overflow: hidden;
+  display: flex;
+  animation: desktopEntry 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 
-  // For desktop - ensure content fits
-  @media (min-width: 769px) {
-    max-width: 480px;
-    padding: $spacing-xl;
-    margin: 0 auto;
-    max-height: fit-content;
-    overflow: visible;
+  &.scale-out { animation: desktopExit 0.3s ease-in forwards; }
+
+  // ... (Glow orb, close btn, left-pane remain similar) ...
+  .glow-orb {
+    position: absolute;
+    top: -50px; left: -50px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(var(--primary-start), 0.2), transparent 70%);
+    filter: blur(40px);
+    z-index: 0;
   }
-
-  // For mobile devices
-  @media (max-width: 768px) {
-    max-width: 95%;
-    padding: $spacing-lg;
-    margin: $spacing-xl auto;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-  }
-
-  // &:hover {
-  //   box-shadow: 0 25px 35px rgba(var(--shadow-rgb), 0.12), 0 15px 15px rgba(var(--shadow-rgb), 0.06);
-  //   transform: translateY(-4px);
-  // }
 
   .close-btn {
-    position: absolute;
-    top: $spacing-md;
-    right: $spacing-md;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50% !important;
-    background: $hover-bg !important;
-    border: 1px solid $border-color !important;
-    color: $text-primary !important;
-    z-index: 10;
-    transition: all 0.3s ease !important;
-    box-shadow: $shadow-md !important;
-
-    mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-
-    &:hover {
-      background: $card-bg !important;
-      transform: translateY(-2px);
-      box-shadow: $shadow-lg !important;
-      border-color: $accent-color !important;
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
+    position: absolute; top: 20px; right: 20px; z-index: 10;
+    color: $text-muted;
+    transition: 0.2s;
+    &:hover { background: $hover-bg; color: $text-primary; }
   }
 
-  .header-badge {
-    display: flex;
-    align-items: center;
-    gap: $spacing-xs;
-    background: $primary-gradient;
-    color: $text-inverse;
-    padding: $spacing-xs $spacing-md;
-    border-radius: 50px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    box-shadow: $shadow-md;
-    animation: pulse 2s ease-in-out infinite;
-    justify-content: center;
-    width: 100%;
-    max-width: 120px;
-    margin: auto;
-    margin-bottom: $spacing-lg;
+  .content-wrapper {
+    display: flex; width: 100%; z-index: 1;
 
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      color: $text-inverse;
+    .left-pane {
+      flex: 0.9;
+      padding: 48px;
+      display: flex; flex-direction: column; justify-content: center;
+      border-right: 1px solid rgba(var(--border-color-rgb), 0.3);
+
+      .badge-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: $accent-overlay-10; color: $accent-color;
+        padding: 6px 14px; border-radius: 20px;
+        font-size: 0.85rem; font-weight: 600; width: fit-content;
+        margin-bottom: 24px;
+        mat-icon { font-size: 16px; width: 16px; height: 16px; }
+      }
+
+      h1 {
+        font-size: 2.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 24px; color: $text-primary;
+        .highlight-text {
+          background: $primary-gradient;
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+      }
+
+      .price-tag {
+        font-size: 3.5rem; font-weight: 800; color: $text-primary;
+        .currency { font-size: 1.5rem; vertical-align: top; color: $text-secondary; }
+        .details { font-size: 1rem; color: $text-muted; font-weight: normal; margin-left: 8px; }
+      }
+
+      .guarantee { display: flex; align-items: center; gap: 8px; margin-top: auto; font-size: 0.9rem; color: $success-color; }
     }
-  }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: $spacing-md;
-    margin-bottom: $spacing-xl;
+    .right-pane {
+      flex: 1;
+      padding: 48px 40px;
+      display: flex; flex-direction: column; justify-content: center;
+      background: rgba(var(--bg-secondary-rgb), 0.4);
 
-    .logo-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      border-radius: $radius-md;
-      background: $primary-gradient;
+      h3 { font-size: 1.2rem; margin-bottom: 24px; color: $text-primary; font-weight: 700; }
 
-      .logo-icon {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
+      .feature-list {
+        list-style: none; padding: 0; margin: 0 0 32px 0;
+
+        li {
+          display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+          color: $text-primary; font-weight: 500; font-size: 0.95rem;
+
+          .icon-box {
+            width: 32px; height: 32px; border-radius: 10px;
+            background: $bg-primary;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: $shadow-sm; color: $success-color;
+            mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+            // Special style for the new AI icon
+            &.ai-icon {
+              background: $primary-gradient;
+              color: white;
+            }
+          }
+
+          &.highlight-feature {
+            font-weight: 600;
+          }
+        }
+      }
+
+      .cta-btn {
+        width: 100%; height: 54px;
+        border: none; border-radius: 12px;
+        background: $done-bg-gradient; color: $done-text;
+        font-size: 1.1rem; font-weight: 600; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        box-shadow: 0 4px 15px rgba(var(--primary-start), 0.4);
+        transition: all 0.3s ease;
+        &:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(var(--primary-start), 0.5); }
       }
     }
+  }
+}
 
-    .logo-text {
-      font-size: 1.5rem;
-      font-weight: 800;
-      background: $primary-gradient;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+// =========================================================
+// MOBILE STYLES (PREMIUM REVAMP)
+// =========================================================
+.mobile-sheet {
+  position: absolute; bottom: 0; left: 0; width: 100%;
+  max-height: 90vh;
+  background: $bg-primary;
+  border-radius: 32px 32px 0 0;
+  display: flex; flex-direction: column;
+  box-shadow: 0 -10px 50px rgba(0,0,0,0.2);
+  z-index: 100;
+  overflow: hidden;
+
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  &.slide-down { animation: slideDown 0.3s ease-in forwards; }
+
+  .sheet-handle {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 4px; background: rgba(var(--text-muted-rgb), 0.3);
+    border-radius: 2px; z-index: 2;
   }
 
-  .header {
-    text-align: center;
-    margin-bottom: $spacing-xl;
+  // 1. DECORATIVE HEADER (New)
+  .decorative-header {
+    padding: 32px 24px 20px 24px;
+    // Premium fade background
+    background: radial-gradient(circle at 100% 0%, rgba(var(--primary-start), 0.15) 0%, transparent 50%);
 
-    h1 {
-      font-size: clamp(1.75rem, 4vw, 2.25rem);
-      font-weight: 800;
-      background: $primary-gradient;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 $spacing-sm 0;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
+    .header-content {
+      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;
+      .badge-pill {
+        background: $accent-overlay-10; color: $accent-color;
+        padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      }
+      .mobile-close { color: $text-muted; margin-top: -8px; margin-right: -8px;}
     }
 
-    p {
-      font-size: 1.125rem;
-      color: $text-secondary;
-      margin: 0;
-      line-height: 1.5;
-    }
-  }
-
-  .plan-card {
-    background: $hover-bg;
-    border-radius: $radius-lg;
-    border: 1px solid $border-color;
-    overflow: hidden;
-    margin-bottom: $spacing-xl;
-
-    .plan-header {
-      padding: $spacing-xl;
-      text-align: center;
-
+    .main-title-row {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
       h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: $text-primary;
-        margin: 0 0 $spacing-md 0;
+        font-size: 2rem; font-weight: 800; margin: 0; color: $text-primary;
+        line-height: 1;
       }
+      .price-bubble {
+        background: $primary-gradient; color: white;
+        padding: 4px 16px; border-radius: 100px;
+        font-weight: 800; font-size: 1.2rem;
+        box-shadow: 0 4px 12px rgba(var(--primary-start), 0.3);
+      }
+    }
 
-      .price {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: $spacing-xs;
+    .sub-title {
+      font-size: 0.95rem; color: $text-secondary; margin: 0;
+    }
+  }
 
-        .amount {
-          font-size: 2.5rem;
-          font-weight: 800;
-          color: $text-primary;
-        }
+  // 2. SCROLLABLE CONTENT (Card Style)
+  .mobile-scroll-content {
+    overflow-y: auto; padding: 0 24px; flex: 1;
 
-        .period {
-          font-size: 0.875rem;
+    .mobile-features {
+      display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px;
+
+      .feature-card {
+        display: flex; align-items: center; gap: 16px;
+        padding: 16px;
+        background: $bg-secondary; // Card bg
+        border: 1px solid transparent;
+        border-radius: 20px;
+        transition: transform 0.2s;
+
+        .card-icon {
+          width: 40px; height: 40px; border-radius: 12px;
+          background: rgba(var(--bg-primary-rgb), 1);
           color: $text-secondary;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          font-weight: 600;
-        }
-      }
-    }
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: $shadow-sm;
+          mat-icon { font-size: 20px; width: 20px; height: 20px; }
 
-    mat-divider {
-      margin: 0 $spacing-xl;
-    }
-
-    .features-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      .feature-item {
-        display: flex;
-        align-items: center;
-        gap: $spacing-md;
-        padding: $spacing-md $spacing-xl;
-
-        .feature-icon-wrapper {
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: $success-gradient;
-          border-radius: 50%;
-          flex-shrink: 0;
-
-          .feature-icon {
-            color: $text-inverse;
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
+          &.ai-gradient {
+            background: $primary-gradient;
+            color: white;
           }
         }
 
-        span {
-          flex: 1;
-          color: $text-primary;
-          font-size: 1rem;
-          font-weight: 500;
+        .card-text {
+          display: flex; flex-direction: column;
+          .title { font-weight: 700; color: $text-primary; font-size: 1rem; }
+          .desc { font-size: 0.85rem; color: $text-muted; }
+        }
+
+        &.highlight-card {
+           background: $accent-overlay-05;
+           border-color: rgba(var(--primary-start), 0.2);
+           .card-text .title { color: $accent-color; }
         }
       }
     }
   }
-}
 
-// Checkout button outside the plan card for proper centering
-.checkout-btn {
-  width: 100%;
-  max-width: 300px;
-  background: $primary-gradient !important;
-  color: $text-inverse !important;
-  border-radius: 50px !important;
-  font-weight: 600 !important;
-  font-size: 1rem !important;
-  box-shadow: $shadow-md !important;
-  transition: all 0.3s ease !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: $spacing-xs;
-  margin: 0 auto $spacing-xl;
-  display: block;
+  // 3. FOOTER
+  .mobile-footer {
+    padding: 20px 24px 34px 24px;
+    border-top: 1px solid rgba(var(--border-color-rgb), 0.4);
+    background: $bg-primary;
 
-  mat-icon {
-    margin-right: $spacing-xs;
-  }
+    .cta-btn {
+      width: 100%; height: 56px;
+      border: none; border-radius: 28px;
+      background: $done-bg-gradient; color: $done-text;
+      font-size: 1.1rem; font-weight: 700;
+      box-shadow: 0 8px 20px rgba(var(--primary-start), 0.3);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
 
-  &:hover:not([disabled]) {
-    box-shadow: $shadow-lg !important;
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-.trust-notice {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  padding: $spacing-sm;
-  background: linear-gradient(
-    var(--success-angle),
-    rgba(var(--success-rgb), 0.05) 0%,
-    rgba(var(--success-end), 0.05) 100%
-  );
-  border-radius: $radius-md;
-  border: 1px solid rgba(var(--success-rgb), 0.2);
-
-  .trust-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: $success-gradient;
-    border-radius: 50%;
-    flex-shrink: 0;
-    box-shadow: $shadow-sm;
-
-    mat-icon {
-      color: $text-inverse;
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
-    }
-  }
-
-  .trust-content {
-    flex: 1;
-
-    strong {
-      display: block;
-      font-size: 1rem;
-      font-weight: 600;
-      color: $text-primary;
-      margin-bottom: 4px;
+      .sep { opacity: 0.5; }
     }
 
-    span {
-      font-size: 0.875rem;
-      color: $text-secondary;
-      line-height: 1.5;
+    .secure-label {
+      text-align: center; margin-top: 16px;
+      font-size: 0.8rem; color: $text-muted;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      mat-icon { font-size: 14px; width: 14px; height: 14px; color: $success-color; }
     }
   }
 }
 
+// ANIMATIONS
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+@keyframes desktopEntry {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes desktopExit {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes slideDown { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+.pulse-animation { animation: pulse 2s infinite; }
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-// Additional responsive adjustments for better centering
-@media (min-width: 769px) {
-  .upgrade-wrapper {
-    // padding: $spacing-xl $spacing-lg;
-    min-height: fit-content;
-    height: auto;
-    align-items: center;
-    justify-content: center;
-    overflow: visible;
-  }
-
-  .upgrade-card {
-    max-height: fit-content;
-    overflow: visible;
-  }
-}
-
-@media (max-width: 768px) {
-  .upgrade-wrapper {
-    // padding: $spacing-lg $spacing-md;
-    min-height: 100vh;
-    height: 100%;
-    align-items: flex-start;
-    justify-content: center;
-    overflow-y: auto;
-  }
-
-  .upgrade-card {
-    max-width: 95%;
-    padding: $spacing-lg;
-    margin: $spacing-xl auto;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-  }
-
-  .checkout-btn {
-    max-width: 100%;
-    margin: 0 auto $spacing-xl;
-  }
+  0% { box-shadow: 0 0 0 0 rgba(var(--primary-start), 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(var(--primary-start), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--primary-start), 0); }
 }

@@ -1,1 +1,56 @@
-<p>quota-exhausted-modal works!</p>
+<div class="quota-container">
+  <div class="backdrop" [class.fade-out]="isClosing" (click)="close()"></div>
+
+  @if (!isMobile) {
+    <div class="desktop-card" [class.scale-out]="isClosing" (click)="$event.stopPropagation()">
+      <div class="glow-orb"></div>
+
+      <div class="icon-wrapper pulse-soft">
+        <mat-icon>workspace_premium</mat-icon>
+      </div>
+
+      <h2 class="title">Limit Reached</h2>
+      <p class="message">{{ data.message || 'You’ve hit the limit for free analyses.' }}</p>
+
+      <div class="actions">
+        <button class="upgrade-btn" (click)="upgrade()">
+          <mat-icon>rocket_launch</mat-icon>
+          <span>Upgrade to Pro</span>
+        </button>
+
+        <button class="cancel-btn" (click)="close()">
+          Maybe Later
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (isMobile) {
+    <div class="mobile-sheet" [class.slide-down]="isClosing" (click)="$event.stopPropagation()">
+      <div class="sheet-handle"></div>
+
+      <div class="mobile-content">
+        <div class="icon-wrapper mobile">
+          <mat-icon>workspace_premium</mat-icon>
+        </div>
+
+        <h2 class="title">Upload Limit Reached</h2>
+        <p class="message">{{ data.message || 'Unlock unlimited access to continue.' }}</p>
+
+        <div class="mobile-actions">
+          <button class="upgrade-btn full-width" (click)="upgrade()">
+            <div class="btn-content">
+              <span>Upgrade Now</span>
+              <span class="sep">•</span>
+              <span>$10</span>
+            </div>
+          </button>
+
+          <button class="cancel-link" (click)="close()">
+            No thanks, I'll wait
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

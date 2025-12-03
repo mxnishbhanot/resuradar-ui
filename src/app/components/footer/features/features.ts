@@ -35,35 +35,17 @@ export class Features {
   }
 
 
-  openUpgradeModal(): void {
-    if (!this.isPro) {
-      const dialogConfig: MatDialogConfig = {
-        width: '100%',
-        maxWidth: '500px',
-        height: 'auto',
-        maxHeight: '90vh',
-        panelClass: 'upgrade-modal-container',
-        autoFocus: false,
-        restoreFocus: true,
-        disableClose: false, // Allow closing by clicking outside
-        hasBackdrop: true,
-        backdropClass: 'upgrade-modal-backdrop',
-        data: {
-          userName: 'John Doe',
-          userEmail: 'john@example.com'
-        },
-        // Smooth entrance animation
-        enterAnimationDuration: '300ms',
-        exitAnimationDuration: '250ms'
-      };
+  openUpgradeModal() {
+    const dialogConfig = new MatDialogConfig();
 
-      const dialogRef = this.dialog.open(UpgradePro, dialogConfig);
+    // This connects to the global CSS above
+    dialogConfig.panelClass = 'responsive-dialog-wrapper';
 
-      // Handle modal close
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('Modal closed with result:', result);
-        // Handle any post-close logic
-      });
-    }
+    dialogConfig.maxWidth = '100vw';
+    dialogConfig.width = '100%';
+    dialogConfig.height = '100%';
+    dialogConfig.disableClose = true; // We handle closing manually
+
+    this.dialog.open(UpgradePro, dialogConfig);
   }
 }

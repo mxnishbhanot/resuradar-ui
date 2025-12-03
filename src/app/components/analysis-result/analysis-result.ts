@@ -84,44 +84,19 @@ export class AnalysisResult implements OnInit {
     return 'Resume needs significant improvements to stand out to employers';
   }
 
-  // openUpgradeModal() {
-  //   this.dialog.open(UpgradePro, {
-  //     width: '100%',
-  //     maxWidth: '520px',
-  //     maxHeight: '90vh',
-  //     panelClass: 'upgrade-pro-dialog',
-  //     hasBackdrop: true,
-  //     disableClose: false,
-  //   });
-  // }
 
-  openUpgradeModal(): void {
-    const dialogConfig: MatDialogConfig = {
-      width: '100%',
-      maxWidth: '500px',
-      height: 'auto',
-      maxHeight: '90vh',
-      panelClass: 'upgrade-modal-container',
-      autoFocus: false,
-      restoreFocus: true,
-      disableClose: false, // Allow closing by clicking outside
-      hasBackdrop: true,
-      backdropClass: 'upgrade-modal-backdrop',
-      data: {
-        userName: 'John Doe',
-        userEmail: 'john@example.com'
-      },
-      // Smooth entrance animation
-      enterAnimationDuration: '300ms',
-      exitAnimationDuration: '250ms'
-    };
 
-    const dialogRef = this.dialog.open(UpgradePro, dialogConfig);
+  openUpgradeModal() {
+    const dialogConfig = new MatDialogConfig();
 
-    // Handle modal close
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Modal closed with result:', result);
-      // Handle any post-close logic
-    });
+    // This connects to the global CSS above
+    dialogConfig.panelClass = 'responsive-dialog-wrapper';
+
+    dialogConfig.maxWidth = '100vw';
+    dialogConfig.width = '100%';
+    dialogConfig.height = '100%';
+    dialogConfig.disableClose = true; // We handle closing manually
+
+    this.dialog.open(UpgradePro, dialogConfig);
   }
 }

@@ -11,7 +11,7 @@ import { GoogleAuthService } from '../../core/services/google-auth';
 import { ResumeService } from '../../core/services/resume';
 import { Router } from '@angular/router';
 import { ToastService } from '../../core/services/toast';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
 import { UpgradePro } from '../upgrade-pro/upgrade-pro';
 
@@ -166,14 +166,16 @@ export class ScanResume {
           });
           modalRef.afterClosed().subscribe(result => {
             if (result === 'upgrade') {
-              this.dialog.open(UpgradePro, {
-                width: '100%',
-                maxWidth: '520px',
-                maxHeight: '90vh',
-                panelClass: 'upgrade-pro-dialog',
-                hasBackdrop: true,
-                disableClose: false,
-              });
+              const dialogConfig = new MatDialogConfig();
+              // This connects to the global CSS above
+              dialogConfig.panelClass = 'responsive-dialog-wrapper';
+
+              dialogConfig.maxWidth = '100vw';
+              dialogConfig.width = '100%';
+              dialogConfig.height = '100%';
+              dialogConfig.disableClose = true; // We handle closing manually
+
+              this.dialog.open(UpgradePro, dialogConfig);
             }
           });
         } else {

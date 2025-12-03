@@ -196,31 +196,18 @@ export class Home {
     this.googleAuth.signIn();
   }
 
-  openUpgradeModal(): void {
-    const dialogConfig: MatDialogConfig = {
-      width: '100%',
-      height: 'auto',
-      panelClass: 'upgrade-modal-container',
-      autoFocus: false,
-      restoreFocus: true,
-      disableClose: false,
-      hasBackdrop: true,
-      backdropClass: 'upgrade-modal-backdrop',
-      data: {
-        userName: 'John Doe',
-        userEmail: 'john@example.com'
-      },
-      enterAnimationDuration: '300ms',
-      exitAnimationDuration: '250ms',
-      maxWidth: window.innerWidth > 768 ? '500px' : '90vw',
-      maxHeight: window.innerWidth > 768 ? 'fit-content' : '90vh',
-    };
+  openUpgradeModal() {
+    const dialogConfig = new MatDialogConfig();
 
-    const dialogRef = this.dialog.open(UpgradePro, dialogConfig);
+    // This connects to the global CSS above
+    dialogConfig.panelClass = 'responsive-dialog-wrapper';
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Modal closed with result:', result);
-    });
+    dialogConfig.maxWidth = '100vw';
+    dialogConfig.width = '100%';
+    dialogConfig.height = '100%';
+    dialogConfig.disableClose = true; // We handle closing manually
+
+    this.dialog.open(UpgradePro, dialogConfig);
   }
 
   exteranlLink(type: string) {

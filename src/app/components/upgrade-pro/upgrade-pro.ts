@@ -31,6 +31,8 @@ export class UpgradePro implements OnInit {
   isLoading = false;
   userName = '';
   userEmail = '';
+  isMobile: boolean = false;
+  isClosing = false;
 
   constructor(
     private userService: UserService,
@@ -42,6 +44,7 @@ export class UpgradePro implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.checkScreenSize();
     this.userName = this.data?.userName || 'User';
     this.userEmail = this.data?.userEmail || '';
   }
@@ -144,6 +147,16 @@ export class UpgradePro implements OnInit {
   }
 
   close(): void {
-    this.dialogRef.close();
+    this.isClosing = true; // Trigger the exit animation class
+
+    // Wait for animation to finish (300ms) before actually closing
+    setTimeout(() => {
+      this.dialogRef.close();
+    }, 300);
+  }
+
+  checkScreenSize() {
+    // Breakpoint at 768px (Standard Tablet/Mobile cutoff)
+    this.isMobile = window.innerWidth < 768;
   }
 }
