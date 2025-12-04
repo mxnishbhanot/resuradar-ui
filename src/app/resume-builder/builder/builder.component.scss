@@ -243,9 +243,9 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .content-wrapper {
-  max-width: 850px;
+  // max-width: 850px;
   width: 100%;
-  margin: 0 auto;
+  // margin: 0 auto;
   padding: 48px 40px 120px 40px;
 
   // INCREASED TOP PADDING FOR MOBILE since header is gone
