@@ -1,211 +1,205 @@
-<div class="experience-container">
-
-  <!-- Section Header -->
-  <div class="section-header">
-    <div class="header-icon-wrapper">
-      <mat-icon class="header-icon">work</mat-icon>
-    </div>
-    <div class="header-content">
-      <h2 class="section-title">Work Experience</h2>
-      <p class="section-subtitle">Showcase your professional journey and key achievements that make you stand out.</p>
-    </div>
-  </div>
-
-  <!-- Experience List -->
-  <div class="experience-list" *ngIf="experiences.length > 0 && !showForm">
-    <div *ngFor="let exp of experiences; let i = index" class="experience-card">
-      <div class="card-header">
-        <div class="card-badge">
-          <mat-icon>work_outline</mat-icon>
+  <div class="experience-container">
+      <!-- Section Header -->
+      <div class="section-header">
+        <div class="header-icon-wrapper">
+          <mat-icon class="header-icon">work</mat-icon>
         </div>
-        <div class="card-title-section">
-          <h3 class="card-title">{{ exp.title }}</h3>
-          <p class="card-company">
-            <mat-icon class="inline-icon">business</mat-icon>
-            {{ exp.company }}
-          </p>
+        <div class="header-content">
+          <h2 class="section-title">Work Experience</h2>
+          <p class="section-subtitle">Showcase your professional journey and key achievements that make you stand out.</p>
         </div>
-        <div class="card-actions">
-          <button mat-icon-button (click)="editExperience(i)" class="action-btn edit-btn" matTooltip="Edit">
-            <mat-icon>edit</mat-icon>
+      </div>
+
+      <!-- Experience List -->
+      @if (experiences.length > 0 && !showForm) {
+        <div class="experience-list">
+          @for (exp of experiences; track $index) {
+            <div class="experience-card">
+              <div class="card-header">
+                <div class="card-badge">
+                  <mat-icon>work_outline</mat-icon>
+                </div>
+                <div class="card-title-section">
+                  <h3 class="card-title">{{ exp.title }}</h3>
+                  <p class="card-company">
+                    <mat-icon class="inline-icon">business</mat-icon>
+                    {{ exp.company }}
+                  </p>
+                </div>
+                <div class="card-actions">
+                  <button mat-icon-button (click)="editExperience($index)" class="action-btn edit-btn" matTooltip="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="deleteExperience($index)" class="action-btn delete-btn" matTooltip="Delete">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="card-meta">
+                <div class="meta-item">
+                  <mat-icon class="meta-icon">calendar_today</mat-icon>
+                  <span>{{ exp.startDate }} - {{ exp.isCurrent ? 'Present' : exp.endDate }}</span>
+                </div>
+                @if (exp.isCurrent) {
+                  <div class="meta-badge">
+                    <mat-icon>trending_up</mat-icon>
+                    <span>Current Role</span>
+                  </div>
+                }
+              </div>
+              @if (exp.bullets && exp.bullets.length > 0) {
+                <div class="card-bullets">
+                  <ul class="bullets-list">
+                    @for (bullet of exp.bullets; track $index) {
+                      <li class="bullet-item">
+                        <mat-icon class="bullet-icon">check_circle</mat-icon>
+                        <span>{{ bullet }}</span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (experiences.length === 0 && !showForm) {
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <mat-icon>work_outline</mat-icon>
+          </div>
+          <h3 class="empty-state-title">No Experience Added Yet</h3>
+          <p class="empty-state-description">Start building your professional story by adding your work experience. Highlight your achievements and responsibilities.</p>
+          <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
+            <mat-icon>add_circle</mat-icon>
+            Add Your First Experience
           </button>
-          <button mat-icon-button (click)="deleteExperience(i)" class="action-btn delete-btn" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
         </div>
-      </div>
+      }
 
-      <div class="card-meta">
-        <div class="meta-item">
-          <mat-icon class="meta-icon">calendar_today</mat-icon>
-          <span>{{ exp.startDate }} - {{ exp.isCurrent ? 'Present' : exp.endDate }}</span>
-        </div>
-        <div class="meta-badge" *ngIf="exp.isCurrent">
-          <mat-icon>trending_up</mat-icon>
-          <span>Current Role</span>
-        </div>
-      </div>
+      @if (experiences.length > 0 && !showForm) {
+        <button mat-stroked-button class="add-more-button" (click)="showAddForm()">
+          <mat-icon>add</mat-icon>
+          Add Another Experience
+        </button>
+      }
 
-      <div class="card-bullets" *ngIf="exp.bullets && exp.bullets.length > 0">
-        <ul class="bullets-list">
-          <li *ngFor="let bullet of exp.bullets" class="bullet-item">
-            <mat-icon class="bullet-icon">check_circle</mat-icon>
-            <span>{{ bullet }}</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="experiences.length === 0 && !showForm">
-    <div class="empty-state-icon">
-      <mat-icon>work_outline</mat-icon>
-    </div>
-    <h3 class="empty-state-title">No Experience Added Yet</h3>
-    <p class="empty-state-description">Start building your professional story by adding your work experience. Highlight your achievements and responsibilities.</p>
-    <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
-      <mat-icon>add_circle</mat-icon>
-      Add Your First Experience
-    </button>
-  </div>
-
-  <!-- Add Button (when list has items) -->
-  <button mat-stroked-button class="add-more-button" *ngIf="experiences.length > 0 && !showForm" (click)="showAddForm()">
-    <mat-icon>add</mat-icon>
-    Add Another Experience
-  </button>
-
-  <!-- Experience Form -->
-  <div class="form-container" *ngIf="showForm">
-    <div class="form-header">
-      <div class="form-header-icon">
-        <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
-      </div>
-      <div class="form-header-text">
-        <h3 class="form-title">{{ editingIndex !== null ? 'Edit Experience' : 'Add New Experience' }}</h3>
-        <p class="form-subtitle">{{ editingIndex !== null ? 'Update your work experience details' : 'Tell us about your professional role' }}</p>
-      </div>
-    </div>
-
-    <form [formGroup]="form" class="experience-form">
-
-      <!-- Basic Information -->
-      <div class="form-section">
-        <h4 class="form-section-title">
-          <mat-icon>info</mat-icon>
-          Basic Information
-        </h4>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field full-width">
-            <mat-label>Job Title</mat-label>
-            <input matInput formControlName="title" placeholder="e.g., Senior Software Engineer" />
-            <mat-icon matPrefix>badge</mat-icon>
-            <mat-hint>Your role or position title</mat-hint>
-            <mat-error *ngIf="form.get('title')?.hasError('required')">Job title is required</mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field full-width">
-            <mat-label>Company Name</mat-label>
-            <input matInput formControlName="company" placeholder="e.g., Tech Corp Inc." />
-            <mat-icon matPrefix>business</mat-icon>
-            <mat-hint>Where did you work?</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <!-- Employment Period -->
-      <div class="form-section">
-        <h4 class="form-section-title">
-          <mat-icon>schedule</mat-icon>
-          Employment Period
-        </h4>
-
-        <div class="form-row form-row-two">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Start Date</mat-label>
-            <input matInput formControlName="startDate" placeholder="e.g., Jan 2020" />
-            <mat-icon matPrefix>event_available</mat-icon>
-            <mat-hint>Month Year</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="form-field" [class.disabled-field]="form.get('isCurrent')?.value">
-            <mat-label>End Date</mat-label>
-            <input matInput formControlName="endDate" placeholder="e.g., Dec 2023" [disabled]="form.get('isCurrent')?.value" />
-            <mat-icon matPrefix>event_busy</mat-icon>
-            <mat-hint>Month Year</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-checkbox formControlName="isCurrent" class="current-checkbox" color="primary">
-            <span class="checkbox-label">
-              I currently work here
-            </span>
-          </mat-checkbox>
-        </div>
-      </div>
-
-      <!-- Achievements & Responsibilities -->
-      <div class="form-section bullets-section">
-        <div class="bullets-section-header">
-          <h4 class="form-section-title">
-            <mat-icon>stars</mat-icon>
-            Key Achievements & Responsibilities
-          </h4>
-          <!-- Uncomment when AI is ready -->
-          <!-- <button mat-stroked-button type="button" (click)="generateBulletsWithAI()"
-                  [disabled]="isGenerating || form.get('title')?.invalid"
-                  class="ai-generate-button">
-            <mat-icon *ngIf="!isGenerating">auto_awesome</mat-icon>
-            <mat-spinner *ngIf="isGenerating" diameter="18"></mat-spinner>
-            {{ isGenerating ? 'Generating...' : 'Generate with AI' }}
-          </button> -->
-        </div>
-
-        <p class="bullets-hint">
-          <mat-icon class="hint-icon">lightbulb</mat-icon>
-          Start each point with an action verb (e.g., Developed, Managed, Achieved, Led)
-        </p>
-
-        <div formArrayName="bullets" class="bullets-container">
-          <div *ngFor="let bullet of bullets.controls; let i = index" class="bullet-row">
-            <div class="bullet-number-badge">{{ i + 1 }}</div>
-            <mat-form-field appearance="outline" class="bullet-field">
-              <mat-label>Achievement or Responsibility {{ i + 1 }}</mat-label>
-              <textarea matInput [formControlName]="i" rows="3"
+      <!-- Experience Form -->
+      @if (showForm) {
+        <div class="form-container">
+          <div class="form-header">
+            <div class="form-header-icon">
+              <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
+            </div>
+            <div class="form-header-text">
+              <h3 class="form-title">{{ editingIndex !== null ? 'Edit Experience' : 'Add New Experience' }}</h3>
+              <p class="form-subtitle">{{ editingIndex !== null ? 'Update your work experience details' : 'Tell us about your professional role' }}</p>
+            </div>
+          </div>
+          <form [formGroup]="form" class="experience-form">
+            <!-- Basic Information -->
+            <div class="form-section">
+              <h4 class="form-section-title">
+                <mat-icon>info</mat-icon>
+                Basic Information
+              </h4>
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field full-width">
+                  <mat-label>Job Title</mat-label>
+                  <input matInput formControlName="title" placeholder="e.g., Senior Software Engineer" />
+                  <mat-icon matPrefix>badge</mat-icon>
+                  @if (form.get('title')?.hasError('required')) {
+                    <mat-error>Job title is required</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field full-width">
+                  <mat-label>Company Name</mat-label>
+                  <input matInput formControlName="company" placeholder="e.g., Tech Corp Inc." />
+                  <mat-icon matPrefix>business</mat-icon>
+                </mat-form-field>
+              </div>
+            </div>
+            <!-- Employment Period -->
+            <div class="form-section">
+              <h4 class="form-section-title">
+                <mat-icon>schedule</mat-icon>
+                Employment Period
+              </h4>
+              <div class="form-row form-row-two">
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Start Date</mat-label>
+                  <input matInput formControlName="startDate" placeholder="e.g., Jan 2020" />
+                  <mat-icon matPrefix>event_available</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="form-field" [class.disabled-field]="form.get('isCurrent')?.value">
+                  <mat-label>End Date</mat-label>
+                  <input matInput formControlName="endDate" placeholder="e.g., Dec 2023" [disabled]="form.get('isCurrent')?.value" />
+                  <mat-icon matPrefix>event_busy</mat-icon>
+                </mat-form-field>
+              </div>
+              <div class="form-row">
+                <mat-checkbox formControlName="isCurrent" class="current-checkbox" color="primary">
+                  <span class="checkbox-label">
+                    I currently work here
+                  </span>
+                </mat-checkbox>
+              </div>
+            </div>
+            <!-- Achievements & Responsibilities -->
+            <div class="form-section bullets-section">
+              <div class="bullets-section-header">
+                <h4 class="form-section-title">
+                  <mat-icon>stars</mat-icon>
+                  Key Achievements & Responsibilities
+                </h4>
+              </div>
+              <p class="bullets-hint">
+                <mat-icon class="hint-icon">lightbulb</mat-icon>
+                Start each point with an action verb (e.g., Developed, Managed, Achieved, Led)
+              </p>
+              <div formArrayName="bullets" class="bullets-container">
+                @for (bullet of bullets.controls; track $index) {
+                  <div class="bullet-row">
+                    <div class="bullet-number-badge">{{ $index + 1 }}</div>
+                    <mat-form-field appearance="outline" class="bullet-field">
+                      <mat-label>Achievement or Responsibility {{ $index + 1 }}</mat-label>
+                      <textarea
+                        matInput
+                        [formControlName]="$index"
+                        rows="3"
                         placeholder="Describe your achievement or responsibility..."
                         cdkTextareaAutosize
                         cdkAutosizeMinRows="2"
-                        cdkAutosizeMaxRows="5"></textarea>
-            </mat-form-field>
-            <button mat-icon-button type="button" (click)="removeBullet(i)" class="bullet-delete-btn" matTooltip="Remove">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-
-          <button mat-stroked-button type="button" (click)="addBullet()" class="add-bullet-btn">
-            <mat-icon>add</mat-icon>
-            Add Another Point
-          </button>
+                        cdkAutosizeMaxRows="5">
+                      </textarea>
+                    </mat-form-field>
+                    <button mat-icon-button type="button" (click)="removeBullet($index)" class="bullet-delete-btn" matTooltip="Remove">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+                }
+                <button mat-stroked-button type="button" (click)="addBullet()" class="add-bullet-btn">
+                  <mat-icon>add</mat-icon>
+                  Add Another Point
+                </button>
+              </div>
+            </div>
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
+                <mat-icon>close</mat-icon>
+                Cancel
+              </button>
+              <button mat-flat-button color="primary" (click)="saveExperience()" [disabled]="form.invalid" class="save-btn">
+                <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
+                {{ editingIndex !== null ? 'Update Experience' : 'Add Experience' }}
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
-
-      <!-- Form Actions -->
-      <div class="form-actions">
-        <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
-          <mat-icon>close</mat-icon>
-          Cancel
-        </button>
-        <button mat-flat-button color="primary" (click)="saveExperience()" [disabled]="form.invalid" class="save-btn">
-          <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
-          {{ editingIndex !== null ? 'Update Experience' : 'Add Experience' }}
-        </button>
-      </div>
-    </form>
-  </div>
-
-</div>
+      }
+    </div>

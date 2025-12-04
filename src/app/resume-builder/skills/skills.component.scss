@@ -1,12 +1,8 @@
-// Import your variables (adjust path as needed based on your project structure)
 @use '../../../theme/variables' as *;
 
 /* =========================================
-   SKILLS COMPONENT - SHARED THEME
-   Based on Experience Component Layout
+   SKILLS COMPONENT - PREMIUM UI
    ========================================= */
-
-// Reusing the main container class name pattern
 .skills-container {
   width: 100%;
   animation: fadeIn 0.4s ease;
@@ -18,7 +14,7 @@
 }
 
 /* =========================================
-   SECTION HEADER (Exact match)
+   SECTION HEADER
    ========================================= */
 .section-header {
   display: flex;
@@ -27,7 +23,6 @@
   margin-bottom: $spacing-xl;
   padding-bottom: $spacing-lg;
   border-bottom: 2px solid var(--border-color);
-
   @media (max-width: 768px) {
     gap: $spacing-md;
     margin-bottom: $spacing-lg;
@@ -44,20 +39,17 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.25);
   animation: scaleIn 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-
   @media (max-width: 768px) {
     width: 48px;
     height: 48px;
   }
-
   .header-icon {
     font-size: 28px;
     width: 28px;
     height: 28px;
     color: $text-inverse;
-
     @media (max-width: 768px) {
       font-size: 24px;
       width: 24px;
@@ -80,7 +72,6 @@
   color: var(--text-primary);
   letter-spacing: -0.02em;
   line-height: 1.2;
-
   @media (max-width: 768px) { font-size: 1.5rem; }
   @media (max-width: 480px) { font-size: 1.25rem; }
 }
@@ -90,27 +81,24 @@
   font-size: 0.9375rem;
   color: var(--text-muted);
   line-height: 1.5;
-
   @media (max-width: 768px) { font-size: 0.875rem; }
   @media (max-width: 480px) { font-size: 0.8125rem; }
 }
 
 /* =========================================
-   SKILLS LIST & CARD (Matches Experience Card)
+   SKILLS LIST & CARDS
    ========================================= */
 .skills-list {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
   margin-bottom: $spacing-xl;
-
   @media (max-width: 768px) {
     gap: $spacing-md;
     margin-bottom: $spacing-lg;
   }
 }
 
-// Renamed .experience-card to .skill-card but kept styles
 .skill-card {
   background: var(--bg-secondary);
   border: 2px solid var(--border-color);
@@ -118,13 +106,12 @@
   padding: $spacing-xl;
   transition: all 0.3s ease;
   animation: slideInUp 0.4s ease;
-
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   &:hover {
-    border-color: rgba(var(--accent-rgb), 0.4);
+    border-color: var(--accent-color);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
-
   @media (max-width: 768px) { padding: $spacing-lg; }
   @media (max-width: 480px) { padding: $spacing-md; }
 }
@@ -139,10 +126,6 @@
   align-items: flex-start;
   gap: $spacing-md;
   margin-bottom: $spacing-md;
-  // Added border bottom to separate title from chips
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: $spacing-md;
-
   @media (max-width: 768px) { flex-wrap: wrap; }
 }
 
@@ -156,14 +139,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-
   mat-icon {
     font-size: 24px;
     width: 24px;
     height: 24px;
     color: var(--accent-color);
   }
-
   @media (max-width: 480px) {
     width: 40px;
     height: 40px;
@@ -179,23 +160,14 @@
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.3;
-
   @media (max-width: 768px) { font-size: 1.125rem; }
   @media (max-width: 480px) { font-size: 1rem; }
-}
-
-// New subtitle for skills count
-.card-subtitle {
-    margin: 0;
-    font-size: 0.875rem;
-    color: var(--text-muted);
 }
 
 .card-actions {
   display: flex;
   gap: $spacing-xs;
   flex-shrink: 0;
-
   @media (max-width: 768px) {
     width: 100%;
     justify-content: flex-end;
@@ -203,21 +175,17 @@
   }
 }
 
-// Action buttons (Identical)
 .action-btn {
   width: 40px;
   height: 40px;
   border-radius: $radius-md;
   transition: all 0.3s ease;
-
   mat-icon { font-size: 20px; width: 20px; height: 20px; }
-
   &.edit-btn {
     color: var(--accent-color);
     background: rgba(var(--accent-rgb), 0.1);
     &:hover { background: rgba(var(--accent-rgb), 0.2); transform: scale(1.05); }
   }
-
   &.delete-btn {
     color: #ef4444;
     background: rgba(239, 68, 68, 0.1);
@@ -225,33 +193,32 @@
   }
 }
 
-// New area for the chips display in read-only mode
+/* =========================================
+   READ-ONLY CHIPS DISPLAY
+   ========================================= */
 .card-skills-content {
-    margin-top: $spacing-md;
-
+  margin-top: $spacing-md;
+  .read-only-chip-set {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
     // Custom styling for read-only chips to match theme
-    .read-only-chip-set {
-        ::ng-deep .mdc-evolution-chip-set__chips {
-            gap: $spacing-sm;
-        }
-
-        .skill-chip {
-            background-color: rgba(var(--accent-rgb), 0.08);
-            color: var(--text-primary);
-            border: 1px solid rgba(var(--accent-rgb), 0.2);
-            font-weight: 500;
-
-            ::ng-deep .mdc-evolution-chip__action--primary {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-        }
+    .skill-chip {
+      background-color: rgba(var(--accent-rgb), 0.08);
+      color: var(--text-primary);
+      border: 1px solid rgba(var(--accent-rgb), 0.2);
+      border-radius: $radius-md;
+      padding: $spacing-xs $spacing-sm;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1;
+      @media (max-width: 480px) { font-size: 0.8125rem; padding: 4px 8px; }
     }
+  }
 }
 
-
 /* =========================================
-   EMPTY STATE & ADD BUTTON (Exact match)
+   EMPTY STATE
    ========================================= */
 .empty-state {
   display: flex;
@@ -264,7 +231,6 @@
   border: 2px dashed var(--border-color);
   border-radius: $radius-xl;
   animation: fadeIn 0.5s ease;
-
   @media (max-width: 768px) { padding: $spacing-xl; }
   @media (max-width: 480px) { padding: $spacing-lg; }
 }
@@ -278,15 +244,8 @@
   align-items: center;
   justify-content: center;
   margin-bottom: $spacing-lg;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
-
-  mat-icon {
-    font-size: 40px;
-    width: 40px;
-    height: 40px;
-    color: $text-inverse;
-  }
-
+  box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.25);
+  mat-icon { font-size: 40px; width: 40px; height: 40px; color: $text-inverse; }
   @media (max-width: 480px) {
     width: 64px;
     height: 64px;
@@ -299,7 +258,6 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
-
   @media (max-width: 768px) { font-size: 1.25rem; }
   @media (max-width: 480px) { font-size: 1.125rem; }
 }
@@ -310,7 +268,6 @@
   color: var(--text-muted);
   max-width: 500px;
   line-height: 1.6;
-
   @media (max-width: 480px) { font-size: 0.875rem; }
 }
 
@@ -320,14 +277,15 @@
   font-weight: 600;
   font-size: 0.9375rem;
   border-radius: $radius-lg;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.3);
   mat-icon { font-size: 22px; width: 22px; height: 22px; }
-
-  &:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4); }
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(var(--accent-rgb), 0.4); }
   @media (max-width: 480px) { height: 44px; padding: 0 $spacing-lg; font-size: 0.875rem; }
 }
 
+/* =========================================
+   ADD MORE BUTTON
+   ========================================= */
 .add-more-button {
   width: 100%;
   height: 48px;
@@ -339,21 +297,18 @@
   color: var(--accent-color);
   background: rgba(var(--accent-rgb), 0.05);
   transition: all 0.3s ease;
-
   mat-icon { font-size: 22px; width: 22px; height: 22px; }
-
   &:hover {
     background: rgba(var(--accent-rgb), 0.1);
     border-color: var(--accent-color);
     border-style: solid;
     transform: translateY(-2px);
   }
-
   @media (max-width: 480px) { height: 44px; font-size: 0.875rem; }
 }
 
 /* =========================================
-   FORM CONTAINER (Exact match)
+   FORM CONTAINER
    ========================================= */
 .form-container {
   background: var(--bg-secondary);
@@ -361,7 +316,7 @@
   border-radius: $radius-xl;
   padding: $spacing-xl;
   animation: slideInUp 0.4s ease;
-
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   @media (max-width: 768px) { padding: $spacing-lg; }
   @media (max-width: 480px) { padding: $spacing-md; }
 }
@@ -373,7 +328,6 @@
   margin-bottom: $spacing-xl;
   padding-bottom: $spacing-lg;
   border-bottom: 2px solid var(--border-color);
-
   @media (max-width: 768px) { margin-bottom: $spacing-lg; padding-bottom: $spacing-md; }
 }
 
@@ -386,10 +340,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.25);
   mat-icon { font-size: 24px; width: 24px; height: 24px; color: $text-inverse; }
-
   @media (max-width: 480px) {
     width: 40px;
     height: 40px;
@@ -404,7 +356,6 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
-
   @media (max-width: 768px) { font-size: 1.25rem; }
   @media (max-width: 480px) { font-size: 1.125rem; }
 }
@@ -417,9 +368,9 @@
 }
 
 /* =========================================
-   FORM SECTIONS (Modified for Chips)
+   FORM SECTIONS
    ========================================= */
-.skills-form {
+.skill-form {
   display: flex;
   flex-direction: column;
   gap: $spacing-xl;
@@ -430,113 +381,80 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  @media (max-width: 480px) { padding: $spacing-md; }
 }
 
 .form-section-title {
   display: flex;
   align-items: center;
   gap: $spacing-sm;
-  margin: 0; // Reset margin for the simple header
+  margin: 0 0 $spacing-md 0;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
-
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid var(--border-color);
   mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
     color: var(--accent-color);
   }
-
   @media (max-width: 480px) {
     font-size: 0.9375rem;
     mat-icon { font-size: 18px; width: 18px; height: 18px; }
   }
 }
 
-.form-row {
-  display: flex;
-  gap: $spacing-md;
-  &.full-width { flex-direction: column; }
-  @media (max-width: 480px) { flex-direction: column; gap: $spacing-sm; }
-}
-
-// Standard form field overrides (reused)
 .form-field {
-  flex: 1;
+  width: 100%;
   &.full-width { width: 100%; }
-
+  // Material Overrides
   ::ng-deep {
     .mat-mdc-form-field-icon-prefix { padding-right: $spacing-sm; color: var(--text-muted); }
-    .mat-mdc-text-field-wrapper { background-color: var(--bg-primary); }
+    .mat-mdc-text-field-wrapper { background-color: var(--bg-secondary); }
     .mat-mdc-form-field-hint { font-size: 0.75rem; color: var(--text-muted); }
-    .mdc-text-field--outlined:hover .mdc-notched-outline {
-        .mdc-notched-outline__leading, .mdc-notched-outline__notch, .mdc-notched-outline__trailing {
-          border-color: var(--accent-color);
-        }
+    .mdc-text-field--outlined {
+      &:hover .mdc-notched-outline {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing { border-color: var(--accent-color); }
+      }
     }
   }
 }
 
 /* =========================================
-   CHIPS INPUT SECTION (New, replaces Bullets)
+   CHIPS INPUT
    ========================================= */
-.chips-input-section {
-  background: var(--bg-primary);
-  border: 2px solid var(--border-color);
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-
-  @media (max-width: 480px) { padding: $spacing-md; }
-}
-
-.section-header-simple {
-    margin-bottom: $spacing-md;
-    padding-bottom: $spacing-sm;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.chips-hint {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  margin: 0 0 $spacing-md 0;
-  padding: $spacing-sm $spacing-md;
-  background: rgba(99, 102, 241, 0.05);
-  border-left: 3px solid var(--accent-color);
-  border-radius: $radius-sm;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-
-  @media (max-width: 480px) { font-size: 0.8125rem; }
-
-  .hint-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: var(--accent-color);
-    flex-shrink: 0;
+.chips-input-container {
+  width: 100%;
+  .mat-mdc-chip-set {
+    margin-bottom: $spacing-sm;
+  }
+  .mat-mdc-chip {
+    background-color: rgba(var(--accent-rgb), 0.08);
+    color: var(--text-primary);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
+    font-weight: 500;
+    font-size: 0.875rem;
+    ::ng-deep .mdc-evolution-chip__action--primary {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+    // Ensure the chips background matches the form field background
+    .mat-mdc-text-field-wrapper { background-color: var(--bg-secondary); }
+    // Adjust padding for the input within the chip grid
+    .mat-mdc-chip-input { margin-left: 4px; }
   }
 }
 
-// Specific styles for the form field holding chips
-.chip-form-field {
-    ::ng-deep {
-        // Ensure the chips background matches the form field background
-        .mat-mdc-text-field-wrapper {
-             background-color: var(--bg-secondary);
-        }
-        // Adjust padding for the input within the chip grid
-        .mat-mdc-chip-input {
-            margin-left: 4px;
-        }
-    }
-}
-
-
 /* =========================================
-   FORM ACTIONS (Exact match)
+   FORM ACTIONS
    ========================================= */
 .form-actions {
   display: flex;
@@ -544,11 +462,11 @@
   gap: $spacing-md;
   padding-top: $spacing-lg;
   border-top: 2px solid var(--border-color);
-
   @media (max-width: 768px) { flex-direction: column-reverse; }
 }
 
-.cancel-btn, .save-btn {
+.cancel-btn,
+.save-btn {
   height: 48px;
   min-width: 140px;
   padding: 0 $spacing-xl;
@@ -557,13 +475,10 @@
   font-size: 0.9375rem;
   display: flex;
   align-items: center;
-  justify-content: center; // Ensure centering on mobile
   gap: $spacing-sm;
   transition: all 0.3s ease;
-
   mat-icon { font-size: 22px; width: 22px; height: 22px; }
-
-  @media (max-width: 768px) { width: 100%; }
+  @media (max-width: 768px) { width: 100%; justify-content: center; }
   @media (max-width: 480px) { height: 44px; min-width: auto; font-size: 0.875rem; }
 }
 
@@ -571,18 +486,18 @@
   border: 2px solid var(--border-color);
   color: var(--text-secondary);
   background: transparent;
-
   &:hover { background: var(--bg-secondary); border-color: var(--text-secondary); color: var(--text-primary); }
 }
 
 .save-btn {
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-
-  &:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4); transform: translateY(-2px); }
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.3);
+  &:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(var(--accent-rgb), 0.4); transform: translateY(-2px); }
   &:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 }
 
-// Universal transitions
+/* =========================================
+   ANIMATIONS & TRANSITIONS
+   ========================================= */
 * {
   transition-property: background-color, border-color, color, box-shadow, transform;
   transition-duration: 0.3s;

@@ -1,126 +1,228 @@
-<div class="modern-builder">
+<div class="builder-layout">
 
-  <aside class="sidebar-nav">
-    <div class="brand-section">
-      <div class="brand-icon-wrapper">
-        <mat-icon class="brand-icon">description</mat-icon>
+  <aside class="sidebar-rail">
+    <div class="brand-area">
+      <div class="brand-logo">
+        <mat-icon>description</mat-icon>
       </div>
-      <div class="brand-text">
-        <h1 class="brand-title">ResuRadar</h1>
-        <span class="brand-subtitle">Professional CV Builder</span>
+      <div class="brand-info">
+        <h1>ResuRadar</h1>
+        <div class="progress-pill">
+          <div class="progress-text">
+            <span>Progress</span>
+            <span class="percent">{{ completionPercentage() }}%</span>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="completionPercentage()"></mat-progress-bar>
+        </div>
       </div>
     </div>
 
-    <div class="progress-section">
-      <div class="progress-header">
-        <span class="progress-text">Builder Progress</span>
-        <span class="progress-percentage">{{ completionPercentage }}%</span>
-      </div>
-      <mat-progress-bar mode="determinate" [value]="completionPercentage" class="main-progress-bar"></mat-progress-bar>
-    </div>
+    <nav class="nav-menu">
+      @for (tab of tabs; track tab.label; let i = $index) {
+        <button class="nav-item-premium"
+                [class.active]="currentTab() === i"
+                [class.completed]="isTabCompleted(i)"
+                (click)="navigateToTab(i)">
 
-    <nav class="tab-list">
-      <button *ngFor="let tab of tabs; let i = index"
-              class="tab-item"
-              [class.active]="currentTab === i"
-              (click)="navigateToTab(i)">
-        <mat-icon class="tab-icon">{{ tab.icon }}</mat-icon>
-        <span class="tab-label">{{ tab.label }}</span>
-        <mat-icon class="status-icon"
-                  [class.completed]="getTabCompletion(i)"
-                  [matTooltip]="getTabCompletion(i) ? 'Section Completed' : 'Incomplete'">
-          {{ getTabCompletion(i) ? 'check_circle' : 'circle' }}
-        </mat-icon>
-      </button>
+          <div class="nav-bg-layer"></div>
+
+          <div class="nav-content">
+            <div class="icon-stage">
+              <mat-icon class="base-icon">{{ tab.icon }}</mat-icon>
+              <!-- @if (isTabCompleted(i)) {
+                <mat-icon class="check-icon">check_circle</mat-icon>
+              } -->
+            </div>
+
+            <span class="nav-label">{{ tab.label }}</span>
+            <mat-icon class="hover-arrow">chevron_right</mat-icon>
+
+            @if (currentTab() === i) {
+               <div class="active-bar" layout:view-transition-name="active-bar"></div>
+            }
+          </div>
+        </button>
+      }
     </nav>
   </aside>
 
-  <main class="content-area">
-    <div class="content-scroll-wrapper">
-      <div class="content-header-mobile">
-        <h2 class="current-tab-title">{{ tabs[currentTab].label }}</h2>
-        <span class="step-indicator-mobile">Step {{ currentTab + 1 }} of {{ tabs.length }}</span>
+  <main class="main-stage">
+    <div class="content-wrapper">
+
+      <div class="form-container">
+        @switch (currentTab()) {
+          @case (0) { <rr-personal class="fade-in-up"/> }
+          @case (1) { <rr-education class="fade-in-up"/> }
+          @case (2) { <rr-experience class="fade-in-up"/> }
+          @case (3) { <rr-projects class="fade-in-up"/> }
+          @case (4) { <rr-skills class="fade-in-up"/> }
+          @case (5) { <rr-summary class="fade-in-up"/> }
+        }
+      </div>
+    </div>
+
+    <div class="mobile-command-deck">
+      <div class="deck-progress-track">
+        <div class="deck-progress-fill"
+             [style.width.%]="((currentTab() + 1) / tabs.length) * 100">
+        </div>
       </div>
 
-      <div class="content-inner">
-        <div class="form-section" *ngIf="currentTab === 0"> <rr-personal></rr-personal> </div>
-        <div class="form-section" *ngIf="currentTab === 1"> <rr-education></rr-education> </div>
-        <div class="form-section" *ngIf="currentTab === 2"> <rr-experience></rr-experience> </div>
-        <div class="form-section" *ngIf="currentTab === 3"> <rr-projects></rr-projects> </div>
-        <div class="form-section" *ngIf="currentTab === 4"> <rr-skills></rr-skills> </div>
-        <div class="form-section" *ngIf="currentTab === 5"> <rr-summary></rr-summary> </div>
+      <div class="deck-content">
+        <button mat-icon-button
+                class="deck-btn-ghost"
+                [disabled]="currentTab() === 0"
+                (click)="previousStep()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+
+        <div class="deck-info" (click)="scrollToTop()">
+          <span class="step-label">Step {{ currentTab() + 1 }}</span>
+          <span class="step-title" layout:view-transition-name="mobile-title">
+            {{ tabs[currentTab()].label }}
+          </span>
+        </div>
+
+        @if (currentTab() === tabs.length - 1) {
+          <button mat-button class="deck-btn-primary finish" (click)="openPreview()">
+            <span>Finish</span>
+            <mat-icon>stars</mat-icon>
+          </button>
+        } @else {
+          <button mat-button class="deck-btn-primary" (click)="nextStep()">
+            <span>Next</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        }
       </div>
     </div>
   </main>
 
-  <aside class="preview-area">
-    <div class="preview-placeholder">
-      <mat-icon class="preview-icon">desktop_windows</mat-icon>
-      <h3 class="placeholder-title">Live Preview</h3>
-      <p class="placeholder-text">Click the button below to see your resume rendered instantly.</p>
+  <aside class="action-rail">
+    <!-- New Checklist Section - Only visible on desktop -->
+
+    <div class="preview-card">
+      <div class="card-visual">
+        <mat-icon>desktop_windows</mat-icon>
+        <div class="visual-ring"></div>
+      </div>
+      <h3>Live Preview</h3>
+      <p>Visualize your resume as you build.</p>
+      <button mat-stroked-button class="btn-premium btn-ghost" (click)="openPreview()">
+        <div class="btn-content">
+          <span>Open Canvas</span>
+          <mat-icon>open_in_new</mat-icon>
+        </div>
+      </button>
     </div>
 
-    <div class="preview-actions">
-      <button mat-stroked-button
-              class="nav-button back-button"
-              (click)="previousStep()"
-              [disabled]="currentTab === 0">
-        <mat-icon>arrow_back</mat-icon>
-        <span>Back</span>
-      </button>
+    <div class="checklist-section">
+      <div class="checklist-header">
+        <mat-icon class="checklist-icon">fact_check</mat-icon>
+        <h4 class="checklist-title">Completion Checklist</h4>
+      </div>
+      <div class="checklist-items">
+        <div class="checklist-item" [class.completed]="isTabCompleted(0)">
+          <div class="checklist-icon-wrapper">
+            <mat-icon>{{ isTabCompleted(0) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </div>
+          <div class="checklist-content">
+            <span class="checklist-label">Personal Information</span>
+            <span class="checklist-description">Name and contact details added</span>
+          </div>
+        </div>
+        <div class="checklist-item" [class.completed]="isTabCompleted(5)">
+          <div class="checklist-icon-wrapper">
+            <mat-icon>{{ isTabCompleted(5) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </div>
+          <div class="checklist-content">
+            <span class="checklist-label">Professional Summary</span>
+            <span class="checklist-description">Compelling overview created</span>
+          </div>
+        </div>
+        <div class="checklist-item" [class.completed]="isTabCompleted(2)">
+          <div class="checklist-icon-wrapper">
+            <mat-icon>{{ isTabCompleted(2) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </div>
+          <div class="checklist-content">
+            <span class="checklist-label">Work Experience</span>
+            <span class="checklist-description">At least one position added</span>
+          </div>
+        </div>
+        <div class="checklist-item" [class.completed]="isTabCompleted(1)">
+          <div class="checklist-icon-wrapper">
+            <mat-icon>{{ isTabCompleted(1) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </div>
+          <div class="checklist-content">
+            <span class="checklist-label">Education</span>
+            <span class="checklist-description">Academic background included</span>
+          </div>
+        </div>
+        <div class="checklist-item" [class.completed]="isTabCompleted(3)">
+          <div class="checklist-icon-wrapper">
+            <mat-icon>{{ isTabCompleted(3) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </div>
+          <div class="checklist-content">
+            <span class="checklist-label">Projects</span>
+            <span class="checklist-description">At least one project added</span>
+          </div>
+        </div>
+        <div class="checklist-item" [class.completed]="isTabCompleted(4)">
+          <div class="checklist-icon-wrapper">
+            <mat-icon>{{ isTabCompleted(4) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </div>
+          <div class="checklist-content">
+            <span class="checklist-label">Skills</span>
+            <span class="checklist-description">At least 3 skills listed</span>
+          </div>
+        </div>
+      </div>
+      <!-- Completion Message -->
+      @if (completionPercentage() === 100) {
+        <div class="completion-message">
+          <div class="completion-icon">
+            <mat-icon>celebration</mat-icon>
+          </div>
+          <div class="completion-text">
+            <h5 class="completion-title">🎉 Resume Complete!</h5>
+            <p class="completion-description">Great job! Your resume is ready. Click "Finish" to review and download.</p>
+          </div>
+        </div>
+      }
+    </div>
 
-      <button mat-flat-button
-              class="nav-button next-button"
-              (click)="nextStep()"
-              *ngIf="currentTab < tabs.length - 1">
-        <span>Next Step</span>
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
+    <div class="action-buttons-container">
+      <div class="nav-row">
+        <button mat-button
+                class="btn-premium btn-ghost"
+                [disabled]="currentTab() === 0"
+                (click)="previousStep()">
+          <div class="btn-content">
+            <mat-icon class="icon-slide-left">arrow_back</mat-icon>
+            <span>Back</span>
+          </div>
+        </button>
 
-      <button mat-flat-button
-              class="nav-button finish-button"
-              (click)="openPreview()"
-              *ngIf="currentTab === tabs.length - 1">
-        <span>Finish & Preview</span>
-        <mat-icon>check_circle</mat-icon>
-      </button>
-
-      <button mat-stroked-button class="view-preview-btn" (click)="openPreview()">
-        <mat-icon>visibility</mat-icon>
-        View Full Preview
-      </button>
+        @if (currentTab() < tabs.length - 1) {
+          <button mat-flat-button
+                  class="btn-premium btn-primary"
+                  (click)="nextStep()">
+            <div class="btn-content">
+              <span>Next Step</span>
+              <mat-icon class="icon-slide-right">arrow_forward</mat-icon>
+            </div>
+          </button>
+        } @else {
+          <button mat-flat-button
+                  class="btn-premium btn-finish"
+                  (click)="openPreview()">
+            <div class="btn-content">
+              <span>Finish</span>
+              <mat-icon class="icon-bounce">stars</mat-icon>
+            </div>
+          </button>
+        }
+      </div>
     </div>
   </aside>
-
-  <footer class="mobile-navigation-footer">
-    <div class="footer-content">
-      <button mat-stroked-button
-              class="nav-button back-button mobile-icon-only"
-              (click)="previousStep()"
-              [disabled]="currentTab === 0">
-        <mat-icon>arrow_back</mat-icon>
-        <span>Back</span>
-      </button>
-
-      <div class="step-indicator">
-        <span class="step-text">{{ tabs[currentTab].label }}</span>
-      </div>
-
-      <button mat-flat-button
-              class="nav-button next-button mobile-icon-only"
-              (click)="nextStep()"
-              *ngIf="currentTab < tabs.length - 1">
-        <span>Next</span>
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-
-      <button mat-flat-button
-              class="nav-button next-button mobile-icon-only"
-              (click)="openPreview()"
-              *ngIf="currentTab === tabs.length - 1">
-        <span>Preview</span>
-        <mat-icon>visibility</mat-icon>
-      </button>
-    </div>
-  </footer>
 </div>

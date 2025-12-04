@@ -1,32 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatStepperModule } from '@angular/material/stepper';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common'; // Still useful for pipes
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogModule, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+
+// Feature Components
 import { PersonalComponent } from '../personal/personal.component';
 import { EducationComponent } from '../education/education.component';
 import { ExperienceComponent } from '../experience/experience.component';
 import { SummaryComponent } from '../summary/summary.component';
-import { PreviewComponent } from '../preview/preview.component';
-import { ActivatedRoute } from '@angular/router';
 import { ProjectsComponent } from '../projects/projects';
 import { SkillsComponent } from '../skills/skills.component';
+import { PreviewComponent } from '../preview/preview.component';
+import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
 @Component({
   selector: 'rr-resume-builder',
   standalone: true,
   imports: [
     CommonModule,
-    MatStepperModule,
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
     PersonalComponent,
@@ -40,135 +38,118 @@ import { SkillsComponent } from '../skills/skills.component';
   styleUrl: './builder.component.scss',
 })
 export class ResumeBuilderComponent implements OnInit {
-  showPreview = false;
-  isExporting = false;
-  completionPercentage = 0;
-  currentTab = 0;
-  resumeId = null;
+  // Services
+  private resumeBuilder = inject(ResumeBuilderService);
+  private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
 
-  tabs = [
-    { label: 'CONTACT INFO', icon: 'person' },
-    { label: 'EDUCATION', icon: 'school' },
-    { label: 'EXPERIENCE', icon: 'work' },
-    { label: 'PROJECTS', icon: 'folder_open' },
-    { label: 'SKILLS', icon: 'stars' },
-    { label: 'SUMMARY', icon: 'description' },
+  // State Signals
+  resumeId = signal<string | null>(null);
+  currentTab = signal<number>(0);
+
+  // Resume Data State (for completion tracking)
+  private resumeState = signal<any>({});
+
+  // Configuration
+  readonly tabs = [
+    { label: 'Contact', icon: 'person_outline', component: 'personal' },
+    { label: 'Education', icon: 'school', component: 'education' },
+    { label: 'Experience', icon: 'work_outline', component: 'experience' },
+    { label: 'Projects', icon: 'folder_open', component: 'projects' },
+    { label: 'Skills', icon: 'stars', component: 'skills' },
+    { label: 'Summary', icon: 'short_text', component: 'summary' },
   ];
 
-  hasPersonalInfo = false;
-  hasEducation = false;
-  hasExperience = false;
-  hasProjects = false;
-  hasSkills = false;
-  hasSummary = false;
-
-  constructor(
-    private resumeBuilder: ResumeBuilderService,
-    private dialog: MatDialog,
-    private route: ActivatedRoute
-  ) {
-    this.route.queryParams.subscribe(params => {
-      this.resumeId = params['resumeId'];
-    });
-  }
-
-  ngOnInit(): void {
-    if (this.resumeId) {
-      this.resumeBuilder.loadDraftFromServer();
-    }
-
-    this.resumeBuilder.state$.subscribe(state => {
-      this.updateCompletionStatus(state);
-    });
-  }
-
-  private updateCompletionStatus(state: any): void {
-    this.hasPersonalInfo = !!(state.personal?.firstName && state.personal?.email);
-    this.hasEducation = (state.educations?.length || 0) > 0;
-    this.hasExperience = (state.experiences?.length || 0) > 0;
-    this.hasProjects = (state.projects?.length || 0) > 0;
-    this.hasSummary = !!state.personal?.summary;
-
-    // Compute total skills across categories for hasSkills
-    const totalSkills = state.skills?.reduce((acc: number, cat: any) => acc + (cat.skills?.length || 0), 0) || 0;
-    this.hasSkills = totalSkills >= 3;
+  // Computed Properties (Modern Reactivity)
+  completionPercentage = computed(() => {
+    const state = this.resumeState();
+    if (!state) return 0;
 
     const checks = [
-      this.hasPersonalInfo,
-      this.hasEducation,
-      this.hasExperience,
-      this.hasProjects,
-      this.hasSkills,
-      this.hasSummary
+      !!(state.personal?.firstName && state.personal?.email), // Contact
+      (state.educations?.length || 0) > 0, // Education
+      (state.experiences?.length || 0) > 0, // Experience
+      (state.projects?.length || 0) > 0,   // Projects
+      (state.skills?.reduce((acc: number, cat: any) => acc + (cat.skills?.length || 0), 0) || 0) >= 3, // Skills
+      !!state.personal?.summary // Summary
     ];
 
-    this.completionPercentage = Math.round(
-      (checks.filter(Boolean).length / checks.length) * 100
-    );
-  }
+    return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  });
 
-  /**
-   * Helper function to check if a specific tab is completed.
-   */
-  getTabCompletion(index: number): boolean {
+  // Track specific section completion for UI indicators
+  isTabCompleted(index: number): boolean {
+    const state = this.resumeState();
     switch (index) {
-      case 0: return this.hasPersonalInfo;
-      case 1: return this.hasEducation;
-      case 2: return this.hasExperience;
-      case 3: return this.hasProjects;
-      case 4: return this.hasSkills;
-      case 5: return this.hasSummary;
+      case 0: return !!(state.personal?.firstName && state.personal?.email);
+      case 1: return (state.educations?.length || 0) > 0;
+      case 2: return (state.experiences?.length || 0) > 0;
+      case 3: return (state.projects?.length || 0) > 0;
+      case 4: return (state.skills?.reduce((acc: number, cat: any) => acc + (cat.skills?.length || 0), 0) || 0) >= 3;
+      case 5: return !!state.personal?.summary;
       default: return false;
     }
   }
 
+  constructor() {
+    // Read query params
+    this.route.queryParams.subscribe(params => {
+      this.resumeId.set(params['resumeId'] || null);
+    });
+
+    // Reactive effect to update local state when service state changes
+    // In Angular 18+, toSignal is often better, but keeping subscription logic simple here
+    this.resumeBuilder.state$.subscribe(state => {
+      this.resumeState.set(state);
+    });
+  }
+
+  ngOnInit(): void {
+    if (this.resumeId()) {
+      this.resumeBuilder.loadDraftFromServer();
+    }
+  }
+
+  // Navigation Actions
   navigateToTab(index: number): void {
-    this.currentTab = index;
+    this.currentTab.set(index);
+    this.scrollToTop();
   }
 
   nextStep(): void {
-    if (this.currentTab < this.tabs.length - 1) {
-      this.currentTab++;
+    if (this.currentTab() < this.tabs.length - 1) {
+      this.currentTab.update(v => v + 1);
+      this.scrollToTop();
     }
   }
 
   previousStep(): void {
-    if (this.currentTab > 0) {
-      this.currentTab--;
+    if (this.currentTab() > 0) {
+      this.currentTab.update(v => v - 1);
+      this.scrollToTop();
     }
   }
 
+  public scrollToTop() {
+    const contentArea = document.querySelector('.content-area');
+    if (contentArea) contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   openPreview(): void {
+    const isMobile = window.innerWidth <= 768;
+
     const dialogConfig: MatDialogConfig = {
-      width: '100%',
-      minWidth: 'fit-content',
-      maxWidth: 'none',
-      height: '90vh',
-      maxHeight: '90vh',
-      panelClass: 'preview-modal-container',
+      width: isMobile ? '100vw' : '100%',
+      height: isMobile ? '100vh' : '90vh',
+      maxWidth: isMobile ? '100vw' : 'none',
+      maxHeight: isMobile ? '100vh' : '90vh',
+      panelClass: isMobile ? 'preview-modal-mobile' : 'preview-modal-desktop',
+      data: { resumeId: this.resumeId() },
       autoFocus: false,
-      restoreFocus: true,
-      disableClose: false,
-      hasBackdrop: true,
-      backdropClass: 'preview-modal-backdrop',
-      data: { resumeId: this.resumeId },
       enterAnimationDuration: '300ms',
-      exitAnimationDuration: '250ms'
+      exitAnimationDuration: '200ms'
     };
 
-    // Responsive configuration
-    if (window.innerWidth <= 768) {
-      dialogConfig.maxWidth = '100vw';
-      dialogConfig.maxHeight = '100vh';
-      dialogConfig.width = '100vw';
-      dialogConfig.height = '100vh';
-      dialogConfig.panelClass = 'preview-modal-container-mobile';
-    }
-
-    const dialogRef = this.dialog.open(PreviewComponent, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('Preview modal closed with result:', result);
-    });
+    this.dialog.open(PreviewComponent, dialogConfig);
   }
 }

@@ -1,5 +1,5 @@
 export interface PersonalInfo {
-  firstName: string;
+  firstName?: string;
   lastName?: string;
   email?: string;
   phone?: string;
@@ -30,6 +30,8 @@ export interface Experience {
   endDate?: string;
   isCurrent?: boolean;
   bullets: string[];
+  role?: string;
+  link?: string;
 }
 
 export interface Project {  // CHANGED: Expanded to match component (separate from skills)

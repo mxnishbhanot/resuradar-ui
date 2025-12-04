@@ -1,23 +1,27 @@
-import { Component, OnInit, inject } from '@angular/core';  // CHANGED: Added inject import
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators, FormControl } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule, MatChipInputEvent, MatChipEditedEvent } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule, MatChipInputEvent, MatChipEditedEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
-import { SkillCategory } from '../../shared/models/resume-builder.model';  // CHANGED: Import from model
+
+export interface SkillCategory {
+  id: string;
+  name: string;
+  skills: string[];
+}
 
 @Component({
   selector: 'rr-skills',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -31,37 +35,25 @@ import { SkillCategory } from '../../shared/models/resume-builder.model';  // CH
   styleUrl: './skills.component.scss',
 })
 export class SkillsComponent implements OnInit {
-  // Key codes for adding chips
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
   form!: FormGroup;
   showForm = false;
   editingIndex: number | null = null;
-  skillCategories: SkillCategory[] = [];  // CHANGED: Typed to SkillCategory[]
-
+  skillCategories: SkillCategory[] = [];
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
   private fb = inject(FormBuilder);
-  private store = inject(ResumeBuilderService);  // CHANGED: Use inject() for standalone
+  private store = inject(ResumeBuilderService);
 
   constructor() {
     this.initForm();
   }
 
-  ngOnInit(): void {
-    // CHANGED: Typed to SkillCategory[]
-    this.store.state$.subscribe(state => {
-       this.skillCategories = state.skills || [];
-    });
-  }
-
-  // Initialize the reactive form
   private initForm(): void {
     this.form = this.fb.group({
       name: ['', Validators.required],
-      // Using FormArray to manage the list of skills strings
-      skills: this.fb.array([], Validators.required)
+      skills: this.fb.array([])
     });
   }
 
-  // Getter for easier access to the FormArray controls in template
   get skillsArray(): FormArray {
     return this.form.get('skills') as FormArray;
   }
@@ -70,6 +62,11 @@ export class SkillsComponent implements OnInit {
     return this.skillsArray.controls as FormControl[];
   }
 
+  ngOnInit(): void {
+    this.store.state$.subscribe(state => {
+      this.skillCategories = state.skills || [];
+    });
+  }
 
   showAddForm(): void {
     this.showForm = true;
@@ -85,92 +82,67 @@ export class SkillsComponent implements OnInit {
     this.skillsArray.clear();
   }
 
-  // === Chip Management Functions ===
-
-  // Add a skill chip when Enter/Comma is pressed
   addSkill(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
-    // Add our skill if it has a value
-    if (value) {
+    if (value && this.skillsArray.length < 15) { // Example: Limit to 15 skills per category
       this.skillsArray.push(this.fb.control(value));
     }
-
-    // Clear the input value
     event.chipInput!.clear();
   }
 
-  // Remove a skill chip
   removeSkill(index: number): void {
     this.skillsArray.removeAt(index);
   }
 
-  // Optional: Allow editing existing chips by double-clicking them
   editSkill(index: number, event: MatChipEditedEvent): void {
     const value = event.value.trim();
-    // Remove skill if it's empty
     if (!value) {
       this.removeSkill(index);
       return;
     }
-
-    // Update existing skill
     this.skillsControls[index].setValue(value);
   }
-
-  // === Category CRUD ===
 
   editCategory(index: number): void {
     this.editingIndex = index;
     const category = this.skillCategories[index];
 
-    // Clear existing form array before patching
     this.skillsArray.clear();
-    // Populate form array with existing skills
     if (category.skills && category.skills.length > 0) {
-      category.skills.forEach((skillName: string) => {  // CHANGED: Typed as string
-        this.skillsArray.push(this.fb.control(skillName));
-      });
+      category.skills.forEach(skill => this.skillsArray.push(this.fb.control(skill)));
     }
 
     this.form.patchValue({
       name: category.name
     });
-
     this.showForm = true;
   }
 
-  deleteCategory(index: number): void {
-    // In a real app, you might want a confirmation dialog here
-    const updatedCategories = [...this.skillCategories];
-    updatedCategories.splice(index, 1);
-    // Update store
-    this.store.update({ skills: updatedCategories });  // Triggers autosave
-  }
-
   saveCategory(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid || this.skillsArray.length === 0) return;
 
-    const formValue = this.form.value;
-    const categoryData: SkillCategory = {
-      id: this.editingIndex !== null ?
-        this.skillCategories[this.editingIndex].id : Date.now().toString(),
+    const formValue = this.form.getRawValue();
+    const filteredSkills = formValue.skills.filter((s: string) => s && s.trim());
+
+    const category: SkillCategory = {
+      id: this.editingIndex !== null ? this.skillCategories[this.editingIndex].id : Date.now().toString(),
       name: formValue.name,
-      // Filter out any potentially empty strings just in case
-      skills: formValue.skills.filter((s: string) => s && s.trim())
+      skills: filteredSkills
     };
-    let updatedCategories = [...this.skillCategories];
 
+    let updatedCategories = [...this.skillCategories];
     if (this.editingIndex !== null) {
-      // Update existing
-      updatedCategories[this.editingIndex] = categoryData;
+      updatedCategories[this.editingIndex] = category;
     } else {
-      // Add new
-      updatedCategories.push(categoryData);
+      updatedCategories.push(category);
     }
 
-    // Send to store
-    this.store.update({ skills: updatedCategories });  // Triggers autosave
-    // Reset UI
+    this.store.update({ skills: updatedCategories });
     this.cancelForm();
+  }
+
+  deleteCategory(index: number): void {
+    const updatedCategories = this.skillCategories.filter((_, i) => i !== index);
+    this.store.update({ skills: updatedCategories });
   }
 }

@@ -1,9 +1,8 @@
 @use '../../../theme/variables' as *;
 
 /* =========================================
-   PROJECTS COMPONENT - SHARED THEME
+   PROJECTS COMPONENT - PREMIUM UI
    ========================================= */
-
 .projects-container {
   width: 100%;
   animation: fadeIn 0.4s ease;
@@ -14,7 +13,9 @@
   to { opacity: 1; }
 }
 
-/* --- SECTION HEADER (REUSED) --- */
+/* =========================================
+   SECTION HEADER
+   ========================================= */
 .section-header {
   display: flex;
   align-items: flex-start;
@@ -22,7 +23,6 @@
   margin-bottom: $spacing-xl;
   padding-bottom: $spacing-lg;
   border-bottom: 2px solid var(--border-color);
-
   @media (max-width: 768px) {
     gap: $spacing-md;
     margin-bottom: $spacing-lg;
@@ -39,20 +39,17 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.25);
   animation: scaleIn 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-
   @media (max-width: 768px) {
     width: 48px;
     height: 48px;
   }
-
   .header-icon {
     font-size: 28px;
     width: 28px;
     height: 28px;
     color: $text-inverse;
-
     @media (max-width: 768px) {
       font-size: 24px;
       width: 24px;
@@ -75,7 +72,6 @@
   color: var(--text-primary);
   letter-spacing: -0.02em;
   line-height: 1.2;
-
   @media (max-width: 768px) { font-size: 1.5rem; }
   @media (max-width: 480px) { font-size: 1.25rem; }
 }
@@ -85,18 +81,18 @@
   font-size: 0.9375rem;
   color: var(--text-muted);
   line-height: 1.5;
-
   @media (max-width: 768px) { font-size: 0.875rem; }
   @media (max-width: 480px) { font-size: 0.8125rem; }
 }
 
-/* --- PROJECTS LIST & CARD --- */
+/* =========================================
+   PROJECTS LIST
+   ========================================= */
 .projects-list {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
   margin-bottom: $spacing-xl;
-
   @media (max-width: 768px) {
     gap: $spacing-md;
     margin-bottom: $spacing-lg;
@@ -110,13 +106,12 @@
   padding: $spacing-xl;
   transition: all 0.3s ease;
   animation: slideInUp 0.4s ease;
-
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   &:hover {
-    border-color: rgba(var(--accent-rgb), 0.4);
+    border-color: var(--accent-color);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
-
   @media (max-width: 768px) { padding: $spacing-lg; }
   @media (max-width: 480px) { padding: $spacing-md; }
 }
@@ -131,7 +126,6 @@
   align-items: flex-start;
   gap: $spacing-md;
   margin-bottom: $spacing-md;
-
   @media (max-width: 768px) { flex-wrap: wrap; }
 }
 
@@ -145,14 +139,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-
   mat-icon {
     font-size: 24px;
     width: 24px;
     height: 24px;
     color: var(--accent-color);
   }
-
   @media (max-width: 480px) {
     width: 40px;
     height: 40px;
@@ -168,37 +160,43 @@
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.3;
-
   @media (max-width: 768px) { font-size: 1.125rem; }
   @media (max-width: 480px) { font-size: 1rem; }
 }
 
 .card-role {
-  margin: 0;
+  margin: 0 0 $spacing-xs 0;
   font-size: 0.9375rem;
   color: var(--text-secondary);
-  display: flex;
+  line-height: 1.4;
+  @media (max-width: 480px) { font-size: 0.875rem; }
+}
+
+.card-link {
+  display: inline-flex;
   align-items: center;
   gap: $spacing-xs;
-  line-height: 1.4;
-
-  @media (max-width: 480px) { font-size: 0.875rem; }
-
-  .inline-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: var(--text-muted);
-
-    @media (max-width: 480px) { font-size: 16px; width: 16px; height: 16px; }
+  text-decoration: none;
+  color: var(--accent-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  .link-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
   }
+  &:hover {
+    color: var(--accent-color-light);
+    transform: translateX(2px);
+  }
+  @media (max-width: 480px) { font-size: 0.8125rem; }
 }
 
 .card-actions {
   display: flex;
   gap: $spacing-xs;
   flex-shrink: 0;
-
   @media (max-width: 768px) {
     width: 100%;
     justify-content: flex-end;
@@ -211,15 +209,12 @@
   height: 40px;
   border-radius: $radius-md;
   transition: all 0.3s ease;
-
   mat-icon { font-size: 20px; width: 20px; height: 20px; }
-
   &.edit-btn {
     color: var(--accent-color);
     background: rgba(var(--accent-rgb), 0.1);
     &:hover { background: rgba(var(--accent-rgb), 0.2); transform: scale(1.05); }
   }
-
   &.delete-btn {
     color: #ef4444;
     background: rgba(239, 68, 68, 0.1);
@@ -236,7 +231,6 @@
   padding: $spacing-sm 0;
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
-
   @media (max-width: 480px) { gap: $spacing-sm; }
 }
 
@@ -246,15 +240,12 @@
   gap: $spacing-xs;
   font-size: 0.875rem;
   color: var(--text-secondary);
-
   @media (max-width: 480px) { font-size: 0.8125rem; }
-
   .meta-icon {
     font-size: 18px;
     width: 18px;
     height: 18px;
     color: var(--text-muted);
-
     @media (max-width: 480px) { font-size: 16px; width: 16px; height: 16px; }
   }
 }
@@ -264,55 +255,57 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
   border-radius: $radius-full;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-
   mat-icon { font-size: 16px; width: 16px; height: 16px; }
-
   @media (max-width: 480px) {
     font-size: 0.6875rem;
     padding: 4px 10px;
   }
 }
 
-/* --- TECH STACK DISPLAY (REUSING SKILLS CHIP STYLING) --- */
+/* =========================================
+   TECH STACK
+   ========================================= */
 .card-tech-stack {
-    margin-bottom: $spacing-md;
-    padding-bottom: $spacing-md;
-    border-bottom: 1px solid var(--border-color);
-
-    .tech-label {
-        margin: 0 0 $spacing-sm 0;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-
-    .read-only-chip-set {
-        ::ng-deep .mdc-evolution-chip-set__chips {
-            gap: $spacing-sm;
-        }
-
-        .tech-chip {
-            background-color: rgba(var(--accent-rgb), 0.08);
-            color: var(--text-primary);
-            border: 1px solid rgba(var(--accent-rgb), 0.2);
-            font-weight: 500;
-            font-size: 0.875rem;
-
-            ::ng-deep .mdc-evolution-chip__action--primary {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-        }
-    }
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid var(--border-color);
 }
 
-/* --- BULLETS LIST (REUSED) --- */
+.tech-label {
+  display: block;
+  margin: 0 0 $spacing-sm 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  @media (max-width: 480px) { font-size: 0.8125rem; }
+}
+
+.read-only-chip-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  .tech-chip {
+    background-color: rgba(var(--accent-rgb), 0.08);
+    color: var(--text-primary);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
+    border-radius: $radius-md;
+    padding: $spacing-xs $spacing-sm;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    @media (max-width: 480px) { font-size: 0.75rem; padding: 4px 8px; }
+  }
+}
+
+/* =========================================
+   BULLETS LIST
+   ========================================= */
 .card-bullets { margin-top: $spacing-md; }
 
 .bullets-list {
@@ -331,9 +324,7 @@
   font-size: 0.9375rem;
   color: var(--text-secondary);
   line-height: 1.6;
-
   @media (max-width: 480px) { font-size: 0.875rem; }
-
   .bullet-icon {
     font-size: 18px;
     width: 18px;
@@ -341,13 +332,13 @@
     color: var(--accent-color);
     flex-shrink: 0;
     margin-top: 2px;
-
     @media (max-width: 480px) { font-size: 16px; width: 16px; height: 16px; }
   }
 }
 
-
-/* --- EMPTY STATE & ADD BUTTON (REUSED) --- */
+/* =========================================
+   EMPTY STATE
+   ========================================= */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -359,7 +350,6 @@
   border: 2px dashed var(--border-color);
   border-radius: $radius-xl;
   animation: fadeIn 0.5s ease;
-
   @media (max-width: 768px) { padding: $spacing-xl; }
   @media (max-width: 480px) { padding: $spacing-lg; }
 }
@@ -373,10 +363,8 @@
   align-items: center;
   justify-content: center;
   margin-bottom: $spacing-lg;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
-
+  box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.25);
   mat-icon { font-size: 40px; width: 40px; height: 40px; color: $text-inverse; }
-
   @media (max-width: 480px) {
     width: 64px;
     height: 64px;
@@ -389,7 +377,6 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
-
   @media (max-width: 768px) { font-size: 1.25rem; }
   @media (max-width: 480px) { font-size: 1.125rem; }
 }
@@ -400,7 +387,6 @@
   color: var(--text-muted);
   max-width: 500px;
   line-height: 1.6;
-
   @media (max-width: 480px) { font-size: 0.875rem; }
 }
 
@@ -410,14 +396,15 @@
   font-weight: 600;
   font-size: 0.9375rem;
   border-radius: $radius-lg;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.3);
   mat-icon { font-size: 22px; width: 22px; height: 22px; }
-
-  &:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4); }
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(var(--accent-rgb), 0.4); }
   @media (max-width: 480px) { height: 44px; padding: 0 $spacing-lg; font-size: 0.875rem; }
 }
 
+/* =========================================
+   ADD MORE BUTTON
+   ========================================= */
 .add-more-button {
   width: 100%;
   height: 48px;
@@ -429,27 +416,26 @@
   color: var(--accent-color);
   background: rgba(var(--accent-rgb), 0.05);
   transition: all 0.3s ease;
-
   mat-icon { font-size: 22px; width: 22px; height: 22px; }
-
   &:hover {
     background: rgba(var(--accent-rgb), 0.1);
     border-color: var(--accent-color);
     border-style: solid;
     transform: translateY(-2px);
   }
-
   @media (max-width: 480px) { height: 44px; font-size: 0.875rem; }
 }
 
-/* --- FORM CONTAINER & HEADERS (REUSED) --- */
+/* =========================================
+   FORM CONTAINER
+   ========================================= */
 .form-container {
   background: var(--bg-secondary);
   border: 2px solid var(--border-color);
   border-radius: $radius-xl;
   padding: $spacing-xl;
   animation: slideInUp 0.4s ease;
-
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   @media (max-width: 768px) { padding: $spacing-lg; }
   @media (max-width: 480px) { padding: $spacing-md; }
 }
@@ -461,7 +447,6 @@
   margin-bottom: $spacing-xl;
   padding-bottom: $spacing-lg;
   border-bottom: 2px solid var(--border-color);
-
   @media (max-width: 768px) { margin-bottom: $spacing-lg; padding-bottom: $spacing-md; }
 }
 
@@ -474,10 +459,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.25);
   mat-icon { font-size: 24px; width: 24px; height: 24px; color: $text-inverse; }
-
   @media (max-width: 480px) {
     width: 40px;
     height: 40px;
@@ -492,7 +475,6 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
-
   @media (max-width: 768px) { font-size: 1.25rem; }
   @media (max-width: 480px) { font-size: 1.125rem; }
 }
@@ -504,9 +486,10 @@
   @media (max-width: 480px) { font-size: 0.8125rem; }
 }
 
-
-/* --- FORM SECTIONS (REUSED) --- */
-.projects-form {
+/* =========================================
+   FORM SECTIONS
+   ========================================= */
+.project-form {
   display: flex;
   flex-direction: column;
   gap: $spacing-xl;
@@ -517,6 +500,11 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  @media (max-width: 480px) { padding: $spacing-md; }
 }
 
 .form-section-title {
@@ -529,14 +517,12 @@
   color: var(--text-primary);
   padding-bottom: $spacing-sm;
   border-bottom: 1px solid var(--border-color);
-
   mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
     color: var(--accent-color);
   }
-
   @media (max-width: 480px) {
     font-size: 0.9375rem;
     mat-icon { font-size: 18px; width: 18px; height: 18px; }
@@ -546,12 +532,10 @@
 .form-row {
   display: flex;
   gap: $spacing-md;
-
   &.full-width { flex-direction: column; }
   &.form-row-two {
     @media (max-width: 768px) { flex-direction: column; }
   }
-
   @media (max-width: 480px) { flex-direction: column; gap: $spacing-sm; }
 }
 
@@ -559,13 +543,11 @@
   flex: 1;
   &.full-width { width: 100%; }
   &.disabled-field { opacity: 0.6; }
-
-  // Material Overrides (REUSED)
+  // Material Overrides
   ::ng-deep {
     .mat-mdc-form-field-icon-prefix { padding-right: $spacing-sm; color: var(--text-muted); }
-    .mat-mdc-text-field-wrapper { background-color: var(--bg-primary); }
+    .mat-mdc-text-field-wrapper { background-color: var(--bg-secondary); }
     .mat-mdc-form-field-hint { font-size: 0.75rem; color: var(--text-muted); }
-
     .mdc-text-field--outlined {
       &:hover .mdc-notched-outline {
         .mdc-notched-outline__leading,
@@ -583,9 +565,7 @@
   background: rgba(var(--accent-rgb), 0.05);
   border-radius: $radius-md;
   transition: all 0.3s ease;
-
   &:hover { background: rgba(var(--accent-rgb), 0.1); }
-
   .checkbox-label {
     display: flex;
     align-items: center;
@@ -596,8 +576,31 @@
   }
 }
 
-/* --- TECH STACK INPUT SECTION (REUSED CHIPS STYLES) --- */
-.chips-input-section {
+/* =========================================
+   CHIPS INPUT
+   ========================================= */
+.chips-input-container {
+   width: 100%;
+   .mat-mdc-chip-set {
+     margin-bottom: $spacing-sm;
+   }
+   .mat-mdc-chip {
+     background-color: rgba(var(--accent-rgb), 0.08);
+     color: var(--text-primary);
+     border: 1px solid rgba(var(--accent-rgb), 0.2);
+     font-weight: 500;
+     font-size: 0.875rem;
+     ::ng-deep .mdc-evolution-chip__action--primary {
+       padding-left: 12px;
+       padding-right: 12px;
+     }
+   }
+ }
+
+/* =========================================
+   BULLETS SECTION
+   ========================================= */
+.bullets-section {
   background: var(--bg-primary);
   border: 2px solid var(--border-color);
   border-radius: $radius-lg;
@@ -605,13 +608,8 @@
   @media (max-width: 480px) { padding: $spacing-md; }
 }
 
-.section-header-simple {
-    margin-bottom: $spacing-md;
-    padding-bottom: $spacing-sm;
-    border-bottom: 1px solid var(--border-color);
-}
+.bullets-section-header { margin-bottom: $spacing-md; }
 
-.chips-hint,
 .bullets-hint {
   display: flex;
   align-items: center;
@@ -624,9 +622,7 @@
   font-size: 0.875rem;
   color: var(--text-secondary);
   line-height: 1.5;
-
   @media (max-width: 480px) { font-size: 0.8125rem; }
-
   .hint-icon {
     font-size: 18px;
     width: 18px;
@@ -634,26 +630,6 @@
     color: var(--accent-color);
     flex-shrink: 0;
   }
-}
-
-.chip-form-field {
-    ::ng-deep {
-        .mat-mdc-text-field-wrapper { background-color: var(--bg-secondary); }
-        .mat-mdc-chip-input { margin-left: 4px; }
-    }
-}
-
-/* --- BULLETS FORM SECTION (REUSED EXPERIENCE STYLES) --- */
-.bullets-section {
-  background: var(--bg-primary);
-  border: 2px solid var(--border-color);
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  @media (max-width: 480px) { padding: $spacing-md; }
-}
-
-.bullets-section-header {
-  margin-bottom: $spacing-md;
 }
 
 .bullets-container {
@@ -666,7 +642,6 @@
   display: flex;
   align-items: flex-start;
   gap: $spacing-sm;
-
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
@@ -686,8 +661,7 @@
   font-size: 0.875rem;
   flex-shrink: 0;
   margin-top: 8px;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
-
+  box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.25);
   @media (max-width: 768px) {
     margin-top: 0;
     width: 28px;
@@ -698,7 +672,6 @@
 
 .bullet-field {
   flex: 1;
-
   ::ng-deep {
     .mat-mdc-text-field-wrapper { background-color: var(--bg-secondary); }
     textarea { resize: vertical; }
@@ -714,9 +687,7 @@
   border-radius: $radius-md;
   flex-shrink: 0;
   transition: all 0.3s ease;
-
   mat-icon { font-size: 20px; width: 20px; height: 20px; }
-
   &:hover { background: rgba(239, 68, 68, 0.2); transform: scale(1.05); }
   @media (max-width: 768px) { margin-top: -28px; }
 }
@@ -729,9 +700,7 @@
   color: var(--accent-color);
   background: rgba(var(--accent-rgb), 0.05);
   transition: all 0.3s ease;
-
   mat-icon { font-size: 20px; width: 20px; height: 20px; }
-
   &:hover {
     background: rgba(var(--accent-rgb), 0.1);
     border-color: var(--accent-color);
@@ -739,15 +708,15 @@
   }
 }
 
-
-/* --- FORM ACTIONS (REUSED) --- */
+/* =========================================
+   FORM ACTIONS
+   ========================================= */
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: $spacing-md;
   padding-top: $spacing-lg;
   border-top: 2px solid var(--border-color);
-
   @media (max-width: 768px) { flex-direction: column-reverse; }
 }
 
@@ -763,9 +732,7 @@
   align-items: center;
   gap: $spacing-sm;
   transition: all 0.3s ease;
-
   mat-icon { font-size: 22px; width: 22px; height: 22px; }
-
   @media (max-width: 768px) { width: 100%; justify-content: center; }
   @media (max-width: 480px) { height: 44px; min-width: auto; font-size: 0.875rem; }
 }
@@ -774,19 +741,18 @@
   border: 2px solid var(--border-color);
   color: var(--text-secondary);
   background: transparent;
-
   &:hover { background: var(--bg-secondary); border-color: var(--text-secondary); color: var(--text-primary); }
 }
 
 .save-btn {
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-
-  &:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4); transform: translateY(-2px); }
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.3);
+  &:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(var(--accent-rgb), 0.4); transform: translateY(-2px); }
   &:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 }
 
-
-/* --- UNIVERSAL STYLES (REUSED) --- */
+/* =========================================
+   ANIMATIONS & TRANSITIONS
+   ========================================= */
 * {
   transition-property: background-color, border-color, color, box-shadow, transform;
   transition-duration: 0.3s;

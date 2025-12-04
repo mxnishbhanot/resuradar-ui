@@ -1,60 +1,57 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule, KeyValue } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators, FormControl } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule, MatChipInputEvent } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { MatChipsModule, MatChipInputEvent } from '@angular/material/chips';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-
-// Assuming data service and model exist (adjust paths if needed)
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
-import { Project } from '../../shared/models/resume-builder.model';  // CHANGED: Import from model
+import { Project } from '../../shared/models/resume-builder.model';
 
-// Local Model Definition (matches global now, removed duplicate)
 @Component({
   selector: 'rr-projects',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
+    TextFieldModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatCheckboxModule,
-    MatChipsModule,
     MatTooltipModule,
-    CdkTextareaAutosize // Required for auto-sizing textarea
+    MatChipsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    CdkTextareaAutosize
   ],
   templateUrl: './projects.html',
   styleUrl: './projects.scss',
 })
 export class ProjectsComponent implements OnInit {
-  // Key codes for adding chips (Tech Stack)
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
-
   form!: FormGroup;
   showForm = false;
   editingIndex: number | null = null;
-  projects: Project[] = [];  // CHANGED: Typed to Project[]
-
+  projects: Project[] = [];
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
   private fb = inject(FormBuilder);
-  private store = inject(ResumeBuilderService);  // CHANGED: Use inject() for standalone
+  private store = inject(ResumeBuilderService);
 
   constructor() {
     this.initForm();
     this.setupEndDateToggle();
   }
 
-  // === Form Setup ===
   private initForm(): void {
     this.form = this.fb.group({
       title: ['', Validators.required],
@@ -63,13 +60,12 @@ export class ProjectsComponent implements OnInit {
       startDate: [''],
       endDate: [''],
       isCurrent: [false],
-      techStack: this.fb.array([]),
+      techStack: this.fb.array([]), // This is now just an array of controls, not bound to the grid
       bullets: this.fb.array([])
     });
   }
 
   private setupEndDateToggle(): void {
-    // Disable endDate when isCurrent is checked
     this.form.get('isCurrent')?.valueChanges.subscribe(isCurrent => {
       const endDateControl = this.form.get('endDate');
       if (isCurrent) {
@@ -81,7 +77,6 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
-  // === FormArray Getters ===
   get bullets(): FormArray {
     return this.form.get('bullets') as FormArray;
   }
@@ -90,19 +85,33 @@ export class ProjectsComponent implements OnInit {
     return this.form.get('techStack') as FormArray;
   }
 
-  get techStackControls(): FormControl[] {
+  get techStackControls() {
     return this.techStackArray.controls as FormControl[];
   }
 
-  // === Component Lifecycle ===
   ngOnInit(): void {
-    // CHANGED: Typed to Project[]
     this.store.state$.subscribe(state => {
       this.projects = state.projects || [];
     });
   }
 
-  // === Bullet Point Management (Reused from Experience) ===
+  showAddForm(): void {
+    this.showForm = true;
+    this.editingIndex = null;
+    this.form.reset({ isCurrent: false });
+    this.bullets.clear();
+    this.techStackArray.clear();
+    this.addBullet();
+  }
+
+  cancelForm(): void {
+    this.showForm = false;
+    this.editingIndex = null;
+    this.form.reset({ isCurrent: false });
+    this.bullets.clear();
+    this.techStackArray.clear();
+  }
+
   addBullet(): void {
     this.bullets.push(this.fb.control(''));
   }
@@ -111,7 +120,6 @@ export class ProjectsComponent implements OnInit {
     this.bullets.removeAt(index);
   }
 
-  // === Tech Stack Chip Management (Reused from Skills) ===
   addTech(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
     if (value) {
@@ -124,98 +132,72 @@ export class ProjectsComponent implements OnInit {
     this.techStackArray.removeAt(index);
   }
 
-  // === UI & CRUD Handlers ===
-  showAddForm(): void {
-    this.showForm = true;
-    this.editingIndex = null;
-    this.form.reset({ isCurrent: false });
-    this.bullets.clear();
-    this.techStackArray.clear();
-    this.addBullet(); // Start with one empty bullet point
-  }
-
-  cancelForm(): void {
-    this.showForm = false;
-    this.editingIndex = null;
-    this.form.reset({ isCurrent: false });
-    this.bullets.clear();
-    this.techStackArray.clear();
-  }
-
   editProject(index: number): void {
     this.editingIndex = index;
     const proj = this.projects[index];
     const isOngoing = proj.isCurrent;
 
-    // Clear and populate FormArrays
     this.bullets.clear();
     if (proj.bullets && proj.bullets.length > 0) {
-      proj.bullets.forEach((bullet: string) => this.bullets.push(this.fb.control(bullet)));  // CHANGED: Typed as string
+      proj.bullets.forEach(bullet => this.bullets.push(this.fb.control(bullet)));
     } else {
       this.addBullet();
     }
 
     this.techStackArray.clear();
     if (proj.techStack && proj.techStack.length > 0) {
-      proj.techStack.forEach((tech: string) => this.techStackArray.push(this.fb.control(tech)));  // CHANGED: Typed as string
+      proj.techStack.forEach(tech => this.techStackArray.push(this.fb.control(tech)));
     }
 
     this.form.patchValue({
       title: proj.title,
-      role: proj.role,
-      link: proj.link,
+      role: proj.role || '',
+      link: proj.link || '',
       startDate: proj.startDate,
       endDate: proj.endDate,
       isCurrent: isOngoing
     });
 
-    // Manually ensure controls are enabled/disabled
     if (isOngoing) {
       this.form.get('endDate')?.disable();
     } else {
       this.form.get('endDate')?.enable();
     }
-
     this.showForm = true;
-  }
-
-  deleteProject(index: number): void {
-    const updatedProjects = [...this.projects];
-    updatedProjects.splice(index, 1);
-    this.store.update({ projects: updatedProjects });  // Triggers autosave
   }
 
   saveProject(): void {
     if (this.form.invalid) return;
 
-    const formValue = this.form.getRawValue();
+    const formValue = this.form.getRawValue(); // getRawValue includes disabled controls
     const filteredBullets = formValue.bullets.filter((b: string) => b && b.trim());
+    const filteredTechStack = formValue.techStack.filter((t: string) => t && t.trim());
 
-    const projectData: Project = {
+    const project: Project = {
       id: this.editingIndex !== null ? this.projects[this.editingIndex].id : Date.now().toString(),
       title: formValue.title,
-      role: formValue.role,
-      link: formValue.link,
-      startDate: formValue.startDate,
-      endDate: formValue.isCurrent ? '' : formValue.endDate,
+      role: formValue.role || undefined,
+      link: formValue.link || undefined,
+      startDate: formValue.startDate, // This will be the date string from the picker
+      endDate: formValue.isCurrent ? '' : formValue.endDate, // This will be the date string or empty
       isCurrent: formValue.isCurrent,
-      techStack: formValue.techStack.filter((t: string) => t && t.trim()),  // CHANGED: Filter empty tech
+      techStack: filteredTechStack,
       bullets: filteredBullets
     };
 
     let updatedProjects = [...this.projects];
-
     if (this.editingIndex !== null) {
-      // Update existing
-      updatedProjects[this.editingIndex] = projectData;
+      updatedProjects[this.editingIndex] = project;
     } else {
-      // Add new
-      updatedProjects.push(projectData);
+      updatedProjects.push(project);
     }
 
-    this.store.update({ projects: updatedProjects });  // Triggers autosave
-
-    // Reset UI
+    this.store.update({ projects: updatedProjects });
     this.cancelForm();
+  }
+
+  deleteProject(index: number): void {
+    const updatedProjects = this.projects.filter((_, i) => i !== index);
+    this.store.update({ projects: updatedProjects });
   }
 }

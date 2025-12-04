@@ -942,8 +942,6 @@
   color: var(--text-secondary);
 
   .footer-content {
-    max-width: 1400px;
-    margin: 0 auto;
     padding: $spacing-3xl $spacing-lg;
 
     @media (max-width: $tablet) {

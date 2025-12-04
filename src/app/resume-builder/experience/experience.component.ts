@@ -1,47 +1,61 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
-import { Experience } from '../../shared/models/resume-builder.model';  // CHANGED: Import from model
+
+export interface Experience {
+  id: string;
+  title: string;
+  company: string;
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
+  bullets: string[];
+}
 
 @Component({
   selector: 'rr-experience',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
+    TextFieldModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatCheckboxModule,
-    MatChipsModule,
-    MatProgressSpinnerModule
+    MatTooltipModule,
+    MatProgressSpinnerModule,
+    CdkTextareaAutosize
   ],
   templateUrl: './experience.component.html',
   styleUrl: './experience.component.scss',
 })
 export class ExperienceComponent implements OnInit {
-  form: FormGroup;
+  form!: FormGroup;
   showForm = false;
   editingIndex: number | null = null;
-  experiences: Experience[] = [];
-  isGenerating = false;
+  experiences: Experience[] | any = [];
+  private fb = inject(FormBuilder);
+  private store = inject(ResumeBuilderService);
 
-  constructor(
-    private fb: FormBuilder,
-    private store: ResumeBuilderService
-  ) {
+  constructor() {
+    this.initForm();
+    this.setupEndDateToggle();
+  }
+
+  private initForm(): void {
     this.form = this.fb.group({
       title: ['', Validators.required],
       company: [''],
@@ -50,8 +64,9 @@ export class ExperienceComponent implements OnInit {
       isCurrent: [false],
       bullets: this.fb.array([])
     });
+  }
 
-    // Disable endDate when isCurrent is checked
+  private setupEndDateToggle(): void {
     this.form.get('isCurrent')?.valueChanges.subscribe(isCurrent => {
       const endDateControl = this.form.get('endDate');
       if (isCurrent) {
@@ -78,7 +93,7 @@ export class ExperienceComponent implements OnInit {
     this.editingIndex = null;
     this.form.reset({ isCurrent: false });
     this.bullets.clear();
-    this.addBullet(); // Start with one empty bullet point
+    this.addBullet();
   }
 
   cancelForm(): void {
@@ -103,9 +118,7 @@ export class ExperienceComponent implements OnInit {
 
     this.bullets.clear();
     if (exp.bullets && exp.bullets.length > 0) {
-      exp.bullets.forEach((bullet: string) => {  // CHANGED: Typed as string
-        this.bullets.push(this.fb.control(bullet));
-      });
+      exp.bullets.forEach((bullet: string) => this.bullets.push(this.fb.control(bullet)));
     } else {
       this.addBullet();
     }
@@ -118,21 +131,18 @@ export class ExperienceComponent implements OnInit {
       isCurrent: isCurrentlyWorking
     });
 
-    // Manually ensure controls are enabled/disabled based on the patched value
     if (isCurrentlyWorking) {
       this.form.get('endDate')?.disable();
     } else {
       this.form.get('endDate')?.enable();
     }
-
     this.showForm = true;
   }
 
   saveExperience(): void {
     if (this.form.invalid) return;
 
-    const formValue = this.form.getRawValue(); // Use getRawValue to include disabled endDate if necessary
-    // Filter out empty bullet points before saving
+    const formValue = this.form.getRawValue();
     const bulletValues = formValue.bullets.filter((b: string) => b && b.trim());
 
     const experience: Experience = {
@@ -140,72 +150,24 @@ export class ExperienceComponent implements OnInit {
       title: formValue.title,
       company: formValue.company,
       startDate: formValue.startDate,
-      // If isCurrent is true, set endDate to an empty string on the model
       endDate: formValue.isCurrent ? '' : formValue.endDate,
       isCurrent: formValue.isCurrent,
       bullets: bulletValues
     };
 
-    let updatedExperiences: Experience[];
+    let updatedExperiences = [...this.experiences];
     if (this.editingIndex !== null) {
-      updatedExperiences = [...this.experiences];
       updatedExperiences[this.editingIndex] = experience;
     } else {
-      updatedExperiences = [...this.experiences, experience];
+      updatedExperiences.push(experience);
     }
 
-    // CHANGED: Use update() instead of replace() to trigger autosave consistently
     this.store.update({ experiences: updatedExperiences });
-
     this.cancelForm();
   }
 
   deleteExperience(index: number): void {
-    const updatedExperiences = this.experiences.filter((_, i) => i !== index);
-    // CHANGED: Use update() instead of replace()
+    const updatedExperiences: Experience[] = this.experiences.filter((_: Experience, i: number) => i !== index);
     this.store.update({ experiences: updatedExperiences });
-  }
-
-  // --- AI Generation Logic ---
-  generateBulletsWithAI(): void {
-    const title = this.form.get('title')?.value;
-    const company = this.form.get('company')?.value;
-
-    // Title is required to generate useful bullets
-    if (!title) {
-      return;
-    }
-
-    this.isGenerating = true;
-    const ctx = {
-      personal: this.store.snapshot.personal,
-      title,
-      company
-    };
-
-    // Simulating API call
-    // Replace with actual API service call
-    const mockResponse = {
-        bullets: [
-            "Developed and maintained a high-traffic microservice architecture using Node.js and AWS Lambda, improving response time by 15%.",
-            "Led a team of 4 junior developers in daily stand-ups and code reviews, ensuring adherence to coding standards and best practices.",
-            "Optimized CI/CD pipelines with Jenkins, reducing deployment time from 30 minutes to under 5 minutes.",
-            "Collaborated cross-functionally with product managers and UX/UI designers to deliver features on schedule."
-        ]
-    };
-
-    setTimeout(() => {
-      this.isGenerating = false;
-
-      const res = mockResponse; // Use the mock response
-
-      if (res?.bullets && Array.isArray(res.bullets)) {
-        this.bullets.clear();
-        res.bullets.forEach((bullet: string) => {
-          this.bullets.push(this.fb.control(bullet));
-        });
-        // CHANGED: Form changes now trigger autosave via state$
-      }
-    }, 1500); // Simulate API delay
   }
 }

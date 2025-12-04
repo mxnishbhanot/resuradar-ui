@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
-import { Router, RouterOutlet, RouterModule, NavigationEnd } from '@angular/router';
+import { Router, RouterOutlet, RouterModule, NavigationEnd, ActivatedRoute, RouterStateSnapshot } from '@angular/router';
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
@@ -60,7 +60,7 @@ export class Home {
     public dialog: MatDialog,
     private userService: UserService,
     private renderer: Renderer2,
-    private skeletonService: SkeletonService
+    private skeletonService: SkeletonService,
   ) { }
 
   @HostListener('window:resize', [])
@@ -228,5 +228,10 @@ export class Home {
       top: 0,
       behavior: 'smooth'
     });
+  }
+
+  shouldRender(): boolean {
+    const url = this.router.url;
+    return !(url.includes('/build') && window.innerWidth < 1024);
   }
 }

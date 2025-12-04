@@ -1,19 +1,16 @@
-import { Component, OnInit, inject } from '@angular/core';  // CHANGED: Added inject import
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators, FormControl } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-
-// Assuming data service and model exist (adjust paths if needed)
+import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
-// Local Model Definition (matches global model now)
 export interface EducationEntry {
   id: string;
   institution: string;
@@ -31,8 +28,8 @@ export interface EducationEntry {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
+    TextFieldModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -46,21 +43,18 @@ export interface EducationEntry {
   styleUrl: './education.component.scss',
 })
 export class EducationComponent implements OnInit {
-
   form!: FormGroup;
   showForm = false;
   editingIndex: number | null = null;
-  educationEntries: EducationEntry[] = [];  // CHANGED: Typed to EducationEntry[]
-
+  educationEntries: EducationEntry[] = [];
   private fb = inject(FormBuilder);
-  private store = inject(ResumeBuilderService);  // CHANGED: Use inject() for standalone
+  private store = inject(ResumeBuilderService);
 
   constructor() {
     this.initForm();
     this.setupEndDateToggle();
   }
 
-  // === Form Setup ===
   private initForm(): void {
     this.form = this.fb.group({
       institution: ['', Validators.required],
@@ -75,7 +69,6 @@ export class EducationComponent implements OnInit {
   }
 
   private setupEndDateToggle(): void {
-    // Disable endDate when isCurrent is checked
     this.form.get('isCurrent')?.valueChanges.subscribe(isCurrent => {
       const endDateControl = this.form.get('endDate');
       if (isCurrent) {
@@ -87,20 +80,16 @@ export class EducationComponent implements OnInit {
     });
   }
 
-  // === FormArray Getters ===
   get bullets(): FormArray {
     return this.form.get('bullets') as FormArray;
   }
 
-  // === Component Lifecycle ===
   ngOnInit(): void {
-    // CHANGED: Typed to EducationEntry[] and handle empty array
     this.store.state$.subscribe(state => {
       this.educationEntries = state.educations || [];
     });
   }
 
-  // === Bullet Point Management (Reused from Experience) ===
   addBullet(): void {
     this.bullets.push(this.fb.control(''));
   }
@@ -109,13 +98,12 @@ export class EducationComponent implements OnInit {
     this.bullets.removeAt(index);
   }
 
-  // === UI & CRUD Handlers ===
   showAddForm(): void {
     this.showForm = true;
     this.editingIndex = null;
     this.form.reset({ isCurrent: false });
     this.bullets.clear();
-    this.addBullet(); // Start with one empty bullet point
+    this.addBullet();
   }
 
   cancelForm(): void {
@@ -130,10 +118,9 @@ export class EducationComponent implements OnInit {
     const entry = this.educationEntries[index];
     const isOngoing = entry.isCurrent;
 
-    // Clear and populate FormArray
     this.bullets.clear();
     if (entry.bullets && entry.bullets.length > 0) {
-      entry.bullets.forEach((bullet: string) => this.bullets.push(this.fb.control(bullet)));  // CHANGED: Typed bullet as string
+      entry.bullets.forEach(bullet => this.bullets.push(this.fb.control(bullet)));
     } else {
       this.addBullet();
     }
@@ -148,20 +135,18 @@ export class EducationComponent implements OnInit {
       gpa: entry.gpa
     });
 
-    // Manually ensure controls are enabled/disabled
     if (isOngoing) {
       this.form.get('endDate')?.disable();
     } else {
       this.form.get('endDate')?.enable();
     }
-
     this.showForm = true;
   }
 
   deleteEntry(index: number): void {
     const updatedEntries = [...this.educationEntries];
     updatedEntries.splice(index, 1);
-    this.store.update({ educations: updatedEntries });  // Triggers autosave
+    this.store.update({ educations: updatedEntries });
   }
 
   saveEntry(): void {
@@ -183,18 +168,13 @@ export class EducationComponent implements OnInit {
     };
 
     let updatedEntries = [...this.educationEntries];
-
     if (this.editingIndex !== null) {
-      // Update existing
       updatedEntries[this.editingIndex] = entryData;
     } else {
-      // Add new
       updatedEntries.push(entryData);
     }
 
-    this.store.update({ educations: updatedEntries });  // Triggers autosave
-
-    // Reset UI
+    this.store.update({ educations: updatedEntries });
     this.cancelForm();
   }
 }

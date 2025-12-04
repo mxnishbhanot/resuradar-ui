@@ -518,7 +518,8 @@ div {
     gap: 0 !important;
 
     .btn-label {
-      display: none !important; /* Hide text on mobile */
+      display: none !important;
+      /* Hide text on mobile */
     }
   }
 }
@@ -584,7 +585,7 @@ div {
     box-shadow: $shadow-sm;
   }
 
-   &:disabled {
+  &:disabled {
     opacity: 0.4;
   }
 
@@ -606,5 +607,74 @@ div {
     background: transparent !important;
     box-shadow: none !important;
     overflow: hidden !important;
+  }
+}
+
+:root.dark-theme, body.dark-theme {
+
+  /* --- ⭐️ Target the custom panel class --- */
+  .custom-dark-datepicker {
+    /* Main popup panel background */
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border-color);
+  }
+
+  /* --- Calendar Header (e.g., "DECEMBER 2025" and arrows) --- */
+  .custom-dark-datepicker .mat-calendar-header {
+    /* Slightly different surface for contrast */
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  /* Text and arrows in the header */
+  .custom-dark-datepicker .mat-calendar-body-label,
+  .custom-dark-datepicker .mat-calendar-period-switch,
+  .custom-dark-datepicker .mat-calendar-arrow {
+    color: var(--text-primary);
+  }
+
+  /* Hover effect on arrow buttons */
+  .custom-dark-datepicker .mat-calendar-header button:hover {
+    background: rgba(var(--text-primary-rgb), 0.05);
+  }
+  .custom-dark-datepicker .mat-calendar-header .mat-mdc-icon-button {
+    color: var(--text-inverse);
+  }
+  .custom-dark-datepicker .mat-calendar-header .mdc-button__label,.mat-calendar-arrow, th {
+    color: var(--text-inverse);
+    fill: var(--text-inverse);
+  }
+
+  /* --- Calendar Body (Year/Month views) --- */
+
+  /* Default text color for all dates/years */
+  .custom-dark-datepicker .mat-calendar-body-cell-content {
+    color: var(--text-secondary);
+  }
+
+  /* Hover effect */
+  .custom-dark-datepicker .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover > .mat-calendar-body-cell-content {
+    background-color: rgba(var(--text-primary-rgb), 0.08);
+  }
+
+  /* Selected Date/Month/Year (Accent Color) */
+  .custom-dark-datepicker .mat-calendar-body-selected {
+    background-color: var(--accent-color);
+    color: var(--text-inverse);
+  }
+
+  .custom-dark-datepicker .mat-calendar-body-selected.mat-calendar-body-cell-content {
+    /* Use !important here if absolutely necessary due to Material's default theme specificity,
+       but usually scoping with the panel class is enough */
+    background-color: var(--accent-color) !important;
+    color: var(--text-inverse) !important;
+  }
+
+  /* Today's Date/Month/Year Outline */
+  .custom-dark-datepicker .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
   }
 }
