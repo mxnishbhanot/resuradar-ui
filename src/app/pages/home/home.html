@@ -2,7 +2,7 @@
 
 <div class="skeleton-loading-indicator" *ngIf="isLoading"></div>
 
-<div class="home-container" >
+<div class="home-container">
   <!-- Animated Background -->
   <div class="background-wrapper">
     <div class="gradient-orb orb-1"></div>
@@ -29,32 +29,20 @@
 
           <!-- Desktop Nav (hidden on mobile) -->
           <nav class="nav-links desktop-nav">
-            <button
-              class="nav-link"
-              (click)="navigate('upload'); setActiveTab('upload')"
-              [class.active]="activeTab === 'upload'"
-              matTooltip="Analyze your resume"
-              matTooltipPosition="below">
+            <button class="nav-link" (click)="navigate('upload'); setActiveTab('upload')"
+              [class.active]="activeTab === 'upload'" matTooltip="Analyze your resume" matTooltipPosition="below">
               <mat-icon>insights</mat-icon>
               <span>Score</span>
               <div class="nav-link-indicator"></div>
             </button>
-            <button
-              class="nav-link"
-              (click)="navigate('scan'); setActiveTab('scan')"
-              [class.active]="activeTab === 'scan'"
-              matTooltip="Compare resume to JD"
-              matTooltipPosition="below">
+            <button class="nav-link" (click)="navigate('scan'); setActiveTab('scan')"
+              [class.active]="activeTab === 'scan'" matTooltip="Compare resume to JD" matTooltipPosition="below">
               <mat-icon>document_scanner</mat-icon>
               <span>Scan</span>
               <div class="nav-link-indicator"></div>
             </button>
-            <button
-              class="nav-link"
-              (click)="navigate('start'); setActiveTab('start')"
-              [class.active]="activeTab === 'start'"
-              matTooltip="Build Resume"
-              matTooltipPosition="below">
+            <button class="nav-link" (click)="navigate('start'); setActiveTab('start')"
+              [class.active]="activeTab === 'start'" matTooltip="Build Resume" matTooltipPosition="below">
               <mat-icon>description</mat-icon>
               <span>Build</span>
               <span class="coming-soon-badge">
@@ -69,11 +57,8 @@
         <!-- Right: Actions -->
         <div class="toolbar-right">
           <!-- Upgrade Button (Desktop Only) -->
-          <button
-            *ngIf="googleAuth.isLoggedIn && !user?.isPremium && !this.isIpadView"
-            mat-flat-button
-            class="upgrade-btn desktop-only"
-            (click)="openUpgradeModal()">
+          <button *ngIf="googleAuth.isLoggedIn && !user?.isPremium && !this.isIpadView" mat-flat-button
+            class="upgrade-btn desktop-only" (click)="openUpgradeModal()">
             <span class="btn-shine"></span>
             <mat-icon>workspace_premium</mat-icon>
             <span>Upgrade Pro</span>
@@ -97,21 +82,14 @@
           </div>
 
           <!-- Login Button (Desktop Only) -->
-          <button
-            *ngIf="!googleAuth.isLoggedIn"
-            mat-flat-button
-            class="login-btn desktop-only"
+          <button *ngIf="!googleAuth.isLoggedIn" mat-flat-button class="login-btn desktop-only"
             (click)="loginWithGoogle()">
             <mat-icon>login</mat-icon>
             <span>Sign In</span>
           </button>
 
           <!-- Mobile Hamburger -->
-          <button
-            class="mobile-nav-toggle mobile-only"
-            (click)="toggleMobileNav()"
-            mat-icon-button
-            aria-label="Menu">
+          <button class="mobile-nav-toggle mobile-only" (click)="toggleMobileNav()" mat-icon-button aria-label="Menu">
             <mat-icon>{{ mobileNavOpen ? 'close' : 'menu' }}</mat-icon>
           </button>
         </div>
@@ -210,9 +188,7 @@
 
     <!-- Navigation Links -->
     <nav class="mobile-nav-links">
-      <button
-        class="mobile-nav-link"
-        [class.active]="activeTab === 'upload'"
+      <button class="mobile-nav-link" [class.active]="activeTab === 'upload'"
         (click)="navigate('upload'); setActiveTab('upload'); toggleMobileNav()">
         <div class="mobile-nav-icon">
           <mat-icon>insights</mat-icon>
@@ -224,9 +200,7 @@
         <mat-icon class="chevron">chevron_right</mat-icon>
       </button>
 
-      <button
-        class="mobile-nav-link"
-        [class.active]="activeTab === 'scan'"
+      <button class="mobile-nav-link" [class.active]="activeTab === 'scan'"
         (click)="navigate('scan'); setActiveTab('scan'); toggleMobileNav()">
         <div class="mobile-nav-icon">
           <mat-icon>document_scanner</mat-icon>
@@ -238,9 +212,7 @@
         <mat-icon class="chevron">chevron_right</mat-icon>
       </button>
 
-      <button
-        class="mobile-nav-link"
-        [class.active]="activeTab === 'start'"
+      <button class="mobile-nav-link" [class.active]="activeTab === 'start'"
         (click)="navigate('start'); setActiveTab('start'); toggleMobileNav()">
         <div class="mobile-nav-icon">
           <mat-icon>description</mat-icon>
@@ -253,8 +225,7 @@
         <mat-icon class="chevron">chevron_right</mat-icon>
       </button>
 
-      <button *ngIf="googleAuth.isLoggedIn"
-        class="mobile-nav-link"
+      <button *ngIf="googleAuth.isLoggedIn" class="mobile-nav-link"
         (click)="navigate('custom-list'); toggleMobileNav()">
         <div class="mobile-nav-icon">
           <mat-icon>folder_open</mat-icon>
@@ -271,28 +242,19 @@
 
     <!-- Mobile Actions -->
     <div class="mobile-nav-actions">
-      <button
-        *ngIf="googleAuth.isLoggedIn && !user?.isPremium"
-        mat-flat-button
-        class="mobile-upgrade-btn"
+      <button *ngIf="googleAuth.isLoggedIn && !user?.isPremium" mat-flat-button class="mobile-upgrade-btn"
         (click)="openUpgradeModal(); toggleMobileNav()">
         <mat-icon>workspace_premium</mat-icon>
         <span>Upgrade to Pro</span>
       </button>
 
-      <button
-        *ngIf="!googleAuth.isLoggedIn"
-        mat-flat-button
-        class="mobile-login-btn"
+      <button *ngIf="!googleAuth.isLoggedIn" mat-flat-button class="mobile-login-btn"
         (click)="loginWithGoogle(); toggleMobileNav()">
         <mat-icon>login</mat-icon>
         <span>Sign In</span>
       </button>
 
-      <button
-        *ngIf="googleAuth.isLoggedIn"
-        mat-stroked-button
-        class="mobile-logout-btn"
+      <button *ngIf="googleAuth.isLoggedIn" mat-stroked-button class="mobile-logout-btn"
         (click)="googleAuth.logout(); toggleMobileNav()">
         <mat-icon>logout</mat-icon>
         <span>Sign Out</span>
@@ -358,15 +320,8 @@
     </div>
   </footer>
 
-  <button
-    class="scroll-to-top-btn"
-    [class.visible]="showBackToTop"
-    (click)="scrollToTop()"
-    mat-fab
-    aria-label="Scroll to top"
-    matTooltip="Back to Top">
+  <button *ngIf="shouldRender()" class="scroll-to-top-btn" [class.visible]="showBackToTop" (click)="scrollToTop()"
+    mat-fab aria-label="Scroll to top" matTooltip="Back to Top">
     <mat-icon>arrow_upward</mat-icon>
   </button>
 </div>
-
-<!-- <app-toast-container></app-toast-container> -->
