@@ -23,19 +23,19 @@ export class ResumeBuilderService {
     this.loadFromLocal();
     // Use the URL ID to trigger a load on initialization
     this.route.queryParamMap.pipe(
-        // We only want to run the initial load when the component loads, not on subsequent parameter changes
-        // unless the ID actually changes.
-        tap(params => {
-            const resumeId = params.get('resumeId');
-            if (resumeId && this.snapshot._id !== resumeId) {
-                // If a resumeId is in the URL but not in the state, load it.
-                this.loadSpecificResume(resumeId);
-            } else if (!resumeId && this.snapshot._id) {
-                // If we land on a clean URL but have local state, clear state to start fresh.
-                this.stateSubject.next(EMPTY_RESUME_STATE);
-                this.saveToLocal();
-            }
-        })
+      // We only want to run the initial load when the component loads, not on subsequent parameter changes
+      // unless the ID actually changes.
+      tap(params => {
+        const resumeId = params.get('resumeId');
+        if (resumeId && this.snapshot._id !== resumeId) {
+          // If a resumeId is in the URL but not in the state, load it.
+          this.loadSpecificResume(resumeId);
+        } else if (!resumeId && this.snapshot._id) {
+          // If we land on a clean URL but have local state, clear state to start fresh.
+          this.stateSubject.next(EMPTY_RESUME_STATE);
+          this.saveToLocal();
+        }
+      })
     ).subscribe();
     this.setupAutoSave();
   }
@@ -57,39 +57,39 @@ export class ResumeBuilderService {
 
   // Loads a specific resume by ID from the server
   private loadSpecificResume(id: string): void {
-      this.getResume(id).pipe(
-          catchError(error => {
-              console.error(`Failed to load resume ${id}:`, error);
-              // Fallback to empty state and clear URL ID if load fails (e.g., ID is invalid)
-              this.startNewResume();
-              return of(null);
-          })
-      ).subscribe(response => {
-          if (response?.resume) {
-              const resume = response.resume;
-              const state: ResumeBuilderState = {
-                  _id: resume._id, // Set the ID from the response
-                  personal: resume.personal || {},
-                  educations: resume.educations || [],
-                  experiences: resume.experiences || [],
-                  skills: resume.skills || [],
-                  projects: resume.projects || []
-              };
-              this.stateSubject.next(state);
-              this.saveToLocal(); // Also save locally as backup
-          }
-      });
+    this.getResume(id).pipe(
+      catchError(error => {
+        console.error(`Failed to load resume ${id}:`, error);
+        // Fallback to empty state and clear URL ID if load fails (e.g., ID is invalid)
+        this.startNewResume();
+        return of(null);
+      })
+    ).subscribe(response => {
+      if (response?.resume) {
+        const resume = response.resume;
+        const state: ResumeBuilderState = {
+          _id: resume._id, // Set the ID from the response
+          personal: resume.personal || {},
+          educations: resume.educations || [],
+          experiences: resume.experiences || [],
+          skills: resume.skills || [],
+          projects: resume.projects || []
+        };
+        this.stateSubject.next(state);
+        this.saveToLocal(); // Also save locally as backup
+      }
+    });
   }
 
   // Old `loadDraftFromServer` is now mainly used to handle initial/non-ID load logic.
   loadDraftFromServer(): void {
     const resumeId = this.route.snapshot.queryParamMap.get('resumeId');
     if (resumeId) {
-        this.loadSpecificResume(resumeId);
+      this.loadSpecificResume(resumeId);
     } else {
-        // If no ID is present, we start clean. The local storage might have a previous state,
-        // so we rely on the initial loadFromLocal() in the constructor.
-        console.log('No resumeId in URL, starting new session.');
+      // If no ID is present, we start clean. The local storage might have a previous state,
+      // so we rely on the initial loadFromLocal() in the constructor.
+      console.log('No resumeId in URL, starting new session.');
     }
   }
 
@@ -116,14 +116,14 @@ export class ResumeBuilderService {
 
     // 2. Clear the resumeId from the URL to signify a new, unsaved draft
     this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { resumeId: null }, // Remove resumeId from URL
-        queryParamsHandling: 'merge'
+      relativeTo: this.route,
+      queryParams: { resumeId: null }, // Remove resumeId from URL
+      queryParamsHandling: 'merge'
     }).then(() => {
-        console.log('Starting a new resume session (URL ID cleared).');
-        // This is necessary to ensure the empty state is synced to the auto-save mechanism
-        this.isDirty = true;
-        this.autoSaveToServer();
+      console.log('Starting a new resume session (URL ID cleared).');
+      // This is necessary to ensure the empty state is synced to the auto-save mechanism
+      this.isDirty = true;
+      this.autoSaveToServer();
     });
   }
   // ----------------------------------------------
@@ -143,8 +143,8 @@ export class ResumeBuilderService {
     const state = this.snapshot;
     // CRITICAL FIX: Send the current _id (null if new) with the state
     const payload = {
-        ...state,
-        _id: state._id // Send the current ID or null/undefined
+      ...state,
+      _id: state._id // Send the current ID or null/undefined
     };
 
     this.http.put(`${environment.apiUrl}/custom-resume/draft/autosave`, payload, {
@@ -159,23 +159,23 @@ export class ResumeBuilderService {
       console.log(response);
 
       if (response && response.resume) {
-          this.isDirty = false;
-          // 1. Update the local state with the new _id returned by the server
-          if (!this.snapshot._id || this.snapshot._id !== response.resume._id) {
-              this.stateSubject.next({ ...this.snapshot, _id: response.resume._id });
-              this.saveToLocal(); // Resave local with new ID
-          }
+        this.isDirty = false;
+        // 1. Update the local state with the new _id returned by the server
+        if (!this.snapshot._id || this.snapshot._id !== response.resume._id) {
+          this.stateSubject.next({ ...this.snapshot, _id: response.resume._id });
+          this.saveToLocal(); // Resave local with new ID
+        }
 
-          // 2. Update the URL if it doesn't already have the correct ID
-          const currentId = this.route.snapshot.queryParamMap.get('resumeId');
-          if (currentId !== response.resume._id) {
-            this.router.navigate([], {
-              relativeTo: this.route,
-              queryParams: { resumeId: response.resume._id },
-              queryParamsHandling: 'merge'
-            });
-          }
-          console.log('✅ Draft auto-saved at', response?.savedAt, 'ID:', response.resume._id);
+        // 2. Update the URL if it doesn't already have the correct ID
+        const currentId = this.route.snapshot.queryParamMap.get('resumeId');
+        if (currentId !== response.resume._id) {
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { resumeId: response.resume._id },
+            queryParamsHandling: 'merge'
+          });
+        }
+        console.log('✅ Draft auto-saved at', response?.savedAt, 'ID:', response.resume._id);
       }
     });
   }
@@ -185,9 +185,9 @@ export class ResumeBuilderService {
     const state = this.snapshot;
     // CRITICAL FIX: Ensure _id is sent for update, or omitted for new save
     const payload = {
-        ...state,
-        _id: state._id,
-        isDraft
+      ...state,
+      _id: state._id,
+      isDraft
     };
 
     // Use a PUT request if ID exists for updating
@@ -195,8 +195,25 @@ export class ResumeBuilderService {
     const method = state._id ? 'PUT' : 'POST';
 
     const save$ = this.http.request(method, url, {
-        body: payload,
-        headers: this.getHeaders()
+      body: payload,
+      headers: this.getHeaders()
+    });
+
+    return save$.pipe(
+      tap(() => {
+        this.isDirty = false;
+        this.saveToLocal();
+      })
+    );
+  }
+
+  completeResume(): Observable<any> {
+    const state = this.snapshot;
+
+    const url = `${environment.apiUrl}/custom-resume/${state._id}/complete`;
+
+    const save$ = this.http.request('POST', url, {
+      headers: this.getHeaders()
     });
 
     return save$.pipe(
@@ -315,8 +332,8 @@ export class ResumeBuilderService {
   exportPdf(template: string, resumeId: string): Observable<any> {
     // Use HttpParams for cleaner query parameters
     let params = new HttpParams()
-        .set('resumeId', resumeId)
-        .set('template', template);
+      .set('resumeId', resumeId)
+      .set('template', template);
 
     return this.http.get(`${environment.apiUrl}/custom-resume/pdf`, {
       headers: this.getHeaders(),

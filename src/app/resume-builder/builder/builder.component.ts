@@ -16,6 +16,7 @@ import { ProjectsComponent } from '../projects/projects';
 import { SkillsComponent } from '../skills/skills.component';
 import { PreviewComponent } from '../preview/preview.component';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'rr-resume-builder',
@@ -33,7 +34,6 @@ import { ResumeBuilderService } from '../../core/services/resume-builder.service
     SummaryComponent,
     ProjectsComponent,
     SkillsComponent,
-    PreviewComponent // Added PreviewComponent import if it's used in the template
   ],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
@@ -156,5 +156,13 @@ export class ResumeBuilderComponent implements OnInit {
     };
 
     this.dialog.open(PreviewComponent, dialogConfig);
+  }
+
+  markCompleted() {
+    this.resumeBuilder.completeResume()
+      .pipe(
+        tap(res => { if (res) this.openPreview(); })
+      )
+      .subscribe();
   }
 }
