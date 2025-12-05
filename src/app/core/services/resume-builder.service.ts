@@ -156,6 +156,8 @@ export class ResumeBuilderService {
         return of(null);
       })
     ).subscribe((response: any) => {
+      console.log(response);
+
       if (response && response.resume) {
           this.isDirty = false;
           // 1. Update the local state with the new _id returned by the server

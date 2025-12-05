@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common'; // <-- ADD DatePipe
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -10,14 +10,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
+// <-- ADD Datepicker Imports
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
 export interface Experience {
   id: string;
   title: string;
   company: string;
-  startDate: string;
-  endDate: string;
+  startDate: string; // Stored as ISO string
+  endDate: string;   // Stored as ISO string or ''
   isCurrent: boolean;
   bullets: string[];
 }
@@ -25,6 +28,7 @@ export interface Experience {
 @Component({
   selector: 'rr-experience',
   standalone: true,
+  providers: [DatePipe], // <-- ADD DatePipe provider
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -37,7 +41,9 @@ export interface Experience {
     MatCheckboxModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    CdkTextareaAutosize
+    CdkTextareaAutosize,
+    MatDatepickerModule, // <-- ADD MatDatepickerModule
+    MatNativeDateModule,  // <-- ADD MatNativeDateModule
   ],
   templateUrl: './experience.component.html',
   styleUrl: './experience.component.scss',
@@ -49,6 +55,7 @@ export class ExperienceComponent implements OnInit {
   experiences: Experience[] | any = [];
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
+  private datePipe = inject(DatePipe); // Inject DatePipe (although only used in template now)
 
   constructor() {
     this.initForm();
@@ -56,10 +63,11 @@ export class ExperienceComponent implements OnInit {
   }
 
   private initForm(): void {
+    // Added required validators for company and startDate
     this.form = this.fb.group({
       title: ['', Validators.required],
-      company: [''],
-      startDate: [''],
+      company: ['', Validators.required], // Added required validation
+      startDate: ['', Validators.required], // Added required validation
       endDate: [''],
       isCurrent: [false],
       bullets: this.fb.array([])
@@ -70,11 +78,15 @@ export class ExperienceComponent implements OnInit {
     this.form.get('isCurrent')?.valueChanges.subscribe(isCurrent => {
       const endDateControl = this.form.get('endDate');
       if (isCurrent) {
+        endDateControl?.clearValidators();
         endDateControl?.setValue('');
         endDateControl?.disable();
       } else {
+        // End date is required only if it's not a current role
+        endDateControl?.setValidators(Validators.required);
         endDateControl?.enable();
       }
+      endDateControl?.updateValueAndValidity();
     });
   }
 
@@ -94,6 +106,9 @@ export class ExperienceComponent implements OnInit {
     this.form.reset({ isCurrent: false });
     this.bullets.clear();
     this.addBullet();
+    // Ensure endDate validation is active if not 'Current Role'
+    this.form.get('endDate')?.setValidators(Validators.required);
+    this.form.get('endDate')?.updateValueAndValidity();
   }
 
   cancelForm(): void {
@@ -123,19 +138,26 @@ export class ExperienceComponent implements OnInit {
       this.addBullet();
     }
 
+    // Patch with stored ISO strings/values for DatePicker and other fields
     this.form.patchValue({
       title: exp.title,
       company: exp.company,
-      startDate: exp.startDate,
-      endDate: exp.endDate,
+      startDate: exp.startDate, // ISO string - DatePicker will read this
+      endDate: exp.endDate,     // ISO string - DatePicker will read this
       isCurrent: isCurrentlyWorking
     });
 
+    // Manually run setup logic to handle required validator for endDate
+    const endDateControl = this.form.get('endDate');
     if (isCurrentlyWorking) {
-      this.form.get('endDate')?.disable();
+      endDateControl?.clearValidators();
+      endDateControl?.disable();
     } else {
-      this.form.get('endDate')?.enable();
+      endDateControl?.setValidators(Validators.required);
+      endDateControl?.enable();
     }
+    endDateControl?.updateValueAndValidity();
+
     this.showForm = true;
   }
 
@@ -145,12 +167,16 @@ export class ExperienceComponent implements OnInit {
     const formValue = this.form.getRawValue();
     const bulletValues = formValue.bullets.filter((b: string) => b && b.trim());
 
+    // Store raw date value (ISO string or Date object from DatePicker)
+    const rawStartDate = formValue.startDate;
+    const rawEndDate = formValue.isCurrent ? '' : formValue.endDate;
+
     const experience: Experience = {
       id: this.editingIndex !== null ? this.experiences[this.editingIndex].id : Date.now().toString(),
       title: formValue.title,
       company: formValue.company,
-      startDate: formValue.startDate,
-      endDate: formValue.isCurrent ? '' : formValue.endDate,
+      startDate: rawStartDate, // Save as ISO string
+      endDate: rawEndDate,     // Save as ISO string or empty string
       isCurrent: formValue.isCurrent,
       bullets: bulletValues
     };

@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common'; // <-- ADD DatePipe
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -9,6 +9,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
+// <-- ADD Datepicker Imports
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
 export interface EducationEntry {
@@ -16,8 +19,8 @@ export interface EducationEntry {
   institution: string;
   degree: string;
   major: string;
-  startDate: string;
-  endDate: string;
+  startDate: string; // Stored as ISO string
+  endDate: string;   // Stored as ISO string or ''
   isCurrent: boolean;
   gpa?: string;
   bullets: string[];
@@ -26,6 +29,7 @@ export interface EducationEntry {
 @Component({
   selector: 'rr-education',
   standalone: true,
+  providers: [DatePipe], // <-- ADD DatePipe provider
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -37,7 +41,9 @@ export interface EducationEntry {
     MatCardModule,
     MatCheckboxModule,
     MatTooltipModule,
-    CdkTextareaAutosize
+    CdkTextareaAutosize,
+    MatDatepickerModule, // <-- ADD MatDatepickerModule
+    MatNativeDateModule,  // <-- ADD MatNativeDateModule
   ],
   templateUrl: './education.component.html',
   styleUrl: './education.component.scss',
@@ -49,6 +55,7 @@ export class EducationComponent implements OnInit {
   educationEntries: EducationEntry[] = [];
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
+  private datePipe = inject(DatePipe); // Inject DatePipe
 
   constructor() {
     this.initForm();
@@ -60,7 +67,7 @@ export class EducationComponent implements OnInit {
       institution: ['', Validators.required],
       degree: ['', Validators.required],
       major: ['', Validators.required],
-      startDate: [''],
+      startDate: ['', Validators.required], // <-- Added required validation
       endDate: [''],
       isCurrent: [false],
       gpa: [''],
@@ -72,11 +79,15 @@ export class EducationComponent implements OnInit {
     this.form.get('isCurrent')?.valueChanges.subscribe(isCurrent => {
       const endDateControl = this.form.get('endDate');
       if (isCurrent) {
+        endDateControl?.clearValidators();
         endDateControl?.setValue('');
         endDateControl?.disable();
       } else {
+        // End date is required only if it's not ongoing
+        endDateControl?.setValidators(Validators.required);
         endDateControl?.enable();
       }
+      endDateControl?.updateValueAndValidity();
     });
   }
 
@@ -104,6 +115,9 @@ export class EducationComponent implements OnInit {
     this.form.reset({ isCurrent: false });
     this.bullets.clear();
     this.addBullet();
+    // Ensure endDate validation is active if not 'Ongoing'
+    this.form.get('endDate')?.setValidators(Validators.required);
+    this.form.get('endDate')?.updateValueAndValidity();
   }
 
   cancelForm(): void {
@@ -125,21 +139,28 @@ export class EducationComponent implements OnInit {
       this.addBullet();
     }
 
+    // Patch with stored ISO strings/values for DatePicker and other fields
     this.form.patchValue({
       institution: entry.institution,
       degree: entry.degree,
       major: entry.major,
-      startDate: entry.startDate,
-      endDate: entry.endDate,
+      startDate: entry.startDate, // ISO string - DatePicker will read this
+      endDate: entry.endDate,     // ISO string - DatePicker will read this
       isCurrent: isOngoing,
       gpa: entry.gpa
     });
 
+    // Manually run setup logic to handle required validator for endDate
+    const endDateControl = this.form.get('endDate');
     if (isOngoing) {
-      this.form.get('endDate')?.disable();
+      endDateControl?.clearValidators();
+      endDateControl?.disable();
     } else {
-      this.form.get('endDate')?.enable();
+      endDateControl?.setValidators(Validators.required);
+      endDateControl?.enable();
     }
+    endDateControl?.updateValueAndValidity();
+
     this.showForm = true;
   }
 
@@ -155,13 +176,17 @@ export class EducationComponent implements OnInit {
     const formValue = this.form.getRawValue();
     const filteredBullets = formValue.bullets.filter((b: string) => b && b.trim());
 
+    // Store raw date value (ISO string or Date object from DatePicker)
+    const rawStartDate = formValue.startDate;
+    const rawEndDate = formValue.isCurrent ? '' : formValue.endDate;
+
     const entryData: EducationEntry = {
       id: this.editingIndex !== null ? this.educationEntries[this.editingIndex].id : Date.now().toString(),
       institution: formValue.institution,
       degree: formValue.degree,
       major: formValue.major,
-      startDate: formValue.startDate,
-      endDate: formValue.isCurrent ? '' : formValue.endDate,
+      startDate: rawStartDate, // Save as ISO string
+      endDate: rawEndDate,     // Save as ISO string or empty string
       isCurrent: formValue.isCurrent,
       gpa: formValue.gpa,
       bullets: filteredBullets

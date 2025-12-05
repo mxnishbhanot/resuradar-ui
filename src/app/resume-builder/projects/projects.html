@@ -1,259 +1,261 @@
-    <div class="projects-container">
-      <!-- Section Header -->
-      <div class="section-header">
-        <div class="header-icon-wrapper">
-          <mat-icon class="header-icon">workspaces</mat-icon>
-        </div>
-        <div class="header-content">
-          <h2 class="section-title">Projects & Portfolio</h2>
-          <p class="section-subtitle">Highlight impactful projects that showcase your skills and problem-solving abilities.</p>
-        </div>
-      </div>
+<div class="projects-container">
+  <!-- Section Header -->
+  <div class="section-header">
+    <div class="header-icon-wrapper">
+      <mat-icon class="header-icon">workspaces</mat-icon>
+    </div>
+    <div class="header-content">
+      <h2 class="section-title">Projects & Portfolio</h2>
+      <p class="section-subtitle">Highlight impactful projects that showcase your skills and problem-solving abilities.
+      </p>
+    </div>
+  </div>
 
-      <!-- Projects List -->
-      @if (projects.length > 0 && !showForm) {
-        <div class="projects-list">
-          @for (proj of projects; track $index) {
-            <div class="project-card">
-              <div class="card-header">
-                <div class="card-badge">
-                  <mat-icon>code</mat-icon>
-                </div>
-                <div class="card-title-section">
-                  <h3 class="card-title">{{ proj.title }}</h3>
-                  @if (proj.role) {
-                    <p class="card-role">{{ proj.role }}</p>
-                  }
-                  @if (proj.link) {
-                    <a href="{{ proj.link }}" target="_blank" rel="noopener noreferrer" class="card-link">
-                      <mat-icon class="link-icon">link</mat-icon>
-                      View Project
-                    </a>
-                  }
-                </div>
-                <div class="card-actions">
-                  <button mat-icon-button (click)="editProject($index)" class="action-btn edit-btn" matTooltip="Edit">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button (click)="deleteProject($index)" class="action-btn delete-btn" matTooltip="Delete">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </div>
-              <div class="card-meta">
-                <div class="meta-item">
-                  <mat-icon class="meta-icon">calendar_today</mat-icon>
-                  <span>{{ proj.startDate }} - {{ proj.isCurrent ? 'Present' : proj.endDate }}</span>
-                </div>
-                @if (proj.isCurrent) {
-                  <div class="meta-badge">
-                    <mat-icon>sync</mat-icon>
-                    <span>Ongoing</span>
-                  </div>
-                }
-              </div>
-              @if (proj.techStack && proj.techStack.length > 0) {
-                <div class="card-tech-stack">
-                  <span class="tech-label">Technologies Used:</span>
-                  <div class="read-only-chip-set">
-                    @for (tech of proj.techStack; track $index) {
-                      <span class="tech-chip">{{ tech }}</span>
-                    }
-                  </div>
-                </div>
-              }
-              @if (proj.bullets && proj.bullets.length > 0) {
-                <div class="card-bullets">
-                  <ul class="bullets-list">
-                    @for (bullet of proj.bullets; track $index) {
-                      <li class="bullet-item">
-                        <mat-icon class="bullet-icon">check_circle</mat-icon>
-                        <span>{{ bullet }}</span>
-                      </li>
-                    }
-                  </ul>
-                </div>
-              }
-            </div>
+  <!-- Projects List -->
+  @if (projects.length > 0 && !showForm) {
+  <div class="projects-list">
+    @for (proj of projects; track $index) {
+    <div class="project-card">
+      <div class="card-header">
+        <div class="card-badge">
+          <mat-icon>code</mat-icon>
+        </div>
+        <div class="card-title-section">
+          <h3 class="card-title">{{ proj.title }}</h3>
+          @if (proj.role) {
+          <p class="card-role">{{ proj.role }}</p>
+          }
+          @if (proj.link) {
+          <a href="{{ proj.link }}" target="_blank" rel="noopener noreferrer" class="card-link">
+            <mat-icon class="link-icon">link</mat-icon>
+            View Project
+          </a>
           }
         </div>
-      }
-
-      <!-- Empty State -->
-      @if (projects.length === 0 && !showForm) {
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <mat-icon>workspaces</mat-icon>
-          </div>
-          <h3 class="empty-state-title">No Projects Added Yet</h3>
-          <p class="empty-state-description">Showcase your skills and accomplishments with a portfolio of your key projects.</p>
-          <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
-            <mat-icon>add_circle</mat-icon>
-            Add Your First Project
+        <div class="card-actions">
+          <button mat-icon-button (click)="editProject($index)" class="action-btn edit-btn" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteProject($index)" class="action-btn delete-btn" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
           </button>
         </div>
-      }
-
-      @if (projects.length > 0 && !showForm) {
-        <button mat-stroked-button class="add-more-button" (click)="showAddForm()">
-          <mat-icon>add</mat-icon>
-          Add Another Project
-        </button>
-      }
-
-      <!-- Project Form -->
-      @if (showForm) {
-        <div class="form-container">
-          <div class="form-header">
-            <div class="form-header-icon">
-              <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
-            </div>
-            <div class="form-header-text">
-              <h3 class="form-title">{{ editingIndex !== null ? 'Edit Project' : 'Add New Project' }}</h3>
-              <p class="form-subtitle">{{ editingIndex !== null ? 'Update your project details' : 'Detail your project and its impact' }}</p>
-            </div>
-          </div>
-          <form [formGroup]="form" class="project-form">
-            <!-- Basic Information -->
-            <div class="form-section">
-              <h4 class="form-section-title">
-                <mat-icon>info</mat-icon>
-                Project Details
-              </h4>
-              <div class="form-row">
-                <mat-form-field appearance="outline" class="form-field full-width">
-                  <mat-label>Project Title</mat-label>
-                  <input matInput formControlName="title" placeholder="e.g., E-commerce Platform Redesign" />
-                  <mat-icon matPrefix>title</mat-icon>
-                  @if (form.get('title')?.hasError('required')) {
-                    <mat-error>Project title is required</mat-error>
-                  }
-                </mat-form-field>
-              </div>
-              <div class="form-row">
-                <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Role/Position (Optional)</mat-label>
-                  <input matInput formControlName="role" placeholder="e.g., Lead Developer" />
-                  <mat-icon matPrefix>badge</mat-icon>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Project Link (Optional)</mat-label>
-                  <input matInput formControlName="link" placeholder="e.g., https://example.com/project" />
-                  <mat-icon matPrefix>link</mat-icon>
-                </mat-form-field>
-              </div>
-            </div>
-            <!-- Timeline -->
-            <div class="form-section">
-              <h4 class="form-section-title">
-                <mat-icon>schedule</mat-icon>
-                Timeline
-              </h4>
-              <div class="form-row form-row-two">
-                <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Start Date</mat-label>
-                  <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="Select start date" />
-                  <mat-icon matPrefix>event_available</mat-icon>
-                  <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
-                  <mat-datepicker panelClass="custom-dark-datepicker" #startPicker></mat-datepicker>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="form-field" [class.disabled-field]="form.get('isCurrent')?.value">
-                  <mat-label>End Date</mat-label>
-                  <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="Select end date" [disabled]="form.get('isCurrent')?.value" />
-                  <mat-icon matPrefix>event_busy</mat-icon>
-                  <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
-                  <mat-datepicker panelClass="custom-dark-datepicker" #endPicker></mat-datepicker>
-                </mat-form-field>
-              </div>
-              <div class="form-row">
-                <mat-checkbox formControlName="isCurrent" class="current-checkbox" color="primary">
-                  <span class="checkbox-label">
-                    This project is ongoing
-                  </span>
-                </mat-checkbox>
-              </div>
-            </div>
-            <!-- Technologies -->
-            <div class="form-section">
-              <h4 class="form-section-title">
-                <mat-icon>build</mat-icon>
-                Technologies Used
-              </h4>
-              <div class="chips-input-container">
-                <mat-form-field appearance="outline" class="form-field full-width">
-                  <mat-label>Add Technologies</mat-label>
-                  <!-- The MatChipGrid is no longer a FormControl, it just displays the FormArray -->
-                  <mat-chip-grid #chipGrid>
-                    @for (tech of techStackControls; track $index) {
-                      <mat-chip-row [removable]="true" (removed)="removeTech($index)">
-                        {{ tech.value }}
-                        <button matChipRemove>
-                          <mat-icon>cancel</mat-icon>
-                        </button>
-                      </mat-chip-row>
-                    }
-                  </mat-chip-grid>
-                  <input
-                    placeholder="e.g., Angular, TypeScript, Node.js..."
-                    [matChipInputFor]="chipGrid"
-                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                    (matChipInputTokenEnd)="addTech($event)"
-                  />
-                  <mat-icon matPrefix>code</mat-icon>
-                </mat-form-field>
-              </div>
-            </div>
-            <!-- Achievements & Responsibilities -->
-            <div class="form-section bullets-section">
-              <div class="bullets-section-header">
-                <h4 class="form-section-title">
-                  <mat-icon>stars</mat-icon>
-                  Key Achievements & Impact
-                </h4>
-              </div>
-              <p class="bullets-hint">
-                <mat-icon class="hint-icon">lightbulb</mat-icon>
-                Describe the problem, your solution, and the measurable impact.
-              </p>
-              <div formArrayName="bullets" class="bullets-container">
-                @for (bullet of bullets.controls; track $index) {
-                  <div class="bullet-row">
-                    <div class="bullet-number-badge">{{ $index + 1 }}</div>
-                    <mat-form-field appearance="outline" class="bullet-field">
-                      <mat-label>Achievement or Responsibility {{ $index + 1 }}</mat-label>
-                      <textarea
-                        matInput
-                        [formControlName]="$index"
-                        rows="3"
-                        placeholder="Describe your role, solution, or impact..."
-                        cdkTextareaAutosize
-                        cdkAutosizeMinRows="2"
-                        cdkAutosizeMaxRows="5">
-                      </textarea>
-                    </mat-form-field>
-                    <button mat-icon-button type="button" (click)="removeBullet($index)" class="bullet-delete-btn" matTooltip="Remove">
-                      <mat-icon>close</mat-icon>
-                    </button>
-                  </div>
-                }
-                <button mat-stroked-button type="button" (click)="addBullet()" class="add-bullet-btn">
-                  <mat-icon>add</mat-icon>
-                  Add Another Point
-                </button>
-              </div>
-            </div>
-            <!-- Form Actions -->
-            <div class="form-actions">
-              <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
-                <mat-icon>close</mat-icon>
-                Cancel
-              </button>
-              <button mat-flat-button color="primary" (click)="saveProject()" [disabled]="form.invalid" class="save-btn">
-                <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
-                {{ editingIndex !== null ? 'Update Project' : 'Add Project' }}
-              </button>
-            </div>
-          </form>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item">
+          <mat-icon class="meta-icon">calendar_today</mat-icon>
+          <span>{{ proj.startDate | date: 'MMMM, yyyy' }} - {{ proj.isCurrent ? 'Present' : (proj.endDate | date: 'MMMM,yyyy') }}</span>
         </div>
+        @if (proj.isCurrent) {
+        <div class="meta-badge">
+          <mat-icon>sync</mat-icon>
+          <span>Ongoing</span>
+        </div>
+        }
+      </div>
+      @if (proj.techStack && proj.techStack.length > 0) {
+      <div class="card-tech-stack">
+        <span class="tech-label">Technologies Used:</span>
+        <div class="read-only-chip-set">
+          @for (tech of proj.techStack; track $index) {
+          <span class="tech-chip">{{ tech }}</span>
+          }
+        </div>
+      </div>
+      }
+      @if (proj.bullets && proj.bullets.length > 0) {
+      <div class="card-bullets">
+        <ul class="bullets-list">
+          @for (bullet of proj.bullets; track $index) {
+          <li class="bullet-item">
+            <mat-icon class="bullet-icon">check_circle</mat-icon>
+            <span>{{ bullet }}</span>
+          </li>
+          }
+        </ul>
+      </div>
       }
     </div>
+    }
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (projects.length === 0 && !showForm) {
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <mat-icon>workspaces</mat-icon>
+    </div>
+    <h3 class="empty-state-title">No Projects Added Yet</h3>
+    <p class="empty-state-description">Showcase your skills and accomplishments with a portfolio of your key projects.
+    </p>
+    <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
+      <mat-icon>add_circle</mat-icon>
+      Add Your First Project
+    </button>
+  </div>
+  }
+
+  @if (projects.length > 0 && !showForm) {
+  <button mat-stroked-button class="add-more-button" (click)="showAddForm()">
+    <mat-icon>add</mat-icon>
+    Add Another Project
+  </button>
+  }
+
+  <!-- Project Form -->
+  @if (showForm) {
+  <div class="form-container">
+    <div class="form-header">
+      <div class="form-header-icon">
+        <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
+      </div>
+      <div class="form-header-text">
+        <h3 class="form-title">{{ editingIndex !== null ? 'Edit Project' : 'Add New Project' }}</h3>
+        <p class="form-subtitle">{{ editingIndex !== null ? 'Update your project details' : 'Detail your project and
+          itsimpact' }}</p>
+      </div>
+    </div>
+    <form [formGroup]="form" class="project-form">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <mat-icon>info</mat-icon>
+          Project Details
+        </h4>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Project Title</mat-label>
+            <input matInput formControlName="title" placeholder="e.g., E-commerce Platform Redesign" />
+            <mat-icon matPrefix>title</mat-icon>
+            @if (form.get('title')?.hasError('required')) {
+            <mat-error>Project title is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Role/Position (Optional)</mat-label>
+            <input matInput formControlName="role" placeholder="e.g., Lead Developer" />
+            <mat-icon matPrefix>badge</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Project Link (Optional)</mat-label>
+            <input matInput formControlName="link" placeholder="e.g., https://example.com/project" />
+            <mat-icon matPrefix>link</mat-icon>
+            @if (form.get('link')?.hasError('pattern')) {
+            <mat-error>Please enter a valid URL (e.g., http://example.com)</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+      <!-- Timeline -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <mat-icon>schedule</mat-icon>
+          Timeline
+        </h4>
+        <div class="form-row form-row-two">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Start Date</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="Select start date" />
+            <mat-icon matPrefix>event_available</mat-icon>
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker panelClass="custom-dark-datepicker" #startPicker></mat-datepicker>
+            @if (form.get('startDate')?.hasError('required')) {
+            <mat-error>Start Date is required</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field" [class.disabled-field]="form.get('isCurrent')?.value">
+            <mat-label>End Date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="Select end date"
+              [disabled]="form.get('isCurrent')?.value" />
+            <mat-icon matPrefix>event_busy</mat-icon>
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker panelClass="custom-dark-datepicker" #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-checkbox formControlName="isCurrent" class="current-checkbox" color="primary">
+            <span class="checkbox-label">
+              This project is ongoing
+            </span>
+          </mat-checkbox>
+        </div>
+      </div>
+      <!-- Technologies -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <mat-icon>build</mat-icon>
+          Technologies Used
+        </h4>
+        <div class="chips-input-container">
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Add Technologies</mat-label>
+            <!-- The MatChipGrid is no longer a FormControl, it just displays the FormArray -->
+            <mat-chip-grid #chipGrid>
+              @for (tech of techStackControls; track $index) {
+              <mat-chip-row [removable]="true" (removed)="removeTech($index)">
+                {{ tech.value }}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+              }
+            </mat-chip-grid>
+            <input placeholder="e.g., Angular, TypeScript, Node.js..." [matChipInputFor]="chipGrid"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes" (matChipInputTokenEnd)="addTech($event)" />
+            <mat-icon matPrefix>code</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+      <!-- Achievements & Responsibilities -->
+      <div class="form-section bullets-section">
+        <div class="bullets-section-header">
+          <h4 class="form-section-title">
+            <mat-icon>stars</mat-icon>
+            Key Achievements & Impact
+          </h4>
+        </div>
+        <p class="bullets-hint">
+          <mat-icon class="hint-icon">lightbulb</mat-icon>
+          Describe the problem, your solution, and the measurable impact.
+        </p>
+        <div formArrayName="bullets" class="bullets-container">
+          @for (bullet of bullets.controls; track $index) {
+          <div class="bullet-row">
+            <div class="bullet-number-badge">{{ $index + 1 }}</div>
+            <mat-form-field appearance="outline" class="bullet-field">
+              <mat-label>Achievement or Responsibility {{ $index + 1 }}</mat-label>
+              <textarea matInput [formControlName]="$index" rows="3"
+                placeholder="Describe your role, solution, or impact..." cdkTextareaAutosize cdkAutosizeMinRows="2"
+                cdkAutosizeMaxRows="5">
+                      </textarea>
+            </mat-form-field>
+            <button mat-icon-button type="button" (click)="removeBullet($index)" class="bullet-delete-btn"
+              matTooltip="Remove">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          }
+          <button mat-stroked-button type="button" (click)="addBullet()" class="add-bullet-btn">
+            <mat-icon>add</mat-icon>
+            Add Another Point
+          </button>
+        </div>
+      </div>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
+          <mat-icon>close</mat-icon>
+          Cancel
+        </button>
+        <button mat-flat-button color="primary" (click)="saveProject()" [disabled]="form.invalid" class="save-btn">
+          <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
+          {{ editingIndex !== null ? 'Update Project' : 'Add Project' }}
+        </button>
+      </div>
+    </form>
+  </div>
+  }
+</div>

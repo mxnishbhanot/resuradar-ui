@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common'; // Import DatePipe
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -19,6 +19,8 @@ import { Project } from '../../shared/models/resume-builder.model';
 @Component({
   selector: 'rr-projects',
   standalone: true,
+  // Add DatePipe to providers
+  providers: [DatePipe],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -46,21 +48,32 @@ export class ProjectsComponent implements OnInit {
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
+  private datePipe = inject(DatePipe); // Inject DatePipe for formatting
 
   constructor() {
     this.initForm();
     this.setupEndDateToggle();
   }
 
+  // Helper to format ISO string (or Date object) to "Month, Year" string for display
+  private formatDateForDisplay(dateValue: any): string {
+    if (!dateValue) return '';
+    // Use Angular's DatePipe to format the ISO string or Date object
+    return this.datePipe.transform(dateValue, 'MMMM, yyyy') || '';
+  }
+
+  // No need for parseDisplayDateToDateObject anymore since we store ISO
+
   private initForm(): void {
+    // Added Validators.pattern for URL validation
     this.form = this.fb.group({
       title: ['', Validators.required],
       role: [''],
-      link: [''],
-      startDate: [''],
+      link: ['', Validators.pattern('^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$')],
+      startDate: ['', Validators.required], // Start Date is required
       endDate: [''],
       isCurrent: [false],
-      techStack: this.fb.array([]), // This is now just an array of controls, not bound to the grid
+      techStack: this.fb.array([]),
       bullets: this.fb.array([])
     });
   }
@@ -149,6 +162,8 @@ export class ProjectsComponent implements OnInit {
       proj.techStack.forEach(tech => this.techStackArray.push(this.fb.control(tech)));
     }
 
+    // Since we now store ISO strings, we can directly patch the values.
+    // The DatePicker will correctly read the ISO string and pre-select the date.
     this.form.patchValue({
       title: proj.title,
       role: proj.role || '',
@@ -169,17 +184,23 @@ export class ProjectsComponent implements OnInit {
   saveProject(): void {
     if (this.form.invalid) return;
 
-    const formValue = this.form.getRawValue(); // getRawValue includes disabled controls
+    // getRawValue includes disabled controls
+    const formValue = this.form.getRawValue();
     const filteredBullets = formValue.bullets.filter((b: string) => b && b.trim());
     const filteredTechStack = formValue.techStack.filter((t: string) => t && t.trim());
+
+    // The DatePicker input value is typically an ISO string or a Date object.
+    // We will save it as is to keep the full date information.
+    const rawStartDate = formValue.startDate;
+    const rawEndDate = formValue.isCurrent ? '' : formValue.endDate;
 
     const project: Project = {
       id: this.editingIndex !== null ? this.projects[this.editingIndex].id : Date.now().toString(),
       title: formValue.title,
       role: formValue.role || undefined,
       link: formValue.link || undefined,
-      startDate: formValue.startDate, // This will be the date string from the picker
-      endDate: formValue.isCurrent ? '' : formValue.endDate, // This will be the date string or empty
+      startDate: rawStartDate, // Save as ISO string/Date object
+      endDate: rawEndDate,     // Save as ISO string/Date object or empty string
       isCurrent: formValue.isCurrent,
       techStack: filteredTechStack,
       bullets: filteredBullets

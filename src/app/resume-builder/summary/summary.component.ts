@@ -48,6 +48,8 @@ export class SummaryComponent implements OnInit {
       this.summaryText = state.personal.summary || '';
       // Update the form value when the store state changes
       this.form.patchValue({ summary: this.summaryText });
+      console.log(this.form.value);
+
     });
   }
 
@@ -65,7 +67,7 @@ export class SummaryComponent implements OnInit {
     if (this.form.invalid) return;
 
     const summaryValue = this.form.get('summary')?.value;
-    this.store.update({ ...this.personal, summary: summaryValue });
+    this.store.update({ personal: { ...this.personal, summary: summaryValue } });
     this.summaryText = summaryValue;
     this.showForm = false;
   }
