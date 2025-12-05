@@ -53,6 +53,7 @@ export interface SkillCategory {  // CHANGED: New interface for skills (categori
 }
 
 export interface ResumeBuilderState {
+  _id: string | null;
   personal: PersonalInfo;
   educations: EducationEntry[];  // CHANGED: Use EducationEntry[]
   experiences: Experience[];
@@ -63,6 +64,7 @@ export interface ResumeBuilderState {
 }
 
 export const EMPTY_RESUME_STATE: ResumeBuilderState = {  // CHANGED: Updated arrays/objects to match new shapes
+  _id: null,
   personal: {
     firstName: '',
     lastName: '',

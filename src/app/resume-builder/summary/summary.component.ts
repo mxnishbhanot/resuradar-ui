@@ -32,6 +32,7 @@ export class SummaryComponent implements OnInit {
   form!: FormGroup;
   showForm = false;
   summaryText = '';
+  personal: any = {};
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
 
@@ -43,6 +44,7 @@ export class SummaryComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.state$.subscribe(state => {
+      this.personal = state.personal;
       this.summaryText = state.personal.summary || '';
       // Update the form value when the store state changes
       this.form.patchValue({ summary: this.summaryText });
@@ -63,7 +65,7 @@ export class SummaryComponent implements OnInit {
     if (this.form.invalid) return;
 
     const summaryValue = this.form.get('summary')?.value;
-    this.store.update({ personal: { summary: summaryValue } });
+    this.store.update({ ...this.personal, summary: summaryValue });
     this.summaryText = summaryValue;
     this.showForm = false;
   }

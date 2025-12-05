@@ -29,9 +29,9 @@
           <div class="nav-content">
             <div class="icon-stage">
               <mat-icon class="base-icon">{{ tab.icon }}</mat-icon>
-              <!-- @if (isTabCompleted(i)) {
+              @if (isTabCompleted(i)) {
                 <mat-icon class="check-icon">check_circle</mat-icon>
-              } -->
+              }
             </div>
 
             <span class="nav-label">{{ tab.label }}</span>
@@ -116,7 +116,7 @@
       </button>
     </div>
 
-    <div class="checklist-section">
+    <!-- <div class="checklist-section">
       <div class="checklist-header">
         <mat-icon class="checklist-icon">fact_check</mat-icon>
         <h4 class="checklist-title">Completion Checklist</h4>
@@ -177,7 +177,6 @@
           </div>
         </div>
       </div>
-      <!-- Completion Message -->
       @if (completionPercentage() === 100) {
         <div class="completion-message">
           <div class="completion-icon">
@@ -189,7 +188,7 @@
           </div>
         </div>
       }
-    </div>
+    </div> -->
 
     <div class="action-buttons-container">
       <div class="nav-row">

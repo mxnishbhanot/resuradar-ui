@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'rr-preview',
@@ -17,7 +18,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     PdfViewerModule,
     MatIconModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatCardModule,
   ],
   templateUrl: './preview.component.html',
   styleUrl: './preview.component.scss'
@@ -28,6 +30,7 @@ export class PreviewComponent implements OnInit {
   pdfUrl: any = null;
   isLoading = true;
   zoom = 1.0;
+  showEmptyState = false;
 
   constructor(
     private store: ResumeBuilderService,
@@ -42,21 +45,25 @@ export class PreviewComponent implements OnInit {
   loadPdfPreview() {
     this.isLoading = true;
     this.zoom = 1.0;
+    this.showEmptyState = false;
 
     this.store.exportPdf(this.currentTemplate, this.data?.resumeId)
       .subscribe({
         next: (blob: Blob) => {
-          this.pdfUrl = URL.createObjectURL(blob);
-
-          if (blob.size > 0) {
-            this.isLoading = false;
+          // Check if the blob size is zero, indicating no content was generated
+          if (blob.size === 0) {
+             this.showEmptyState = true;
           } else {
-            this.isLoading = true;
+            this.pdfUrl = URL.createObjectURL(blob);
           }
+          this.isLoading = false;
         },
         error: (err) => {
           console.error('PDF preview failed:', err);
           this.isLoading = false;
+          this.showEmptyState = true;
+          // Optionally, you could also set showEmptyState here if the error indicates no data
+          // For now, we'll just hide the loader and let the user retry.
         }
       });
   }

@@ -88,7 +88,7 @@ export class GoogleAuthService {
 
   // 3️⃣ Handle manual sign-in (existing logic)
   private handleGoogleResponse(response: any) {
-    console.log('Google access token:', response.access_token);
+    // console.log('Google access token:', response.access_token);
 
     this.http
       .post<{ token: string; user: any }>(
@@ -97,7 +97,7 @@ export class GoogleAuthService {
       )
       .pipe(
         tap((res) => {
-          console.log('App JWT:', res.token);
+          // console.log('App JWT:', res.token);
           localStorage.setItem('auth_token', res.token);
           localStorage.setItem('user', JSON.stringify(res.user));
           this.setUser(res.user);

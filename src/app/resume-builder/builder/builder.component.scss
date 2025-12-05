@@ -7,24 +7,51 @@ $spring-easing: cubic-bezier(0.68, -0.6, 0.32, 1.6);
 $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
 @keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes floatIcon {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 @keyframes spinAndPop {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.4); }
-  100% { transform: rotate(360deg) scale(1); }
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.4);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
 }
 
 @keyframes spinSmall {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .fade-in-up {
@@ -38,7 +65,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 .builder-layout {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr) 320px;
-  height: 100vh;
+  // height: 100vh;
   background: var(--bg-primary);
   overflow: hidden;
 
@@ -66,7 +93,9 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
   z-index: 10;
 
-  @media (max-width: 1024px) { display: none; }
+  @media (max-width: 1024px) {
+    display: none;
+  }
 }
 
 .brand-area {
@@ -81,9 +110,12 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     align-items: center;
     justify-content: center;
     margin-bottom: 20px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 
-    mat-icon { color: #fff; font-size: 24px; }
+    mat-icon {
+      color: #fff;
+      font-size: 24px;
+    }
   }
 
   h1 {
@@ -103,14 +135,23 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 600;
     margin-bottom: 8px;
     color: var(--text-secondary);
-    .percent { color: var(--accent-color); }
+
+    .percent {
+      color: var(--accent-color);
+    }
   }
 
   mat-progress-bar {
     height: 6px;
     border-radius: 4px;
-    ::ng-deep .mat-mdc-progress-bar-fill::after { background-color: var(--accent-color) !important; }
-    ::ng-deep .mat-mdc-progress-bar-buffer { background-color: color-mix(in srgb, var(--border-color), transparent 50%); }
+
+    ::ng-deep .mat-mdc-progress-bar-fill::after {
+      background-color: var(--accent-color) !important;
+    }
+
+    ::ng-deep .mat-mdc-progress-bar-buffer {
+      background-color: color-mix(in srgb, var(--border-color), transparent 50%);
+    }
   }
 }
 
@@ -132,7 +173,9 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 14px;
   transition: transform 0.1s linear;
 
-  &:active { transform: scale(0.96); }
+  &:active {
+    transform: scale(0.96);
+  }
 
   .nav-bg-layer {
     position: absolute;
@@ -172,8 +215,9 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
       position: absolute;
       font-size: 20px;
       color: #10b981;
-      opacity: 0;
-      transform: scale(0) rotate(-45deg);
+      display: none;
+      align-items: center;
+      justify-content: center;
       transition: all 0.4s $spring-easing;
     }
   }
@@ -205,28 +249,62 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   &:hover:not(.active) {
-    .nav-bg-layer { opacity: 1; transform: scale(1); }
-    .base-icon { transform: rotate(12deg) scale(1.1); color: var(--text-primary); }
-    .nav-label { color: var(--text-primary); }
-    .hover-arrow { opacity: 0.6; transform: translateX(0); }
+    .nav-bg-layer {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .base-icon {
+      transform: rotate(12deg) scale(1.1);
+      color: var(--text-primary);
+    }
+
+    .nav-label {
+      color: var(--text-primary);
+    }
+
+    .hover-arrow {
+      opacity: 0.6;
+      transform: translateX(0);
+    }
   }
 
   &.completed {
-    // .base-icon { opacity: 0; transform: scale(0.5); }
-    .check-icon { opacity: 1; transform: scale(1) rotate(0deg); }
+    .base-icon {
+      opacity: 0;
+      transform: scale(0.5);
+      display: none !important;
+    }
+
+    .check-icon {
+      opacity: 1 !important;
+      display: flex !important;
+    }
   }
 
   &.active {
     .nav-bg-layer {
       background: var(--bg-primary);
       border: 1px solid var(--border-color);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       opacity: 1;
       transform: scale(1);
     }
-    .base-icon { color: var(--accent-color); animation: floatIcon 3s ease-in-out infinite; }
-    .nav-label { color: var(--text-primary); font-weight: 700; }
-    .hover-arrow { opacity: 1; transform: translateX(0); }
+
+    .base-icon {
+      color: var(--accent-color);
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+
+    .nav-label {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .hover-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 }
 
@@ -271,9 +349,12 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 24px; /* Add space between checklist, preview card, and buttons */
+  gap: 24px;
+  /* Add space between checklist, preview card, and buttons */
 
-  @media (max-width: 1280px) { display: none; }
+  @media (max-width: 1280px) {
+    display: none;
+  }
 }
 
 // --- New Checklist Section Styles ---
@@ -328,8 +409,14 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
     border-color: rgba(16, 185, 129, 0.3);
 
-    .checklist-icon-wrapper mat-icon { color: #10b981; }
-    .checklist-label { color: var(--text-primary); font-weight: 600; }
+    .checklist-icon-wrapper mat-icon {
+      color: #10b981;
+    }
+
+    .checklist-label {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
   }
 
   &:hover {
@@ -347,6 +434,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   justify-content: center;
   flex-shrink: 0;
   background: color-mix(in srgb, var(--accent-rgb), transparent 90%);
+
   mat-icon {
     font-size: 20px;
     width: 20px;
@@ -397,6 +485,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     justify-content: center;
     flex-shrink: 0;
     box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+
     mat-icon {
       font-size: 24px;
       width: 24px;
@@ -450,7 +539,12 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     color: var(--accent-color);
     border: 1px solid var(--border-color);
     z-index: 2;
-    mat-icon { font-size: 36px; width: 36px; height: 36px; }
+
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+    }
 
     .visual-ring {
       position: absolute;
@@ -462,8 +556,19 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  h3 { margin: 8px 0 0 0; font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
-  p { margin: 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+  h3 {
+    margin: 8px 0 0 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
 }
 
 .action-buttons-container {
@@ -474,7 +579,10 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 .nav-row {
   display: flex;
   gap: 12px;
-  button { flex: 1; }
+
+  button {
+    flex: 1;
+  }
 }
 
 // =============================================
@@ -486,8 +594,11 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 14px !important;
   transition: transform 0.1s linear !important;
   overflow: hidden;
+  min-width: max-content;
 
-  &:active:not(:disabled) { transform: scale(0.97); }
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
 
   .btn-content {
     display: flex;
@@ -507,9 +618,15 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     &:hover:not(:disabled) {
       background: var(--bg-secondary);
       color: var(--text-primary) !important;
-      .icon-slide-left { transform: translateX(-4px); }
+
+      .icon-slide-left {
+        transform: translateX(-4px);
+      }
     }
-    .icon-slide-left { transition: transform 0.3s $spring-easing; }
+
+    .icon-slide-left {
+      transition: transform 0.3s $spring-easing;
+    }
   }
 
   &.btn-primary {
@@ -519,9 +636,15 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
       box-shadow: 0 8px 24px color-mix(in srgb, var(--accent-color), transparent 40%);
-      .icon-slide-right { transform: translateX(4px); }
+
+      .icon-slide-right {
+        transform: translateX(4px);
+      }
     }
-    .icon-slide-right { transition: transform 0.3s $spring-easing; }
+
+    .icon-slide-right {
+      transition: transform 0.3s $spring-easing;
+    }
   }
 
   &.btn-finish {
@@ -531,7 +654,10 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
       box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
-      .icon-bounce { animation: spinAndPop 0.6s $spring-easing; }
+
+      .icon-bounce {
+        animation: spinAndPop 0.6s $spring-easing;
+      }
     }
   }
 }
@@ -556,7 +682,9 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   padding-bottom: env(safe-area-inset-bottom, 16px);
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
 
-  @media (max-width: 1024px) { display: block; }
+  @media (max-width: 1024px) {
+    display: block;
+  }
 }
 
 .deck-progress-track {
@@ -622,8 +750,14 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     transform: scale(0.9);
     background: var(--bg-secondary);
   }
-  &:disabled { opacity: 0.3; }
-  mat-icon { font-size: 20px; }
+
+  &:disabled {
+    opacity: 0.3;
+  }
+
+  mat-icon {
+    font-size: 20px;
+  }
 }
 
 .deck-btn-primary {
@@ -637,7 +771,9 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px color-mix(in srgb, var(--accent-color), transparent 60%);
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  span { margin-right: 8px; }
+  span {
+    margin-right: 8px;
+  }
 
   mat-icon {
     font-size: 20px;
@@ -646,11 +782,16 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
     transition: transform 0.2s ease;
   }
 
-  &:active { transform: scale(0.95); }
+  &:active {
+    transform: scale(0.95);
+  }
 
   &.finish {
     background: linear-gradient(135deg, var(--accent-color), #8b5cf6) !important;
     padding: 0 28px !important;
-    mat-icon { animation: spinSmall 2s linear infinite; }
+
+    mat-icon {
+      animation: spinSmall 2s linear infinite;
+    }
   }
 }

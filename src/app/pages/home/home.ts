@@ -13,7 +13,7 @@ import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { UserService } from '../../core/services/user';
 import { MatRippleModule } from '@angular/material/core';
-import { filter } from 'rxjs';
+import { catchError, filter, of, switchMap } from 'rxjs';
 import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader';
 import { SkeletonService } from '../../core/services/skeleton';
 import { ToastContainerComponent } from '../../shared/components/toast-container/toast-container';
@@ -91,23 +91,29 @@ export class Home {
     this.googleAuth.loadUserFromStorage();
 
     // Subscribe to user changes
-    this.googleAuth.user$.subscribe((u) => {
-      if (u) {
-        this.userName = u.name || 'Guest User';
-        this.userEmail = u.email || '';
-        this.avatar = u.picture || '';
-        this.userService.fetchCurrentUser().subscribe(() => {
-          // Stop loading after user data is fetched
-          this.stopLoadingWithDelay();
-        });
-      } else {
+    this.googleAuth.user$
+  .pipe(
+    switchMap(u => {
+      if (!u) {
         this.userName = 'Guest User';
         this.userEmail = '';
         this.avatar = '';
-        // Stop loading even if no user
-        this.stopLoadingWithDelay();
+        return of(null);
       }
-    });
+
+      this.userName = u.name || 'Guest User';
+      this.userEmail = u.email || '';
+      this.avatar = u.picture || '';
+
+      return this.userService.fetchCurrentUser()
+        .pipe(catchError(err => {
+          console.error('Error fetching user:', err);
+          this.googleAuth.logout();
+          return of(null);
+        }));
+    })
+  )
+  .subscribe(() => this.stopLoadingWithDelay());
 
     // Subscribe to user service
     this.userService.user$.subscribe(user => {

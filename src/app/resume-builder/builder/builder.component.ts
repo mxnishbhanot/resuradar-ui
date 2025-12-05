@@ -32,7 +32,8 @@ import { ResumeBuilderService } from '../../core/services/resume-builder.service
     ExperienceComponent,
     SummaryComponent,
     ProjectsComponent,
-    SkillsComponent
+    SkillsComponent,
+    PreviewComponent // Added PreviewComponent import if it's used in the template
   ],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
@@ -80,6 +81,7 @@ export class ResumeBuilderComponent implements OnInit {
   // Track specific section completion for UI indicators
   isTabCompleted(index: number): boolean {
     const state = this.resumeState();
+
     switch (index) {
       case 0: return !!(state.personal?.firstName && state.personal?.email);
       case 1: return (state.educations?.length || 0) > 0;
@@ -92,22 +94,24 @@ export class ResumeBuilderComponent implements OnInit {
   }
 
   constructor() {
-    // Read query params
+    // Read query params and update the local signal
     this.route.queryParams.subscribe(params => {
       this.resumeId.set(params['resumeId'] || null);
     });
 
     // Reactive effect to update local state when service state changes
-    // In Angular 18+, toSignal is often better, but keeping subscription logic simple here
     this.resumeBuilder.state$.subscribe(state => {
+      console.log(state);
+
       this.resumeState.set(state);
     });
   }
 
   ngOnInit(): void {
-    if (this.resumeId()) {
-      this.resumeBuilder.loadDraftFromServer();
-    }
+    // FIX: Removed the explicit loadDraftFromServer call.
+    // The ResumeBuilderService's constructor now actively monitors the URL query parameters
+    // (including 'resumeId') and triggers the necessary load action automatically,
+    // avoiding the race condition that caused the empty state to load.
   }
 
   // Navigation Actions
@@ -144,7 +148,8 @@ export class ResumeBuilderComponent implements OnInit {
       maxWidth: isMobile ? '100vw' : 'none',
       maxHeight: isMobile ? '100vh' : '90vh',
       panelClass: isMobile ? 'preview-modal-mobile' : 'preview-modal-desktop',
-      data: { resumeId: this.resumeId() },
+      // Using the ID from the service snapshot for reliability
+      data: { resumeId: this.resumeBuilder.snapshot._id },
       autoFocus: false,
       enterAnimationDuration: '300ms',
       exitAnimationDuration: '200ms'

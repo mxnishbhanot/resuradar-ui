@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil, map } from 'rxjs'; // Import map
 
 @Component({
   selector: 'rr-personal',
@@ -38,21 +38,35 @@ export class PersonalComponent implements OnInit, OnDestroy {
   private store = inject(ResumeBuilderService);
 
   constructor() {
-    const personal = this.store.snapshot.personal || {};
+    // Initialize form fields with structure only (initial values will be patched later)
     this.form = this.fb.group({
-      firstName: [personal.firstName || '', Validators.required],
-      lastName: [personal.lastName || '', Validators.required],
-      email: [personal.email || '', [Validators.email]],
-      phone: [personal.phone || ''],
-      headline: [personal.headline || ''],
-      location: [personal.location || ''],
-      linkedin: [personal.linkedin || ''],
-      github: [personal.github || ''],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', [Validators.email, Validators.required]],
+      phone: ['', [Validators.pattern(/^\+?[1-9]\d{1,14}$/)]],
+      headline: [''],
+      location: [''],
+      linkedin: [''],
+      github: [''],
     });
   }
 
   ngOnInit(): void {
-    // Auto-save on form changes with debounce
+    // 1. Subscribe to the service state to load data asynchronously
+    this.store.state$.pipe(
+      map(state => state.personal),
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+      takeUntil(this.destroy$)
+    ).subscribe((personal) => {
+      if (personal) {
+        // Patch the form with the new data from the service
+        // emitEvent: false prevents this patch from triggering the valueChanges subscription (2)
+        this.form.patchValue(personal, { emitEvent: false });
+      }
+    });
+
+
+    // 2. Auto-save on form changes with debounce
     this.form.valueChanges
       .pipe(
         debounceTime(1000),

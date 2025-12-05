@@ -17,7 +17,7 @@
     </div>
 
     <!-- Zoom Controls -->
-    <div class="zoom-controls" *ngIf="!isLoading">
+    <div class="zoom-controls" *ngIf="!isLoading && !showEmptyState">
       <button mat-icon-button (click)="zoomOut()" matTooltip="Zoom Out">
         <mat-icon>zoom_out</mat-icon>
       </button>
@@ -30,7 +30,7 @@
       </button>
     </div>
 
-    <button mat-flat-button color="primary" (click)="downloadPDF()" class="download-btn" [disabled]="isLoading">
+    <button mat-flat-button color="primary" (click)="downloadPDF()" class="download-btn" [disabled]="isLoading || showEmptyState">
       <mat-icon>download</mat-icon>
       <span>{{ isLoading ? 'Generating...' : 'Download PDF' }}</span>
     </button>
@@ -43,8 +43,18 @@
       <div class="skeleton-page"></div>
     </div>
 
+    <!-- Empty State Message -->
+    <div class="empty-state-message" *ngIf="showEmptyState && !isLoading">
+      <mat-card class="empty-state-card">
+        <mat-icon class="empty-state-icon">description</mat-icon>
+        <h3>Your Resume is Empty</h3>
+        <p>Add some details to your resume sections to generate a preview.</p>
+        <button mat-raised-button color="primary" (click)="close()">Go Back to Builder</button>
+      </mat-card>
+    </div>
+
     <!-- PDF Viewer -->
-    <div class="preview-frame-wrapper" *ngIf="pdfUrl && !isLoading">
+    <div class="preview-frame-wrapper" *ngIf="pdfUrl && !isLoading && !showEmptyState">
       <pdf-viewer
         [src]="pdfUrl"
         [zoom]="zoom"

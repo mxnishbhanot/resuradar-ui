@@ -6,10 +6,10 @@
 
 .preview-container {
   position: relative;
-  background: $card-bg;
+  background: var(--bg-secondary);
   border-radius: $radius-xl;
   box-shadow: $shadow-xl;
-  border: 1px solid $accent-overlay-10;
+  border: 1px solid var(--border-color);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -35,9 +35,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-md-20 $spacing-md-20;
-  background: $hover-bg;
-  border-bottom: 1px solid $border-color;
+  padding: $spacing-md $spacing-lg;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
   gap: $spacing-lg;
 
   @media (max-width: 768px) {
@@ -61,17 +61,17 @@
       width: 40px !important;
       height: 40px !important;
       border-radius: 50% !important;
-      background: $card-bg !important;
-      border: 1px solid $border-color !important;
-      color: $text-primary !important;
+      background: var(--bg-secondary) !important;
+      border: 1px solid var(--border-color) !important;
+      color: var(--text-primary) !important;
       transition: all 0.3s ease !important;
       box-shadow: $shadow-md !important;
 
       &:hover {
-        background: $hover-bg !important;
+        background: var(--bg-hover) !important;
         transform: translateY(-2px);
         box-shadow: $shadow-lg !important;
-        border-color: $accent-color !important;
+        border-color: var(--accent-color) !important;
       }
 
       &:active {
@@ -86,29 +86,29 @@
 
       label {
         font-size: 0.875rem;
-        color: $text-secondary;
+        color: var(--text-secondary);
         font-weight: 500;
         white-space: nowrap;
       }
 
       .template-dropdown {
-        background: $card-bg;
-        border: 1px solid $border-color;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
         border-radius: $radius-md;
         padding: $spacing-sm $spacing-md;
-        color: $text-primary;
+        color: var(--text-primary);
         font-size: 0.875rem;
         cursor: pointer;
         transition: all 0.2s ease;
         min-width: 120px;
 
         &:hover {
-          border-color: $accent-color;
+          border-color: var(--accent-color);
         }
 
         &:focus {
           outline: none;
-          border-color: $accent-color;
+          border-color: var(--accent-color);
           box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
         }
       }
@@ -119,14 +119,14 @@
     display: flex;
     align-items: center;
     gap: $spacing-xs;
-    background: $card-bg;
-    border: 1px solid $border-color;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 50px;
     padding: $spacing-xs $spacing-md;
 
     .zoom-value {
       font-size: 0.875rem;
-      color: $text-primary;
+      color: var(--text-primary);
       font-weight: 500;
       min-width: 40px;
       text-align: center;
@@ -140,12 +140,12 @@
       height: 32px !important;
       border-radius: 50% !important;
       background: transparent !important;
-      color: $text-primary !important;
+      color: var(--text-primary) !important;
       transition: all 0.2s ease !important;
 
       &:hover {
-        background: $hover-bg !important;
-        color: $accent-color !important;
+        background: var(--bg-hover) !important;
+        color: var(--accent-color) !important;
       }
 
       &:active {
@@ -201,10 +201,77 @@
       width: 100%;
       height: 100%;
       max-width: 800px;
-      background: linear-gradient(90deg, $hover-bg 25%, rgba(var(--accent-rgb), 0.1) 50%, $hover-bg 75%);
+      background: linear-gradient(90deg, var(--bg-hover) 25%, rgba(var(--accent-rgb), 0.1) 50%, var(--bg-hover) 75%);
       background-size: 200% 100%;
       animation: skeleton-loading 1.5s infinite;
       border-radius: $radius-md;
+    }
+  }
+
+  .empty-state-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: $spacing-xl;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.05), rgba(var(--accent-rgb), 0.02));
+    border-radius: $radius-xl;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .empty-state-card {
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: $radius-xl;
+    padding: $spacing-xl * 2;
+    max-width: 500px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-lg;
+    box-shadow: $shadow-md;
+
+    .empty-state-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: $radius-full;
+      background: $primary-gradient;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $text-inverse;
+      font-size: 40px;
+      mat-icon { font-size: 40px; width: 40px; height: 40px; }
+      @media (max-width: 480px) {
+        width: 64px;
+        height: 64px;
+        mat-icon { font-size: 32px; width: 32px; height: 32px; }
+      }
+    }
+
+    h3 {
+      margin: 0 0 $spacing-sm 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      @media (max-width: 768px) { font-size: 1.25rem; }
+    }
+
+    p {
+      margin: 0 0 $spacing-lg 0;
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    button {
+      padding: $spacing-sm $spacing-xl;
+      font-weight: 600;
+      border-radius: $radius-lg;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+      &:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4); }
     }
   }
 
@@ -242,6 +309,11 @@
   100% {
     background-position: -200% 0;
   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 // Responsive adjustments

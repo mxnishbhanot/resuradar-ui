@@ -206,9 +206,17 @@
   gap: 24px;
 
   // 3 Columns on standard Desktop
-@media (max-width: 1200px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  @media (max-width: 900px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  @media (max-width: 600px) { grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 // --- CARD STYLES ---
@@ -511,4 +519,34 @@
     color: $text-secondary;
     margin-bottom: 24px;
   }
+
+  .btn-content{
+
+    width: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    .btn-primary-gradient {
+      height: 48px;
+      padding: 0 24px;
+      border: none;
+      border-radius: 12px;
+      background: $primary-gradient;
+      color: white;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(var(--primary-start), 0.3);
+      cursor: pointer;
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(var(--primary-start), 0.4);
+      }
+    }
+  }
+
 }

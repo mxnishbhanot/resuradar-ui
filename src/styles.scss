@@ -109,7 +109,7 @@ router-outlet+* {
 
     // Desktop: Fixed size, no scrolling
     @media (min-width: 769px) {
-      max-width: 500px !important;
+      max-width: max-content !important;
       max-height: fit-content !important;
       height: auto !important;
       overflow: visible !important;
@@ -242,7 +242,7 @@ router-outlet+* {
 @media (min-width: 769px) {
   .cdk-overlay-pane {
     .mat-mdc-dialog-container {
-      max-width: 500px !important;
+      max-width: max-content !important;;
       max-height: fit-content !important;
       height: auto !important;
     }
