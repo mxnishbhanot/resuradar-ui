@@ -32,7 +32,7 @@
                 "output": ""
               }
             ],
-            "styles": ["node_modules/intl-tel-input/build/css/intlTelInput.css","src/styles.scss", "src/custom-theme.scss"]
+            "styles": ["src/styles.scss", "src/custom-theme.scss"]
           },
           "configurations": {
             "production": {
