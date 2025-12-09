@@ -1,9 +1,5 @@
 @use '../../../theme/variables' as *;
 
-// ==============================
-// PROFILE SECTION STYLES (unified theme)
-// ==============================
-
 .profile-container {
   position: relative;
   max-width: 900px;
@@ -19,7 +15,7 @@
   }
 }
 
-// Animated Background (same as other components)
+// Animated Background
 .background-gradient {
   position: fixed;
   top: 0;
@@ -360,7 +356,7 @@
   }
 }
 
-// Privacy Notice (same as other components)
+// Privacy Notice
 .privacy-notice {
   display: flex;
   align-items: center;
