@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
@@ -8,11 +8,14 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
 import { ResumeService } from '../../core/services/resume';
 import { Router } from '@angular/router';
 import { UserService } from '../../core/services/user';
 import { UpgradePro } from '../upgrade-pro/upgrade-pro';
+
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-analysis-result',
@@ -32,71 +35,84 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
   styleUrls: ['./analysis-result.scss']
 })
 export class AnalysisResult implements OnInit {
-  @Input() isProUser = false;
-  data: any = null;
 
-  // For the circular progress bar
+  // Services via modern injection
+  private resumeService = inject(ResumeService);
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private dialog = inject(MatDialog);
+
+  // Data as reactive signal
+  data = signal<any>(null);
+
+  // User premium state (auto-updating signal)
+  user = toSignal(this.userService.user$, { initialValue: null });
+
+  // Exposed to template
+  isProUser = computed(() => !!this.user()?.isPremium);
+
+  // Circle geometry
   private radius = 54;
   circumference = 2 * Math.PI * this.radius;
 
-  constructor(
-    private resumeService: ResumeService,
-    private router: Router,
-    private userService: UserService,
-    public dialog: MatDialog
-  ) { }
+  // Reactive circular progress offset
+  strokeDashoffset = computed(() => {
+    const score = this.data()?.score ?? 0;
+    return this.circumference * (1 - score / 100);
+  });
 
-  ngOnInit() {
-    this.data = this.resumeService.getLatestAnalysis();
+  // Score class
+  scoreClass = computed(() => {
+    const score = this.data()?.score ?? 0;
+    if (score >= 80) return 'score-excellent';
+    if (score >= 60) return 'score-good';
+    return 'score-needs-work';
+  });
 
-    if (!this.data) {
+  // Score label text
+  scoreLabel = computed(() => {
+    const score = this.data()?.score ?? 0;
+    if (score >= 80) return 'Excellent';
+    if (score >= 60) return 'Good';
+    return 'Needs Improvement';
+  });
+
+  // Score description text
+  scoreDescription = computed(() => {
+    const score = this.data()?.score ?? 0;
+    if (score >= 80) return 'Outstanding resume with strong impact and effectiveness';
+    if (score >= 60) return 'Good resume with potential for improvement in key areas';
+    return 'Resume needs significant improvements to stand out to employers';
+  });
+
+  ngOnInit(): void {
+    const result = this.resumeService.getLatestAnalysis();
+
+    if (!result) {
       this.router.navigate(['/upload']);
+      return;
     }
 
+    this.data.set(result);
+
+    // Trigger background user fetch (signals update automatically)
     this.userService.fetchCurrentUser().subscribe();
-    this.userService.user$.subscribe(user => {
-      this.isProUser = user?.isPremium || false;
-    })
   }
 
-  get strokeDashoffset(): number {
-    if (!this.data) return this.circumference;
-    const score = this.data.score;
-    const progress = score / 100;
-    return this.circumference * (1 - progress);
-  }
+  // Template wrappers (optional for readability)
+  getScoreClass() { return this.scoreClass(); }
+  getScoreLabel() { return this.scoreLabel(); }
+  getScoreDescription() { return this.scoreDescription(); }
 
-  getScoreClass(): string {
-    if (this.data.score >= 80) return 'score-excellent';
-    if (this.data.score >= 60) return 'score-good';
-    return 'score-needs-work';
-  }
+  openUpgradeModal(): void {
+    const config: MatDialogConfig = {
+      panelClass: 'responsive-dialog-wrapper',
+      maxWidth: '100vw',
+      width: '100%',
+      height: '100%',
+      disableClose: true
+    };
 
-  getScoreLabel(): string {
-    if (this.data.score >= 80) return 'Excellent';
-    if (this.data.score >= 60) return 'Good';
-    return 'Needs Improvement';
-  }
-
-  getScoreDescription(): string {
-    if (this.data.score >= 80) return 'Outstanding resume with strong impact and effectiveness';
-    if (this.data.score >= 60) return 'Good resume with potential for improvement in key areas';
-    return 'Resume needs significant improvements to stand out to employers';
-  }
-
-
-
-  openUpgradeModal() {
-    const dialogConfig = new MatDialogConfig();
-
-    // This connects to the global CSS above
-    dialogConfig.panelClass = 'responsive-dialog-wrapper';
-
-    dialogConfig.maxWidth = '100vw';
-    dialogConfig.width = '100%';
-    dialogConfig.height = '100%';
-    dialogConfig.disableClose = true; // We handle closing manually
-
-    this.dialog.open(UpgradePro, dialogConfig);
+    this.dialog.open(UpgradePro, config);
   }
 }

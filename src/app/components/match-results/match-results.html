@@ -1,244 +1,267 @@
-<div class="match-container" *ngIf="data">
-  <!-- Animated Background -->
-  <div class="background-gradient"></div>
+<div class="match-container">
 
-  <!-- Header with Match Score -->
-  <div class="match-header">
-    <div class="header-content">
-      <div class="title-section">
-        <div class="header-badge">
-          <mat-icon>auto_awesome</mat-icon>
-          <span>AI-Powered Matching</span>
-        </div>
-        <h1 class="main-title">Job Match Analysis</h1>
-        <p class="subtitle">AI-powered alignment report between your resume and the job description</p>
-      </div>
-      <div class="score-section">
-        <div class="score-display" [ngClass]="getScoreClass()">
-          <div class="score-circle">
-            <svg class="score-progress" viewBox="0 0 120 120">
-              <circle class="progress-bg" cx="60" cy="60" r="54" />
-              <circle
-                class="progress-bar"
-                cx="60"
-                cy="60"
-                r="54"
-                [attr.stroke-dasharray]="circumference"
-                [attr.stroke-dashoffset]="strokeDashoffset"
-              />
-            </svg>
-            <div class="score-content">
-              <span class="score-value">{{ data.free_feedback.match_score }}</span>
-              <span class="score-out-of">/100</span>
-            </div>
-          </div>
-          <div class="score-label">{{ data.free_feedback.match_level }}</div>
-          <div class="score-description">{{ getScoreDescription() }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  @if (data()) {
 
-  <!-- Main Content Grid -->
-  <div class="content-grid">
-    <!-- Left Column - Free Insights -->
-    <div class="left-column">
-      <!-- Summary -->
-      <mat-card class="summary-card">
-        <div class="card-header">
-          <div class="icon-container">
-            <mat-icon class="header-icon">summarize</mat-icon>
-          </div>
-          <h2>Match Summary</h2>
-        </div>
-        <mat-divider></mat-divider>
-        <div class="card-content">
-          <p class="summary-text">{{ data.free_feedback.summary }}</p>
-        </div>
-      </mat-card>
+    <!-- Animated Background -->
+    <div class="background-gradient"></div>
 
-      <!-- Strengths -->
-      <mat-card class="insight-card strength-card">
-        <div class="card-header">
-          <div class="icon-container success">
-            <mat-icon>thumb_up</mat-icon>
-          </div>
-          <h3>Strengths</h3>
-        </div>
-        <div class="card-content">
-          <ul class="insight-list">
-            <li *ngFor="let strength of data.free_feedback.strengths" class="insight-item">
-              <mat-icon class="item-icon success">check_circle</mat-icon>
-              <span>{{ strength }}</span>
-            </li>
-          </ul>
-        </div>
-      </mat-card>
+    <!-- HEADER -->
+    <div class="match-header">
+      <div class="header-content">
 
-      <!-- Gaps -->
-      <mat-card class="insight-card gap-card">
-        <div class="card-header">
-          <div class="icon-container warning">
-            <mat-icon>lightbulb</mat-icon>
+        <div class="title-section">
+          <div class="header-badge">
+            <mat-icon>auto_awesome</mat-icon>
+            <span>AI-Powered Matching</span>
           </div>
-          <h3>Improvement Areas</h3>
-        </div>
-        <div class="card-content">
-          <ul class="insight-list">
-            <li *ngFor="let gap of data.free_feedback.gaps" class="insight-item">
-              <mat-icon class="item-icon warning">info</mat-icon>
-              <span>{{ gap }}</span>
-            </li>
-          </ul>
-        </div>
-      </mat-card>
-    </div>
 
-    <!-- Right Column - Premium Content -->
-    <div class="right-column">
-      <!-- Premium Locked -->
-      <mat-card class="premium-lock-card" *ngIf="!isProUser">
-        <div class="lock-content">
-          <div class="lock-icon-container">
-            <mat-icon class="lock-icon">lock</mat-icon>
-          </div>
-          <h3>Unlock Full Match Insights</h3>
-          <p class="lock-subtitle">
-            Get keyword analysis, role-fit breakdown, rewrite suggestions, and more.
+          <h1 class="main-title">Job Match Analysis</h1>
+          <p class="subtitle">
+            AI-powered alignment report between your resume and the job description
           </p>
-          <button mat-flat-button color="primary" class="upgrade-btn" (click)="openUpgradeModal()">
-            <mat-icon>rocket_launch</mat-icon>
-            <span>Upgrade to Pro</span>
-          </button>
         </div>
-      </mat-card>
 
-      <!-- Premium Content -->
-      <ng-container *ngIf="isProUser">
-        <!-- Keyword Analysis -->
-        <mat-card class="premium-card">
-          <div class="card-header">
-            <div class="icon-container">
-              <mat-icon class="header-icon">tag</mat-icon>
+        <!-- Score Section -->
+        <div class="score-section">
+          <div class="score-display" [ngClass]="getScoreClass()">
+
+            <div class="score-circle">
+              <svg class="score-progress" viewBox="0 0 120 120">
+                <circle class="progress-bg" cx="60" cy="60" r="54" />
+                <circle
+                  class="progress-bar"
+                  cx="60"
+                  cy="60"
+                  r="54"
+                  [attr.stroke-dasharray]="circumference"
+                  [attr.stroke-dashoffset]="strokeDashoffset()"
+                />
+              </svg>
+
+              <div class="score-content">
+                <span class="score-value">{{ data().free_feedback.match_score }}</span>
+                <span class="score-out-of">/100</span>
+              </div>
             </div>
-            <h3>Keyword Match</h3>
+
+            <div class="score-label">{{ data().free_feedback.match_level }}</div>
+            <div class="score-description">{{ getScoreDescription() }}</div>
           </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="content-grid">
+
+      <!-- LEFT COLUMN (free insights) -->
+      <div class="left-column">
+
+        <!-- SUMMARY -->
+        <mat-card class="summary-card">
+          <div class="card-header">
+            <div class="icon-container"><mat-icon class="header-icon">summarize</mat-icon></div>
+            <h2>Match Summary</h2>
+          </div>
+
           <mat-divider></mat-divider>
+
           <div class="card-content">
-            <p><strong>{{ data.premium_feedback.keyword_analysis.matched_keywords }} / {{ data.premium_feedback.keyword_analysis.total_keywords_in_jd }}</strong> keywords matched</p>
-            <div *ngIf="data.premium_feedback.keyword_analysis.missing_keywords.length > 0" class="missing-keywords">
-              <p><strong>Missing:</strong> {{ data.premium_feedback.keyword_analysis.missing_keywords.join(', ') }}</p>
-            </div>
+            <p class="summary-text">{{ data().free_feedback.summary }}</p>
           </div>
         </mat-card>
 
-        <!-- Role Fit Breakdown -->
-        <mat-card class="premium-card">
+        <!-- STRENGTHS -->
+        <mat-card class="insight-card strength-card">
           <div class="card-header">
-            <div class="icon-container">
-              <mat-icon class="header-icon">analytics</mat-icon>
+            <div class="icon-container success">
+              <mat-icon>thumb_up</mat-icon>
             </div>
-            <h3>Role Fit Breakdown</h3>
+            <h3>Strengths</h3>
           </div>
-          <mat-divider></mat-divider>
+
           <div class="card-content">
-            <div class="fit-item">
-              <span>Technical Skills</span>
-              <span class="fit-value">{{ data.premium_feedback.role_fit_breakdown.technical_skills_fit }}%</span>
-            </div>
-            <mat-progress-bar
-              mode="determinate"
-              [value]="data.premium_feedback.role_fit_breakdown.technical_skills_fit"
-              color="primary"
-              class="fit-bar">
-            </mat-progress-bar>
-
-            <div class="fit-item">
-              <span>Experience</span>
-              <span class="fit-value">{{ data.premium_feedback.role_fit_breakdown.experience_fit }}%</span>
-            </div>
-            <mat-progress-bar
-              mode="determinate"
-              [value]="data.premium_feedback.role_fit_breakdown.experience_fit"
-              color="primary"
-              class="fit-bar">
-            </mat-progress-bar>
-
-            <div class="fit-item">
-              <span>Education</span>
-              <span class="fit-value">{{ data.premium_feedback.role_fit_breakdown.education_fit }}%</span>
-            </div>
-            <mat-progress-bar
-              mode="determinate"
-              [value]="data.premium_feedback.role_fit_breakdown.education_fit"
-              color="primary"
-              class="fit-bar">
-            </mat-progress-bar>
-
-            <div class="fit-item">
-              <span>Soft Skills</span>
-              <span class="fit-value">{{ data.premium_feedback.role_fit_breakdown.soft_skills_fit }}%</span>
-            </div>
-            <mat-progress-bar
-              mode="determinate"
-              [value]="data.premium_feedback.role_fit_breakdown.soft_skills_fit"
-              color="primary"
-              class="fit-bar">
-            </mat-progress-bar>
-          </div>
-        </mat-card>
-
-        <!-- Recommendations -->
-        <mat-card class="premium-card">
-          <div class="card-header">
-            <div class="icon-container">
-              <mat-icon class="header-icon">lightbulb</mat-icon>
-            </div>
-            <h3>Actionable Recommendations</h3>
-          </div>
-          <mat-divider></mat-divider>
-          <div class="card-content">
-            <ul class="tips-list">
-              <li *ngFor="let rec of data.premium_feedback.recommendations" class="tip-item">
-                <mat-icon class="tip-icon">arrow_right</mat-icon>
-                <span>{{ rec }}</span>
-              </li>
+            <ul class="insight-list">
+              @for (strength of data().free_feedback.strengths; track strength) {
+                <li class="insight-item">
+                  <mat-icon class="item-icon success">check_circle</mat-icon>
+                  <span>{{ strength }}</span>
+                </li>
+              }
             </ul>
           </div>
         </mat-card>
 
-        <!-- Rewritten Examples -->
-        <mat-card class="premium-card">
+        <!-- GAPS / IMPROVEMENT -->
+        <mat-card class="insight-card gap-card">
           <div class="card-header">
-            <div class="icon-container">
-              <mat-icon class="header-icon">auto_fix_high</mat-icon>
+            <div class="icon-container warning">
+              <mat-icon>lightbulb</mat-icon>
             </div>
-            <h3>Rewritten Examples</h3>
+            <h3>Improvement Areas</h3>
           </div>
-          <mat-divider></mat-divider>
+
           <div class="card-content">
-            <div class="rewrites-list">
-              <div *ngFor="let rewrite of data.premium_feedback.suggested_rewrites" class="rewrite-item">
-                <p class="original-text"><strong>Before:</strong> {{ rewrite.original }}</p>
-                <p class="rewrite-text"><strong>After:</strong> {{ rewrite.suggestion }}</p>
-              </div>
-            </div>
+            <ul class="insight-list">
+              @for (gap of data().free_feedback.gaps; track gap) {
+                <li class="insight-item">
+                  <mat-icon class="item-icon warning">info</mat-icon>
+                  <span>{{ gap }}</span>
+                </li>
+              }
+            </ul>
           </div>
         </mat-card>
 
-         <!-- Success Banner -->
-        <mat-card class="success-banner">
-          <div class="banner-content">
-            <div class="celebration-icon-container">
-              <mat-icon class="celebration-icon">celebration</mat-icon>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-column">
+
+        <!-- PRO LOCKED VIEW -->
+        @if (!isProUser()) {
+          <mat-card class="premium-lock-card">
+            <div class="lock-content">
+              <div class="lock-icon-container">
+                <mat-icon class="lock-icon">lock</mat-icon>
+              </div>
+              <h3>Unlock Full Match Insights</h3>
+              <p class="lock-subtitle">
+                Get keyword analysis, role-fit breakdown, rewrite suggestions, and more.
+              </p>
+
+              <button mat-flat-button color="primary" class="upgrade-btn" (click)="openUpgradeModal()">
+                <mat-icon>rocket_launch</mat-icon>
+                <span>Upgrade to Pro</span>
+              </button>
             </div>
-            <div class="banner-text">
-              <h3>You're All Set!</h3>
-              <p>Apply these insights to enhance your career opportunities</p>
+          </mat-card>
+        }
+
+        <!-- PRO CONTENT -->
+        @if (isProUser()) {
+
+          <!-- Keyword Match -->
+          <mat-card class="premium-card">
+            <div class="card-header">
+              <div class="icon-container">
+                <mat-icon class="header-icon">tag</mat-icon>
+              </div>
+              <h3>Keyword Match</h3>
             </div>
-          </div>
-        </mat-card>
-      </ng-container>
+
+            <mat-divider></mat-divider>
+
+            <div class="card-content">
+              <p>
+                <strong>
+                  {{ data().premium_feedback.keyword_analysis.matched_keywords }} /
+                  {{ data().premium_feedback.keyword_analysis.total_keywords_in_jd }}
+                </strong>
+                keywords matched
+              </p>
+
+              @if (data().premium_feedback.keyword_analysis.missing_keywords.length > 0) {
+                <div class="missing-keywords">
+                  <p>
+                    <strong>Missing:</strong>
+                    {{ data().premium_feedback.keyword_analysis.missing_keywords.join(', ') }}
+                  </p>
+                </div>
+              }
+            </div>
+          </mat-card>
+
+          <!-- ROLE FIT BREAKDOWN -->
+          <mat-card class="premium-card">
+            <div class="card-header">
+              <div class="icon-container"><mat-icon class="header-icon">analytics</mat-icon></div>
+              <h3>Role Fit Breakdown</h3>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="card-content">
+              @for (category of ['technical_skills_fit','experience_fit','education_fit','soft_skills_fit']; track category) {
+                <div class="fit-item">
+                  <span>{{ category.replace('_',' ') | titlecase }}</span>
+                  <span class="fit-value">{{ data().premium_feedback.role_fit_breakdown[category] }}%</span>
+                </div>
+
+                <mat-progress-bar
+                  mode="determinate"
+                  color="primary"
+                  class="fit-bar"
+                  [value]="data().premium_feedback.role_fit_breakdown[category]">
+                </mat-progress-bar>
+              }
+            </div>
+          </mat-card>
+
+          <!-- Recommendations -->
+          <mat-card class="premium-card">
+            <div class="card-header">
+              <div class="icon-container"><mat-icon class="header-icon">lightbulb</mat-icon></div>
+              <h3>Actionable Recommendations</h3>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="card-content">
+              <ul class="tips-list">
+                @for (rec of data().premium_feedback.recommendations; track rec) {
+                  <li class="tip-item">
+                    <mat-icon class="tip-icon">arrow_right</mat-icon>
+                    <span>{{ rec }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          </mat-card>
+
+          <!-- Rewritten Examples -->
+          <mat-card class="premium-card">
+            <div class="card-header">
+              <div class="icon-container"><mat-icon class="header-icon">auto_fix_high</mat-icon></div>
+              <h3>Rewritten Examples</h3>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="card-content">
+              <div class="rewrites-list">
+                @for (rewrite of data()().premium_feedback.suggested_rewrites; track rewrite.original) {
+                  <div class="rewrite-item">
+                    <p class="original-text">
+                      <strong>Before:</strong> {{ rewrite.original }}
+                    </p>
+                    <p class="rewrite-text">
+                      <strong>After:</strong> {{ rewrite.suggestion }}
+                    </p>
+                  </div>
+                }
+              </div>
+            </div>
+          </mat-card>
+
+          <!-- SUCCESS BANNER -->
+          <mat-card class="success-banner">
+            <div class="banner-content">
+              <div class="celebration-icon-container">
+                <mat-icon class="celebration-icon">celebration</mat-icon>
+              </div>
+              <div class="banner-text">
+                <h3>You're All Set!</h3>
+                <p>Apply these insights to enhance your career opportunities</p>
+              </div>
+            </div>
+          </mat-card>
+
+        }
+      </div>
     </div>
-  </div>
+
+  }
+
 </div>

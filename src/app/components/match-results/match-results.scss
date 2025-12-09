@@ -1,9 +1,5 @@
 @use '../../../theme/variables' as *;
 
-// ==============================
-// MATCH RESULTS STYLES (unified theme)
-// ==============================
-
 .match-container {
   position: relative;
   max-width: 1200px;
@@ -19,7 +15,7 @@
   }
 }
 
-// Animated Background (same as other components)
+// Animated Background
 .background-gradient {
   position: fixed;
   top: 0;
@@ -282,7 +278,7 @@
   gap: $spacing-xl;
 }
 
-// Card Styles (unified with other components)
+// Card Styles
 .summary-card,
 .insight-card,
 .premium-lock-card,
