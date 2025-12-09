@@ -1,210 +1,278 @@
 <div class="experience-container">
-    <div class="section-header">
-        <div class="header-icon-wrapper">
-            <mat-icon class="header-icon">work</mat-icon>
-        </div>
-        <div class="header-content">
-            <h2 class="section-title">Work Experience</h2>
-            <p class="section-subtitle">Showcase your professional journey and key achievements that make you stand out.</p>
-        </div>
-    </div>
 
-    @if (experiences.length > 0 && !showForm) {
+  <!-- SECTION HEADER -->
+  <div class="section-header">
+    <div class="header-icon-wrapper">
+      <mat-icon class="header-icon">work</mat-icon>
+    </div>
+    <div class="header-content">
+      <h2 class="section-title">Work Experience</h2>
+      <p class="section-subtitle">Showcase your professional journey and key achievements.</p>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE LIST -->
+  @if (experiences().length > 0 && !showForm()) {
+
     <div class="experience-list">
-        @for (exp of experiences; track $index) {
+
+      @for (exp of experiences(); track exp.id) {
+
         <div class="experience-card">
-            <div class="card-header">
-                <div class="card-badge">
-                    <mat-icon>work_outline</mat-icon>
-                </div>
-                <div class="card-title-section">
-                    <h3 class="card-title">{{ exp.title }}</h3>
-                    <p class="card-company">
-                        <mat-icon class="inline-icon">business</mat-icon>
-                        {{ exp.company }}
-                    </p>
-                </div>
-                <div class="card-actions">
-                    <button mat-icon-button (click)="editExperience($index)" class="action-btn edit-btn" matTooltip="Edit">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="deleteExperience($index)" class="action-btn delete-btn" matTooltip="Delete">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </div>
+
+          <!-- CARD HEADER -->
+          <div class="card-header">
+            <div class="card-badge">
+              <mat-icon>work_outline</mat-icon>
             </div>
-            <div class="card-meta">
-                <div class="meta-item">
-                    <mat-icon class="meta-icon">calendar_today</mat-icon>
-                    <span>{{ exp.startDate | date: 'MMMM, yyyy' }} - {{ exp.isCurrent ? 'Present' : (exp.endDate | date: 'MMMM, yyyy') }}</span>
-                </div>
-                @if (exp.isCurrent) {
-                <div class="meta-badge">
-                    <mat-icon>trending_up</mat-icon>
-                    <span>Current Role</span>
-                </div>
-                }
+
+            <div class="card-title-section">
+              <h3 class="card-title">{{ exp.title }}</h3>
+              <p class="card-company">
+                <mat-icon class="inline-icon">business</mat-icon>
+                {{ exp.company }}
+              </p>
             </div>
-            @if (exp.bullets && exp.bullets.length > 0) {
-            <div class="card-bullets">
-                <ul class="bullets-list">
-                    @for (bullet of exp.bullets; track $index) {
-                    <li class="bullet-item">
-                        <mat-icon class="bullet-icon">check_circle</mat-icon>
-                        <span>{{ bullet }}</span>
-                    </li>
-                    }
-                </ul>
+
+            <div class="card-actions">
+              <button mat-icon-button class="action-btn edit-btn" (click)="editExperience($index)">
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button mat-icon-button class="action-btn delete-btn" (click)="deleteExperience($index)">
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
+          </div>
+
+          <!-- META -->
+          <div class="card-meta">
+            <div class="meta-item">
+              <mat-icon class="meta-icon">calendar_today</mat-icon>
+              <span>
+                {{ exp.startDate | date:'MMMM, yyyy' }} -
+                {{ exp.isCurrent ? 'Present' : (exp.endDate | date:'MMMM, yyyy') }}
+              </span>
+            </div>
+
+            @if (exp.isCurrent) {
+              <div class="meta-badge">
+                <mat-icon>trending_up</mat-icon>
+                <span>Current Role</span>
+              </div>
             }
-        </div>
-        }
-    </div>
-    }
+          </div>
 
-    @if (experiences.length === 0 && !showForm) {
-    <div class="empty-state">
-        <div class="empty-state-icon">
-            <mat-icon>work_outline</mat-icon>
-        </div>
-        <h3 class="empty-state-title">No Experience Added Yet</h3>
-        <p class="empty-state-description">Start building your professional story by adding your work experience. Highlight your achievements and responsibilities.</p>
-        <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
-            <mat-icon>add_circle</mat-icon>
-            Add Your First Experience
-        </button>
-    </div>
-    }
+          <!-- BULLETS -->
+          @if (exp.bullets.length > 0) {
+            <div class="card-bullets">
+              <ul class="bullets-list">
+                @for (b of exp.bullets; track $index) {
+                  <li class="bullet-item">
+                    <mat-icon class="bullet-icon">check_circle</mat-icon>
+                    <span>{{ b }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
 
-    @if (experiences.length > 0 && !showForm) {
+        </div>
+
+      }
+
+    </div>
+
     <button mat-stroked-button class="add-more-button" (click)="showAddForm()">
-        <mat-icon>add</mat-icon>
-        Add Another Experience
+      <mat-icon>add</mat-icon>
+      Add Another Experience
     </button>
-    }
+  }
 
-    @if (showForm) {
-    <div class="form-container">
-        <div class="form-header">
-            <div class="form-header-icon">
-                <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
-            </div>
-            <div class="form-header-text">
-                <h3 class="form-title">{{ editingIndex !== null ? 'Edit Experience' : 'Add New Experience' }}</h3>
-                <p class="form-subtitle">{{ editingIndex !== null ? 'Update your work experience details' : 'Tell us about your professional role' }}</p>
-            </div>
-        </div>
-        <form [formGroup]="form" class="experience-form">
-            <div class="form-section">
-                <h4 class="form-section-title">
-                    <mat-icon>info</mat-icon>
-                    Basic Information
-                </h4>
-                <div class="form-row">
-                    <mat-form-field appearance="outline" class="form-field full-width">
-                        <mat-label>Job Title</mat-label>
-                        <input matInput formControlName="title" placeholder="e.g., Senior Software Engineer" />
-                        <mat-icon matPrefix>badge</mat-icon>
-                        @if (form.get('title')?.hasError('required')) {
-                        <mat-error>Job title is required</mat-error>
-                        }
-                    </mat-form-field>
-                </div>
-                <div class="form-row">
-                    <mat-form-field appearance="outline" class="form-field full-width">
-                        <mat-label>Company Name</mat-label>
-                        <input matInput formControlName="company" placeholder="e.g., Tech Corp Inc." />
-                        <mat-icon matPrefix>business</mat-icon>
-                        @if (form.get('company')?.hasError('required')) {
-                        <mat-error>Company name is required</mat-error>
-                        }
-                    </mat-form-field>
-                </div>
-            </div>
-            <div class="form-section">
-                <h4 class="form-section-title">
-                    <mat-icon>schedule</mat-icon>
-                    Employment Period
-                </h4>
-                <div class="form-row form-row-two">
-                    <mat-form-field appearance="outline" class="form-field">
-                        <mat-label>Start Date</mat-label>
-                        <input matInput [matDatepicker]="startPickerExp" formControlName="startDate" placeholder="Select start date" />
-                        <mat-icon matPrefix>event_available</mat-icon>
-                        <mat-datepicker-toggle matIconSuffix [for]="startPickerExp"></mat-datepicker-toggle>
-                        <mat-datepicker panelClass="custom-dark-datepicker" #startPickerExp></mat-datepicker>
-                        @if (form.get('startDate')?.hasError('required')) {
-                        <mat-error>Start Date is required</mat-error>
-                        }
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="form-field" [class.disabled-field]="form.get('isCurrent')?.value">
-                        <mat-label>End Date</mat-label>
-                        <input matInput [matDatepicker]="endPickerExp" formControlName="endDate" placeholder="Select end date" [disabled]="form.get('isCurrent')?.value" />
-                        <mat-icon matPrefix>event_busy</mat-icon>
-                        <mat-datepicker-toggle matIconSuffix [for]="endPickerExp"></mat-datepicker-toggle>
-                        <mat-datepicker panelClass="custom-dark-datepicker" #endPickerExp></mat-datepicker>
-                        @if (form.get('endDate')?.hasError('required') && !form.get('isCurrent')?.value) {
-                        <mat-error>End Date is required</mat-error>
-                        }
-                    </mat-form-field>
-                </div>
-                <div class="form-row">
-                    <mat-checkbox formControlName="isCurrent" class="current-checkbox" color="primary">
-                        <span class="checkbox-label">
-                            I currently work here
-                        </span>
-                    </mat-checkbox>
-                </div>
-            </div>
-            <div class="form-section bullets-section">
-                <div class="bullets-section-header">
-                    <h4 class="form-section-title">
-                        <mat-icon>stars</mat-icon>
-                        Key Achievements & Responsibilities
-                    </h4>
-                </div>
-                <p class="bullets-hint">
-                    <mat-icon class="hint-icon">lightbulb</mat-icon>
-                    Start each point with an action verb (e.g., Developed, Managed, Achieved, Led)
-                </p>
-                <div formArrayName="bullets" class="bullets-container">
-                    @for (bullet of bullets.controls; track $index) {
-                    <div class="bullet-row">
-                        <div class="bullet-number-badge">{{ $index + 1 }}</div>
-                        <mat-form-field appearance="outline" class="bullet-field">
-                            <mat-label>Achievement or Responsibility {{ $index + 1 }}</mat-label>
-                            <textarea
-                                matInput
-                                [formControlName]="$index"
-                                rows="3"
-                                placeholder="Describe your achievement or responsibility..."
-                                cdkTextareaAutosize
-                                cdkAutosizeMinRows="2"
-                                cdkAutosizeMaxRows="5">
-                            </textarea>
-                        </mat-form-field>
-                        <button mat-icon-button type="button" (click)="removeBullet($index)" class="bullet-delete-btn" matTooltip="Remove">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </div>
-                    }
-                    <button mat-stroked-button type="button" (click)="addBullet()" class="add-bullet-btn">
-                        <mat-icon>add</mat-icon>
-                        Add Another Point
-                    </button>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
-                    <mat-icon>close</mat-icon>
-                    Cancel
-                </button>
-                <button mat-flat-button color="primary" (click)="saveExperience()" [disabled]="form.invalid" class="save-btn">
-                    <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
-                    {{ editingIndex !== null ? 'Update Experience' : 'Add Experience' }}
-                </button>
-            </div>
-        </form>
+  <!-- EMPTY STATE -->
+  @else if (experiences().length === 0 && !showForm()) {
+
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <mat-icon>work_outline</mat-icon>
+      </div>
+
+      <h3 class="empty-state-title">No Experience Added Yet</h3>
+      <p class="empty-state-description">
+        Start building your professional story by adding your work experience.
+      </p>
+
+      <button mat-flat-button color="primary" (click)="showAddForm()">
+        <mat-icon>add_circle</mat-icon>
+        Add Your First Experience
+      </button>
     </div>
-    }
+
+  }
+
+  <!-- FORM SECTION -->
+  @if (showForm()) {
+
+    <div class="form-container">
+
+      <!-- FORM HEADER -->
+      <div class="form-header">
+        <div class="form-header-icon">
+          <mat-icon>{{ editingIndex() !== null ? 'edit' : 'add_circle' }}</mat-icon>
+        </div>
+
+        <div class="form-header-text">
+          <h3 class="form-title">
+            {{ editingIndex() !== null ? 'Edit Experience' : 'Add New Experience' }}
+          </h3>
+
+          <p class="form-subtitle">
+            {{ editingIndex() !== null ? 'Update your experience' : 'Tell us about your role' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- ACTUAL FORM -->
+      <form [formGroup]="form" class="experience-form">
+
+        <!-- BASIC INFO -->
+        <div class="form-section">
+
+          <h4 class="form-section-title">
+            <mat-icon>info</mat-icon>
+            Basic Information
+          </h4>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field full-width">
+              <mat-label>Job Title</mat-label>
+              <input matInput formControlName="title" placeholder="e.g., Senior Engineer" />
+              @if (form.get('title')?.hasError('required')) {
+                <mat-error>Job title is required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field full-width">
+              <mat-label>Company Name</mat-label>
+              <input matInput formControlName="company" placeholder="e.g., Google" />
+              @if (form.get('company')?.hasError('required')) {
+                <mat-error>Company name is required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <!-- DATES -->
+        <div class="form-section">
+          <h4 class="form-section-title">
+            <mat-icon>schedule</mat-icon>
+            Employment Period
+          </h4>
+
+          <div class="form-row form-row-two">
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+              <mat-datepicker-toggle matSuffix [for]="startPicker" />
+              <mat-datepicker #startPicker />
+
+              @if (form.get('startDate')?.hasError('required')) {
+                <mat-error>Start Date is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+              class="form-field"
+              [class.disabled-field]="form.get('isCurrent')?.value"
+            >
+              <mat-label>End Date</mat-label>
+              <input
+                matInput
+                [matDatepicker]="endPicker"
+                formControlName="endDate"
+                [disabled]="form.get('isCurrent')?.value" />
+
+              <mat-datepicker-toggle matSuffix [for]="endPicker" />
+              <mat-datepicker #endPicker />
+            </mat-form-field>
+
+          </div>
+
+          <div class="form-row">
+            <mat-checkbox formControlName="isCurrent" color="primary">
+              I currently work here
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <!-- BULLETS -->
+        <div class="form-section bullets-section">
+
+          <h4 class="form-section-title">
+            <mat-icon>stars</mat-icon> Achievements
+          </h4>
+
+          <p class="bullets-hint">
+            <mat-icon class="hint-icon">lightbulb</mat-icon>
+            Start each point with an action verb.
+          </p>
+
+          <div formArrayName="bullets">
+
+            @for (b of bullets.controls; track $index) {
+
+              <div class="bullet-row">
+                <div class="bullet-number-badge">{{ $index + 1 }}</div>
+
+                <mat-form-field appearance="outline" class="bullet-field">
+                  <mat-label>Achievement {{ $index + 1 }}</mat-label>
+                  <textarea matInput [formControlName]="$index" rows="3"></textarea>
+                </mat-form-field>
+
+                <button mat-icon-button type="button" (click)="removeBullet($index)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+
+            }
+
+            <button mat-stroked-button type="button" (click)="addBullet()">
+              <mat-icon>add</mat-icon>
+              Add Another Point
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="cancelForm()">
+            <mat-icon>close</mat-icon>
+            Cancel
+          </button>
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="saveExperience()"
+            [disabled]="form.invalid"
+          >
+            <mat-icon>{{ editingIndex() !== null ? 'check' : 'add' }}</mat-icon>
+            {{ editingIndex() !== null ? 'Update Experience' : 'Add Experience' }}
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  }
 </div>

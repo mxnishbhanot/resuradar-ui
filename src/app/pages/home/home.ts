@@ -1,4 +1,15 @@
-import { Component, HostListener, Renderer2, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Renderer2,
+  effect,
+  signal,
+  computed,
+  inject,
+  OnInit,
+  OnDestroy
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -10,15 +21,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
-import { signal, computed, effect, Signal } from '@angular/core';
-import { Subscription, of } from 'rxjs';
-import { catchError, filter, switchMap } from 'rxjs/operators';
-
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { UserService } from '../../core/services/user';
 import { SkeletonService } from '../../core/services/skeleton';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -39,226 +47,171 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
   styleUrls: ['./home.scss'],
 })
 export class Home implements OnInit, OnDestroy {
-  // Signals for UI state
-  isLoading = signal<boolean>(true);
-  mobileNavOpen = signal<boolean>(false);
-  profileMenuOpen = signal<boolean>(false);
-  isMobileView = signal<boolean>(false);
-  isIpadView = signal<boolean>(false);
-  showBackToTop = signal<boolean>(false);
 
-  // Active tab as a signal
-  activeTab = signal<string>('upload');
+  /** ✅ NEW: DI fields (safe for signals/effects) */
+  private router = inject(Router);
+  private renderer = inject(Renderer2);
+  private dialog = inject(MatDialog);
+  public googleAuth = inject(GoogleAuthService);
+  private userService = inject(UserService);
+  private skeletonService = inject(SkeletonService);
 
-  // User-related signals
-  userFromAuth = signal<any | null>(null);
-  user = signal<any | null>(null);
-  userName = signal<string>('Guest User');
-  userEmail = signal<string>('');
-  avatar = signal<string>('');
+  /** UI Signals */
+  isLoading = this.skeletonService.loading;
+  mobileNavOpen = signal(false);
+  profileMenuOpen = signal(false);
+  isMobileView = signal(false);
+  isIpadView = signal(false);
+  showBackToTop = signal(false);
+
+  /** Tabs */
+  activeTab = signal(localStorage.getItem('activeTab') || 'upload');
+
+  /** URL */
+  currentUrl = signal('');
+
+  /** User State */
+  user = this.userService.user;
+  userName = computed(() => this.user()?.name ?? 'Guest User');
+  userEmail = computed(() => this.user()?.email ?? '');
+  avatar = computed(() => this.user()?.picture ?? '');
   isPremium = computed(() => !!this.user()?.isPremium);
-  isLoggedIn = computed(() => !!this.userFromAuth());
+  isLoggedIn = computed(() => !!this.googleAuth.user());
 
-  // Router URL tracking for shouldRender behaviour
-  currentUrl = signal<string>('');
-
-  // Subscriptions to clean up
-  private subs: Subscription[] = [];
-
-  constructor(
-    private router: Router,
-    public googleAuth: GoogleAuthService,
-    public dialog: MatDialog,
-    private userService: UserService,
-    private renderer: Renderer2,
-    private skeletonService: SkeletonService,
-  ) {
-    // Initialize activeTab from localStorage safely inside constructor
-    const stored = localStorage.getItem('activeTab');
-    this.activeTab.set(stored || 'upload');
-
-    // Initialize currentUrl safely (router is available now)
-    this.currentUrl.set(this.router.url);
-
-    // Wire router navigation events (scroll-to-top + url tracking)
-    const subRouter = this.router.events
+  constructor() {
+    /** Router tracking */
+    this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((ev: any) => {
-        this.currentUrl.set(ev?.url || this.router.url);
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        this.currentUrl.set(ev.url);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       });
-    this.subs.push(subRouter);
 
-    // Subscribe to skeletonService.loading$ -> set signal
-    const skeletonSub = this.skeletonService.loading$.subscribe(v => this.isLoading.set(!!v));
-    this.subs.push(skeletonSub);
+    /** Sync GoogleAuth → UserService */
+    effect(() => {
+      const authUser = this.googleAuth.user();
+      if (!authUser) {
+        this.userService.clearUser();
+        return;
+      }
+
+      this.userService.fetchCurrentUser().subscribe({
+        error: () => this.googleAuth.logout()
+      });
+    });
+
+    /** Stop skeleton after user loads */
+    effect(() => {
+      if (this.user()) {
+        setTimeout(() => this.skeletonService.setLoading(false), 800);
+      }
+    });
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.checkScreenSize();
 
-    // keep skeleton visible initially (preserve original behavior)
-    this.skeletonService.setLoading(true);
-
-    // Initialize Google Auth after the original small delay
-    const timeout = setTimeout(() => {
-      this.googleAuth.initialize('159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com');
-    }, 500);
-    // add a pseudo-subscription for cleanup
-    this.subs.push({ unsubscribe: () => clearTimeout(timeout) } as unknown as Subscription);
-
-    // Load user from storage
+    // Load stored user
     this.googleAuth.loadUserFromStorage();
 
-    // Subscribe to googleAuth.user$ and fetch current user if present
-    const authSub = this.googleAuth.user$
-      .pipe(
-        switchMap(u => {
-          if (!u) {
-            this.userFromAuth.set(null);
-            this.userName.set('Guest User');
-            this.userEmail.set('');
-            this.avatar.set('');
-            return of(null);
-          }
-
-          this.userFromAuth.set(u);
-          this.userName.set(u.name || 'Guest User');
-          this.userEmail.set(u.email || '');
-          this.avatar.set(u.picture || '');
-
-          return this.userService.fetchCurrentUser()
-            .pipe(catchError(err => {
-              console.error('Error fetching user:', err);
-              this.googleAuth.logout();
-              return of(null);
-            }));
-        })
-      )
-      .subscribe(() => {
-        this.stopLoadingWithDelay();
-      });
-    this.subs.push(authSub);
-
-    // Mirror userService.user$ into the user signal
-    const userServiceSub = this.userService.user$.subscribe(u => this.user.set(u));
-    this.subs.push(userServiceSub);
+    // Initialize Google
+    setTimeout(() => {
+      this.googleAuth.initialize(
+        '159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com'
+      );
+    }, 500);
   }
 
   ngOnDestroy(): void {
-    // unsubscribe all subscriptions
-    this.subs.forEach(s => {
-      try { s.unsubscribe(); } catch { /* noop */ }
-    });
-
-    if (this.mobileNavOpen()) {
-      this.renderer.removeClass(document.body, 'mobile-nav-open');
-    }
-    this.profileMenuOpen.set(false);
-    this.renderer.removeClass(document.body, 'loading-active');
+    this.renderer.removeClass(document.body, 'mobile-nav-open');
   }
 
-  @HostListener('window:resize', [])
-  onResize(): void {
+  // -------------------------------------------------------------------
+  // UI Events
+  // -------------------------------------------------------------------
+
+  @HostListener('window:resize')
+  onResize() {
     this.checkScreenSize();
   }
 
-  @HostListener('window:scroll', [])
-  onWindowScroll(): void {
+  @HostListener('window:scroll')
+  onScroll() {
     this.showBackToTop.set(window.scrollY > 300);
   }
 
-  // UI helpers
-  private stopLoadingWithDelay(): void {
-    setTimeout(() => {
-      this.skeletonService.setLoading(false);
-    }, 800);
-  }
-
-  checkScreenSize(): void {
+  checkScreenSize() {
     const w = window.innerWidth;
     this.isMobileView.set(w <= 768);
     this.isIpadView.set(w <= 820);
 
-    if (!this.isMobileView() && this.mobileNavOpen()) {
-      this.closeMobileNav();
-    }
-
-    if (this.isMobileView() && this.profileMenuOpen()) {
-      this.profileMenuOpen.set(false);
-    }
+    if (!this.isMobileView() && this.mobileNavOpen()) this.closeMobileNav();
+    if (this.isMobileView() && this.profileMenuOpen()) this.profileMenuOpen.set(false);
   }
 
-  toggleMobileNav(): void {
+  toggleMobileNav() {
     const next = !this.mobileNavOpen();
     this.mobileNavOpen.set(next);
 
-    if (next && this.profileMenuOpen()) {
-      this.profileMenuOpen.set(false);
-    }
-
     if (next) {
       this.renderer.addClass(document.body, 'mobile-nav-open');
+      this.profileMenuOpen.set(false);
     } else {
       this.renderer.removeClass(document.body, 'mobile-nav-open');
     }
   }
 
-  closeMobileNav(): void {
+  closeMobileNav() {
     this.mobileNavOpen.set(false);
     this.renderer.removeClass(document.body, 'mobile-nav-open');
   }
 
-  toggleProfileMenu(): void {
+  toggleProfileMenu() {
     const next = !this.profileMenuOpen();
     this.profileMenuOpen.set(next);
-
-    if (next && this.mobileNavOpen()) {
-      this.closeMobileNav();
-    }
+    if (next) this.closeMobileNav();
   }
 
-  navigate(path: string): void {
+  navigate(path: string) {
     this.router.navigate([`/${path}`]);
   }
 
-  loginWithGoogle(): void {
+  loginWithGoogle() {
     this.googleAuth.signIn();
   }
 
-  openUpgradeModal(): void {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.panelClass = 'responsive-dialog-wrapper';
-    dialogConfig.maxWidth = '100vw';
-    dialogConfig.width = '100%';
-    dialogConfig.height = '100%';
-    dialogConfig.disableClose = true;
+  openUpgradeModal() {
+    const cfg = new MatDialogConfig();
+    cfg.panelClass = 'responsive-dialog-wrapper';
+    cfg.maxWidth = '100vw';
+    cfg.width = '100%';
+    cfg.height = '100%';
+    cfg.disableClose = true;
 
-    this.dialog.open(UpgradePro, dialogConfig);
+    this.dialog.open(UpgradePro, cfg);
   }
 
-  exteranlLink(type: string): void {
-    if (type === 'site') {
-      window.open('https://resuradar.in', '_blank');
-    } else if (type === 'linkedin') {
-      window.open('https://www.linkedin.com/in/manish-kumar-031124226/', '_blank');
-    }
-  }
-
-  setActiveTab(tab: string): void {
+  setActiveTab(tab: string) {
     this.activeTab.set(tab);
     localStorage.setItem('activeTab', tab);
   }
 
-  scrollToTop(): void {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  shouldRender(): boolean {
+  shouldRender() {
     const url = this.currentUrl();
     return !(url.includes('/build') && window.innerWidth < 1024);
   }
+
+  externalLink(url: 'site' | 'linkedin') {
+    const urls = {
+      site: 'https://resuradar.in',
+      linkedin: 'https://www.linkedin.com/in/manish-kumar-031124226/',
+    };
+
+    window.open(urls[url], '_blank');
+  }
+
 }

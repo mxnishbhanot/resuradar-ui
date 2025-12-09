@@ -1,5 +1,5 @@
 <div class="preview-container">
-  <!-- Header -->
+
   <div class="preview-header">
     <div class="header-left">
       <button mat-icon-button class="close-btn" (click)="close()" matTooltip="Close">
@@ -7,65 +7,69 @@
       </button>
 
       <div class="template-selector">
-        <label>Template:</label>
-        <select [(ngModel)]="currentTemplate" (ngModelChange)="changeTemplate()" class="template-dropdown">
-          <option value="corporate">Corporate</option>
-          <option value="modern">Modern</option>
-          <option value="minimal">Minimalist</option>
-          <!-- <option value="luxury">Serif Luxe</option> -->
-          <!-- <option value="magazine">Editorial</option>
-          <option value="faang">Clean</option> -->
+        <label for="templateSelect">Template:</label>
+        <select
+          id="templateSelect"
+          class="template-dropdown"
+          [ngModel]="currentTemplate()"
+          (ngModelChange)="currentTemplate.set($event)"
+        >
+          @for (t of templates(); track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
         </select>
       </div>
     </div>
 
-    <!-- Zoom Controls -->
-    <div class="zoom-controls" *ngIf="!isLoading && !showEmptyState">
-      <button mat-icon-button (click)="zoomOut()" matTooltip="Zoom Out">
-        <mat-icon>zoom_out</mat-icon>
-      </button>
-      <span class="zoom-value">{{ (zoom * 100) | number:'1.0-0' }}%</span>
-      <button mat-icon-button (click)="zoomIn()" matTooltip="Zoom In">
-        <mat-icon>zoom_in</mat-icon>
-      </button>
-      <button mat-icon-button (click)="resetZoom()" matTooltip="Reset Zoom">
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </div>
+    @if (!isLoading() && !showEmptyState()) {
+      <div class="zoom-controls">
+        <button mat-icon-button (click)="zoomOut()" matTooltip="Zoom Out"><mat-icon>zoom_out</mat-icon></button>
+        <span class="zoom-value">{{ zoomPercent() }}</span>
+        <button mat-icon-button (click)="zoomIn()" matTooltip="Zoom In"><mat-icon>zoom_in</mat-icon></button>
+        <button mat-icon-button (click)="resetZoom()" matTooltip="Reset Zoom"><mat-icon>refresh</mat-icon></button>
+      </div>
+    }
 
-    <button mat-flat-button color="primary" (click)="downloadPDF()" class="download-btn" [disabled]="isLoading || showEmptyState">
+    <button
+      mat-flat-button color="primary"
+      (click)="downloadPDF()"
+      [disabled]="isLoading() || showEmptyState()"
+      class="download-btn"
+    >
       <mat-icon>download</mat-icon>
-      <span>{{ isLoading ? 'Generating...' : 'Download PDF' }}</span>
+      <span>{{ isLoading() ? 'Generating...' : 'Download PDF' }}</span>
     </button>
   </div>
 
-  <!-- Body -->
   <div class="preview-body">
-    <!-- Skeleton Loader -->
-    <div class="skeleton" *ngIf="isLoading">
-      <div class="skeleton-page"></div>
-    </div>
 
-    <!-- Empty State Message -->
-    <div class="empty-state-message" *ngIf="showEmptyState && !isLoading">
-      <mat-card class="empty-state-card">
-        <mat-icon class="empty-state-icon">description</mat-icon>
-        <h3>Your Resume is Empty</h3>
-        <p>Add some details to your resume sections to generate a preview.</p>
-        <button mat-raised-button color="primary" (click)="close()">Go Back to Builder</button>
-      </mat-card>
-    </div>
+    @if (isLoading()) {
+      <div class="skeleton"><div class="skeleton-page"></div></div>
+    }
 
-    <!-- PDF Viewer -->
-    <div class="preview-frame-wrapper" *ngIf="pdfUrl && !isLoading && !showEmptyState">
-      <pdf-viewer
-        [src]="pdfUrl"
-        [zoom]="zoom"
-        [original-size]="false"
-        [render-text]="true"
-        (after-load-complete)="onPDFLoaded()"
-        style="width: 100%; height: 100%; display: block;"
-      ></pdf-viewer>
-    </div>
+    @else if (showEmptyState()) {
+      <div class="empty-state-message">
+        <mat-card class="empty-state-card">
+          <mat-icon class="empty-state-icon">description</mat-icon>
+          <h3>Your Resume is Empty</h3>
+          <p>Add details to your resume to generate a preview.</p>
+          <button mat-raised-button color="primary" (click)="close()">Go Back to Builder</button>
+        </mat-card>
+      </div>
+    }
+
+    @else if (pdfUrl()) {
+      <div class="preview-frame-wrapper">
+        <pdf-viewer
+          [src]="pdfUrl()!"
+          [zoom]="zoom()"
+          [original-size]="false"
+          [render-text]="true"
+          [show-all]="true"
+          (after-load-complete)="onPDFLoaded()"
+          style="display: block; width: 100%; height: 100%;"
+        ></pdf-viewer>
+      </div>
+    }
   </div>
 </div>

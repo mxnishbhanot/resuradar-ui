@@ -1,6 +1,19 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common'; // <-- ADD DatePipe
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -8,19 +21,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
-// <-- ADD Datepicker Imports
+import { TextFieldModule, CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
 export interface Experience {
   id: string;
   title: string;
   company: string;
-  startDate: string; // Stored as ISO string
-  endDate: string;   // Stored as ISO string or ''
+  startDate: string;
+  endDate: string;
   isCurrent: boolean;
   bullets: string[];
 }
@@ -28,7 +40,6 @@ export interface Experience {
 @Component({
   selector: 'rr-experience',
   standalone: true,
-  providers: [DatePipe], // <-- ADD DatePipe provider
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -40,160 +51,170 @@ export interface Experience {
     MatCardModule,
     MatCheckboxModule,
     MatTooltipModule,
-    MatProgressSpinnerModule,
-    CdkTextareaAutosize,
-    MatDatepickerModule, // <-- ADD MatDatepickerModule
-    MatNativeDateModule,  // <-- ADD MatNativeDateModule
+    MatDatepickerModule,
+    MatNativeDateModule,
+    CdkTextareaAutosize
   ],
   templateUrl: './experience.component.html',
-  styleUrl: './experience.component.scss',
+  styleUrls: ['./experience.component.scss']
 })
-export class ExperienceComponent implements OnInit {
-  form!: FormGroup;
-  showForm = false;
-  editingIndex: number | null = null;
-  experiences: Experience[] | any = [];
+export class ExperienceComponent {
+
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
-  private datePipe = inject(DatePipe); // Inject DatePipe (although only used in template now)
+
+  /** UI Signals */
+  showForm = signal(false);
+  editingIndex = signal<number | null>(null);
+
+  /** Experience list derived from signal-based store */
+  experiences = computed<Experience[]>(() => {
+    return (this.store.state()?.experiences ?? []) as Experience[];
+  });
+
+  /** Build Form */
+  form: FormGroup = this.fb.group({
+    title: ['', Validators.required],
+    company: ['', Validators.required],
+    startDate: [null, Validators.required],
+    endDate: [null],
+    isCurrent: [false],
+    bullets: this.fb.array([])
+  });
 
   constructor() {
-    this.initForm();
-    this.setupEndDateToggle();
-  }
+    /** Effect: handle "isCurrent" toggle without subscribing */
+    effect(() => {
+      const isCurr = this.form.get('isCurrent')?.value;
+      const endCtrl = this.form.get('endDate');
 
-  private initForm(): void {
-    // Added required validators for company and startDate
-    this.form = this.fb.group({
-      title: ['', Validators.required],
-      company: ['', Validators.required], // Added required validation
-      startDate: ['', Validators.required], // Added required validation
-      endDate: [''],
-      isCurrent: [false],
-      bullets: this.fb.array([])
-    });
-  }
+      if (!endCtrl) return;
 
-  private setupEndDateToggle(): void {
-    this.form.get('isCurrent')?.valueChanges.subscribe(isCurrent => {
-      const endDateControl = this.form.get('endDate');
-      if (isCurrent) {
-        endDateControl?.clearValidators();
-        endDateControl?.setValue('');
-        endDateControl?.disable();
+      if (isCurr) {
+        endCtrl.disable({ emitEvent: false });
+        endCtrl.clearValidators();
+        endCtrl.setValue(null, { emitEvent: false });
       } else {
-        // End date is required only if it's not a current role
-        endDateControl?.setValidators(Validators.required);
-        endDateControl?.enable();
+        endCtrl.enable({ emitEvent: false });
+        endCtrl.setValidators([Validators.required]);
       }
-      endDateControl?.updateValueAndValidity();
+
+      endCtrl.updateValueAndValidity({ emitEvent: false });
     });
   }
 
+  /** Bullets getter */
   get bullets(): FormArray {
     return this.form.get('bullets') as FormArray;
   }
 
-  ngOnInit(): void {
-    this.store.state$.subscribe(state => {
-      this.experiences = state.experiences || [];
-    });
-  }
-
-  showAddForm(): void {
-    this.showForm = true;
-    this.editingIndex = null;
-    this.form.reset({ isCurrent: false });
-    this.bullets.clear();
+  /** UI Actions */
+  showAddForm() {
+    this.showForm.set(true);
+    this.editingIndex.set(null);
+    this.resetForm();
     this.addBullet();
-    // Ensure endDate validation is active if not 'Current Role'
-    this.form.get('endDate')?.setValidators(Validators.required);
-    this.form.get('endDate')?.updateValueAndValidity();
   }
 
-  cancelForm(): void {
-    this.showForm = false;
-    this.editingIndex = null;
-    this.form.reset({ isCurrent: false });
-    this.bullets.clear();
+  cancelForm() {
+    this.showForm.set(false);
+    this.editingIndex.set(null);
+    this.resetForm();
   }
 
-  addBullet(): void {
+  /** Bullets */
+  addBullet() {
     this.bullets.push(this.fb.control(''));
   }
 
-  removeBullet(index: number): void {
-    this.bullets.removeAt(index);
+  removeBullet(i: number) {
+    this.bullets.removeAt(i);
   }
 
-  editExperience(index: number): void {
-    this.editingIndex = index;
-    const exp = this.experiences[index];
-    const isCurrentlyWorking = exp.isCurrent;
+  /** Editing an Experience */
+  editExperience(index: number) {
+    const exp = this.experiences()[index];
+    if (!exp) return;
 
-    this.bullets.clear();
-    if (exp.bullets && exp.bullets.length > 0) {
-      exp.bullets.forEach((bullet: string) => this.bullets.push(this.fb.control(bullet)));
-    } else {
-      this.addBullet();
-    }
+    this.editingIndex.set(index);
+    this.showForm.set(true);
 
-    // Patch with stored ISO strings/values for DatePicker and other fields
+    this.resetForm();
+
+    // Load bullets
+    exp.bullets.forEach(b => this.bullets.push(this.fb.control(b)));
+
     this.form.patchValue({
       title: exp.title,
       company: exp.company,
-      startDate: exp.startDate, // ISO string - DatePicker will read this
-      endDate: exp.endDate,     // ISO string - DatePicker will read this
-      isCurrent: isCurrentlyWorking
+      startDate: exp.startDate ? new Date(exp.startDate) : null,
+      endDate: exp.endDate ? new Date(exp.endDate) : null,
+      isCurrent: exp.isCurrent
     });
-
-    // Manually run setup logic to handle required validator for endDate
-    const endDateControl = this.form.get('endDate');
-    if (isCurrentlyWorking) {
-      endDateControl?.clearValidators();
-      endDateControl?.disable();
-    } else {
-      endDateControl?.setValidators(Validators.required);
-      endDateControl?.enable();
-    }
-    endDateControl?.updateValueAndValidity();
-
-    this.showForm = true;
   }
 
-  saveExperience(): void {
-    if (this.form.invalid) return;
-
-    const formValue = this.form.getRawValue();
-    const bulletValues = formValue.bullets.filter((b: string) => b && b.trim());
-
-    // Store raw date value (ISO string or Date object from DatePicker)
-    const rawStartDate = formValue.startDate;
-    const rawEndDate = formValue.isCurrent ? '' : formValue.endDate;
-
-    const experience: Experience = {
-      id: this.editingIndex !== null ? this.experiences[this.editingIndex].id : Date.now().toString(),
-      title: formValue.title,
-      company: formValue.company,
-      startDate: rawStartDate, // Save as ISO string
-      endDate: rawEndDate,     // Save as ISO string or empty string
-      isCurrent: formValue.isCurrent,
-      bullets: bulletValues
-    };
-
-    let updatedExperiences = [...this.experiences];
-    if (this.editingIndex !== null) {
-      updatedExperiences[this.editingIndex] = experience;
-    } else {
-      updatedExperiences.push(experience);
+  /** Save Experience (new or update) */
+  saveExperience() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
 
-    this.store.update({ experiences: updatedExperiences });
+    const raw = this.form.getRawValue();
+
+    const experience: Experience = {
+      id:
+        this.editingIndex() !== null
+          ? this.experiences()[this.editingIndex()!].id
+          : Date.now().toString(),
+
+      title: raw.title,
+      company: raw.company,
+      startDate: raw.startDate instanceof Date
+        ? raw.startDate.toISOString()
+        : raw.startDate,
+
+      endDate: raw.isCurrent
+        ? ''
+        : raw.endDate instanceof Date
+          ? raw.endDate.toISOString()
+          : raw.endDate ?? '',
+
+      isCurrent: raw.isCurrent,
+      bullets: raw.bullets
+        .map((b: string) => b.trim())
+        .filter((b: string) => b.length > 0)
+    };
+
+    const updated = [...this.experiences()];
+    if (this.editingIndex() !== null) {
+      updated[this.editingIndex()!] = experience;
+    } else {
+      updated.push(experience);
+    }
+
+    this.store.update({ experiences: updated });
+
     this.cancelForm();
   }
 
-  deleteExperience(index: number): void {
-    const updatedExperiences: Experience[] = this.experiences.filter((_: Experience, i: number) => i !== index);
-    this.store.update({ experiences: updatedExperiences });
+  /** Delete experience */
+  deleteExperience(index: number) {
+    this.store.update({
+      experiences: this.experiences().filter((_, i) => i !== index)
+    });
+  }
+
+  /** Reset form for new entry */
+  private resetForm() {
+    this.form.reset({
+      title: '',
+      company: '',
+      startDate: null,
+      endDate: null,
+      isCurrent: false
+    });
+
+    while (this.bullets.length) this.bullets.removeAt(0);
   }
 }

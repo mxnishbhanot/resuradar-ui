@@ -1,13 +1,26 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormArray,
+  FormControl
+} from '@angular/forms';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule, MatChipInputEvent, MatChipEditedEvent } from '@angular/material/chips';
+import {
+  MatChipsModule,
+  MatChipInputEvent,
+  MatChipEditedEvent
+} from '@angular/material/chips';
+
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
@@ -34,115 +47,126 @@ export interface SkillCategory {
   templateUrl: './skills.component.html',
   styleUrl: './skills.component.scss',
 })
-export class SkillsComponent implements OnInit {
-  form!: FormGroup;
-  showForm = false;
-  editingIndex: number | null = null;
-  skillCategories: SkillCategory[] = [];
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+export class SkillsComponent {
+
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
 
-  constructor() {
-    this.initForm();
-  }
+  // ► SIGNAL STATE
+  skillCategories = signal<SkillCategory[]>([]);
+  showForm = signal(false);
+  editingIndex = signal<number | null>(null);
 
-  private initForm(): void {
-    this.form = this.fb.group({
-      name: ['', Validators.required],
-      skills: this.fb.array([])
+  // CHIPS
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+
+  form: FormGroup = this.fb.group({
+    name: ['', Validators.required],
+    skills: this.fb.array([])
+  });
+
+  constructor() {
+
+    // Auto-sync service state → local signal
+    effect(() => {
+      const state = this.store.state();
+      this.skillCategories.set(state.skills ?? []);
     });
   }
 
-  get skillsArray(): FormArray {
+  // ---- FORM HELPERS ----
+
+  skillsArray(): FormArray {
     return this.form.get('skills') as FormArray;
   }
 
-  get skillsControls(): FormControl[] {
-    return this.skillsArray.controls as FormControl[];
+  skillsControls(): FormControl[] {
+    return this.skillsArray().controls as FormControl[];
   }
 
-  ngOnInit(): void {
-    this.store.state$.subscribe(state => {
-      this.skillCategories = state.skills || [];
-    });
-  }
+  // ---- UI ACTIONS ----
 
   showAddForm(): void {
-    this.showForm = true;
-    this.editingIndex = null;
+    this.showForm.set(true);
+    this.editingIndex.set(null);
     this.form.reset();
-    this.skillsArray.clear();
+    this.skillsArray().clear();
   }
 
   cancelForm(): void {
-    this.showForm = false;
-    this.editingIndex = null;
+    this.showForm.set(false);
+    this.editingIndex.set(null);
     this.form.reset();
-    this.skillsArray.clear();
+    this.skillsArray().clear();
   }
 
+  // Chips add
   addSkill(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
-    if (value && this.skillsArray.length < 15) { // Example: Limit to 15 skills per category
-      this.skillsArray.push(this.fb.control(value));
+    if (value) {
+      this.skillsArray().push(new FormControl(value));
     }
-    event.chipInput!.clear();
+    event.chipInput?.clear();
   }
 
   removeSkill(index: number): void {
-    this.skillsArray.removeAt(index);
+    this.skillsArray().removeAt(index);
   }
 
   editSkill(index: number, event: MatChipEditedEvent): void {
     const value = event.value.trim();
     if (!value) {
       this.removeSkill(index);
-      return;
+    } else {
+      this.skillsControls()[index].setValue(value);
     }
-    this.skillsControls[index].setValue(value);
   }
 
+  // Editing an existing category
   editCategory(index: number): void {
-    this.editingIndex = index;
-    const category = this.skillCategories[index];
+    const category = this.skillCategories()[index];
 
-    this.skillsArray.clear();
-    if (category.skills && category.skills.length > 0) {
-      category.skills.forEach(skill => this.skillsArray.push(this.fb.control(skill)));
-    }
+    this.editingIndex.set(index);
+    this.showForm.set(true);
 
-    this.form.patchValue({
-      name: category.name
+    this.form.patchValue({ name: category.name });
+
+    this.skillsArray().clear();
+    category.skills.forEach(skill => {
+      this.skillsArray().push(new FormControl(skill));
     });
-    this.showForm = true;
   }
 
   saveCategory(): void {
-    if (this.form.invalid || this.skillsArray.length === 0) return;
+    if (this.form.invalid || this.skillsArray().length === 0) return;
 
     const formValue = this.form.getRawValue();
-    const filteredSkills = formValue.skills.filter((s: string) => s && s.trim());
+    const cleanedSkills = formValue.skills.map((s: string) => s.trim()).filter(Boolean);
 
-    const category: SkillCategory = {
-      id: this.editingIndex !== null ? this.skillCategories[this.editingIndex].id : Date.now().toString(),
+    const index = this.editingIndex();
+    const id = index !== null ? this.skillCategories()[index].id : Date.now().toString();
+
+    const newCategory: SkillCategory = {
+      id,
       name: formValue.name,
-      skills: filteredSkills
+      skills: cleanedSkills
     };
 
-    let updatedCategories = [...this.skillCategories];
-    if (this.editingIndex !== null) {
-      updatedCategories[this.editingIndex] = category;
+    const updated = [...this.skillCategories()];
+
+    if (index !== null) {
+      updated[index] = newCategory;
     } else {
-      updatedCategories.push(category);
+      updated.push(newCategory);
     }
 
-    this.store.update({ skills: updatedCategories });
+    this.store.update({ skills: updated });
     this.cancelForm();
   }
 
   deleteCategory(index: number): void {
-    const updatedCategories = this.skillCategories.filter((_, i) => i !== index);
-    this.store.update({ skills: updatedCategories });
+    const updated = this.skillCategories().filter((_, i) => i !== index);
+    this.store.update({ skills: updated });
   }
+
 }

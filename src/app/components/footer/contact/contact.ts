@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { firstValueFrom } from 'rxjs';
+
 import { UserService } from '../../../core/services/user';
 import { ToastService } from '../../../core/services/toast';
 
@@ -13,52 +15,59 @@ import { ToastService } from '../../../core/services/toast';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     MatCardModule,
     MatIconModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    CdkTextareaAutosize
   ],
   templateUrl: './contact.html',
   styleUrls: ['./contact.scss']
 })
 export class Contact {
-  name = '';
-  email = '';
-  message = '';
-  submitted = false;
 
-  constructor(private userService: UserService, private toast: ToastService) { }
+  /** Signals for form fields */
+  name = signal<string>('');
+  email = signal<string>('');
+  message = signal<string>('');
 
-  onSubmit() {
-    if (!this.name || !this.email || !this.message) {
+  /** UI state */
+  submitted = signal(false);
+
+  constructor(
+    private userService: UserService,
+    private toast: ToastService
+  ) {}
+
+  async onSubmit() {
+    if (!this.name() || !this.email() || !this.message()) {
       this.toast.show(
         'error',
         'Validation Error',
         'Please fill all fields.',
         5000
       );
-
       return;
     }
 
-    this.userService.sendContact({
-      name: this.name,
-      email: this.email,
-      message: this.message
-    }).subscribe({
-      next: (res) => {
-        this.submitted = true;
-      },
-      error: (err) => {
-        this.toast.show(
-          'error',
-          'Error',
-          'Something went wrong, please try again later.',
-          5000
-        );
+    try {
+      await firstValueFrom(
+        this.userService.sendContact({
+          name: this.name(),
+          email: this.email(),
+          message: this.message()
+        })
+      );
 
-      }
-    });
+      this.submitted.set(true);
+
+    } catch (err) {
+      this.toast.show(
+        'error',
+        'Error',
+        'Something went wrong, please try again later.',
+        5000
+      );
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, computed, signal } from '@angular/core';
+import { Component, OnInit, effect, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -11,8 +11,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { UserService } from '../../core/services/user';
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { ThemeService } from '../../core/services/theme';
-
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -28,28 +26,26 @@ import { Subscription } from 'rxjs';
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss'],
 })
-export class Profile implements OnInit, OnDestroy {
-  private subs: Subscription[] = [];
+export class Profile {
+  // Theme state
+  isDarkTheme = signal<boolean>(localStorage.getItem('theme') === 'dark');
 
-  // --- Signals ---
-  user = signal<any>({
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@example.com',
-    picture: 'https://i.pravatar.cc/150?img=12',
-    resumeCount: 7,
-    lastActive: new Date(),
+  // User signal - starts with placeholder values
+  user = signal({
+    name: 'Loading...',
+    email: '',
+    picture: '',
+    resumeCount: 0,
     joinedDate: new Date(),
-    isPremium: false,
+    isPremium: false
   });
 
-  isDarkTheme = signal<boolean>(false);
-
-  // Derived signal: initials
+  // Derived signal
   userInitials = computed(() => {
-    const n = this.user()?.name || '';
-    return n
+    const name = this.user()?.name || '';
+    return name
       .split(' ')
-      .map((x: string) => x[0])
+      .map(n => n[0] ?? '')
       .join('')
       .toUpperCase()
       .substring(0, 2);
@@ -58,51 +54,38 @@ export class Profile implements OnInit, OnDestroy {
   constructor(
     private userService: UserService,
     private router: Router,
-    private googleAuth: GoogleAuthService,
+    public googleAuth: GoogleAuthService,
     private themeService: ThemeService
   ) {
-    // Initialize theme
-    this.isDarkTheme.set(localStorage.getItem('theme') === 'dark');
-  }
-
-  ngOnInit(): void {
-    // Fetch user from backend
-    const sub1 = this.userService.fetchCurrentUser().subscribe();
-
-    // Sync userService.user$ → signal
-    const sub2 = this.userService.user$.subscribe(u => {
+    // 🔄 Sync userService.user → profile.user signal
+    effect(() => {
+      const u = this.userService.user();
       if (u) {
         this.user.set({
           name: u.name,
           email: u.email,
           picture: u.picture,
           isPremium: u.isPremium,
-          joinedDate: new Date(u?.joinedDate) ?? new Date(),
           resumeCount: u.resumeCount || 0,
-          lastActive: new Date(),
+          joinedDate: new Date(u.joinedDate),
         });
       }
     });
 
-    this.subs.push(sub1, sub2);
+    // 🔄 Fetch backend user on load (no subscription needed)
+    this.userService.fetchCurrentUser().subscribe();
   }
 
-  ngOnDestroy(): void {
-    this.subs.forEach(s => {
-      try { s.unsubscribe(); } catch {}
-    });
-  }
-
-  toggleTheme(): void {
+  toggleTheme() {
     this.themeService.toggle();
     this.isDarkTheme.set(localStorage.getItem('theme') === 'dark');
   }
 
-  navigate(): void {
+  navigate() {
     this.router.navigate(['/custom-list']);
   }
 
-  logout(): void {
+  logout() {
     this.googleAuth.logout();
     this.router.navigate(['/upload']);
   }

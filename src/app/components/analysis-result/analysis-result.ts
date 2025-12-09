@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
@@ -13,9 +13,7 @@ import { ResumeService } from '../../core/services/resume';
 import { Router } from '@angular/router';
 import { UserService } from '../../core/services/user';
 import { UpgradePro } from '../upgrade-pro/upgrade-pro';
-
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-analysis-result',
@@ -36,52 +34,51 @@ import { toSignal } from '@angular/core/rxjs-interop';
 })
 export class AnalysisResult implements OnInit {
 
-  // Services via modern injection
+  // Modern DI
   private resumeService = inject(ResumeService);
   private router = inject(Router);
   private userService = inject(UserService);
   private dialog = inject(MatDialog);
 
-  // Data as reactive signal
+  // Reactive analysis data
   data = signal<any>(null);
 
-  // User premium state (auto-updating signal)
-  user = toSignal(this.userService.user$, { initialValue: null });
+  // User from UserService (already a signal)
+  user = this.userService.user;
 
-  // Exposed to template
+  // Premium reactive state
   isProUser = computed(() => !!this.user()?.isPremium);
 
-  // Circle geometry
+  // Circle progress geometry
   private radius = 54;
   circumference = 2 * Math.PI * this.radius;
 
-  // Reactive circular progress offset
+  // Reactive circle animation
   strokeDashoffset = computed(() => {
-    const score = this.data()?.score ?? 0;
-    return this.circumference * (1 - score / 100);
+    const s = this.data()?.score ?? 0;
+    return this.circumference * (1 - s / 100);
   });
 
-  // Score class
+  // Score Class
   scoreClass = computed(() => {
-    const score = this.data()?.score ?? 0;
-    if (score >= 80) return 'score-excellent';
-    if (score >= 60) return 'score-good';
+    const s = this.data()?.score ?? 0;
+    if (s >= 80) return 'score-excellent';
+    if (s >= 60) return 'score-good';
     return 'score-needs-work';
   });
 
-  // Score label text
+  // Score labels
   scoreLabel = computed(() => {
-    const score = this.data()?.score ?? 0;
-    if (score >= 80) return 'Excellent';
-    if (score >= 60) return 'Good';
+    const s = this.data()?.score ?? 0;
+    if (s >= 80) return 'Excellent';
+    if (s >= 60) return 'Good';
     return 'Needs Improvement';
   });
 
-  // Score description text
   scoreDescription = computed(() => {
-    const score = this.data()?.score ?? 0;
-    if (score >= 80) return 'Outstanding resume with strong impact and effectiveness';
-    if (score >= 60) return 'Good resume with potential for improvement in key areas';
+    const s = this.data()?.score ?? 0;
+    if (s >= 80) return 'Outstanding resume with strong impact and effectiveness';
+    if (s >= 60) return 'Good resume with potential for improvement in key areas';
     return 'Resume needs significant improvements to stand out to employers';
   });
 
@@ -95,22 +92,22 @@ export class AnalysisResult implements OnInit {
 
     this.data.set(result);
 
-    // Trigger background user fetch (signals update automatically)
+    // Fetch user silently → updates signal
     this.userService.fetchCurrentUser().subscribe();
   }
 
-  // Template wrappers (optional for readability)
+  // Template-friendly accessors
   getScoreClass() { return this.scoreClass(); }
   getScoreLabel() { return this.scoreLabel(); }
   getScoreDescription() { return this.scoreDescription(); }
 
-  openUpgradeModal(): void {
+  openUpgradeModal() {
     const config: MatDialogConfig = {
       panelClass: 'responsive-dialog-wrapper',
       maxWidth: '100vw',
       width: '100%',
       height: '100%',
-      disableClose: true
+      disableClose: true,
     };
 
     this.dialog.open(UpgradePro, config);

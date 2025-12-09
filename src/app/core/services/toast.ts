@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 export interface Toast {
   id: string;
@@ -11,26 +10,26 @@ export interface Toast {
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  // Store the list of active toasts
-  private toastsSubject = new BehaviorSubject<Toast[]>([]);
-  public toasts$ = this.toastsSubject.asObservable();
+  // Reactive toast list (replaces BehaviorSubject)
+  toasts = signal<Toast[]>([]);
 
-  show(type: Toast['type'], title: string, message: string, duration: number = 5000) {
-    const id = Date.now().toString();
+  show(
+    type: Toast['type'],
+    title: string,
+    message: string,
+    duration: number = 5000
+  ) {
+    const id = String(Date.now());
     const newToast: Toast = { id, type, title, message, duration };
 
-    // Add to top of stack
-    const currentToasts = this.toastsSubject.value;
-    this.toastsSubject.next([...currentToasts, newToast]);
+    // Add toast to the end of the list
+    this.toasts.update((list) => [...list, newToast]);
 
-    // Auto-remove
-    setTimeout(() => {
-      this.remove(id);
-    }, duration);
+    // Auto remove when duration expires
+    setTimeout(() => this.remove(id), duration);
   }
 
   remove(id: string) {
-    const currentToasts = this.toastsSubject.value;
-    this.toastsSubject.next(currentToasts.filter(t => t.id !== id));
+    this.toasts.update((list) => list.filter((toast) => toast.id !== id));
   }
 }

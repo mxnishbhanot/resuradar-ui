@@ -1,8 +1,9 @@
-import { Component, Inject, OnInit, HostListener } from '@angular/core';
+import { Component, Inject, effect, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { fromEvent } from 'rxjs';
 
 @Component({
   selector: 'app-quota-exhausted-modal',
@@ -11,42 +12,33 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   templateUrl: './quota-exhausted-modal.html',
   styleUrls: ['./quota-exhausted-modal.scss']
 })
-export class QuotaExhaustedModal implements OnInit {
-  isMobile: boolean = false;
-  isClosing: boolean = false; // For exit animation
+export class QuotaExhaustedModal {
 
-  constructor(
-    public dialogRef: MatDialogRef<QuotaExhaustedModal>,
-    @Inject(MAT_DIALOG_DATA) public data: { message: string }
-  ) {}
+  // SIGNAL STATES
+  isMobile = signal(window.innerWidth < 768);
+  isClosing = signal(false);
+
+  private dialogRef = inject(MatDialogRef<QuotaExhaustedModal>);
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { message: string }) {}
+
+  // Auto-update mobile state on resize
+  resize$ = fromEvent(window, 'resize');
 
   ngOnInit() {
-    this.checkScreenSize();
-  }
-
-  @HostListener('window:resize', [])
-  onResize() {
-    this.checkScreenSize();
-  }
-
-  checkScreenSize() {
-    // Breakpoint at 768px (Standard Tablet/Mobile cutoff)
-    this.isMobile = window.innerWidth < 768;
+    effect(() => {
+      this.resize$.subscribe(() => {
+        this.isMobile.set(window.innerWidth < 768);
+      });
+    });
   }
 
   upgrade() {
-    // 1. Trigger exit animation
-    this.isClosing = true;
-    // 2. Wait for animation then close with result
-    setTimeout(() => {
-      this.dialogRef.close('upgrade');
-    }, 300);
+    this.isClosing.set(true);
+    setTimeout(() => this.dialogRef.close('upgrade'), 300);
   }
 
   close() {
-    this.isClosing = true;
-    setTimeout(() => {
-      this.dialogRef.close();
-    }, 300);
+    this.isClosing.set(true);
+    setTimeout(() => this.dialogRef.close(), 300);
   }
 }

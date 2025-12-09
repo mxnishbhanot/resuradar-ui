@@ -3,7 +3,7 @@
 
   <div class="content-wrapper">
 
-    <!-- Header -->
+    <!-- HEADER -->
     <header class="page-header fade-in-up">
       <div class="header-text">
         <h1 class="page-title">My Resumes</h1>
@@ -16,7 +16,8 @@
       </button>
     </header>
 
-    <!-- Loading State -->
+
+    <!-- LOADING STATE -->
     @if (isLoading()) {
     <div class="loading-container fade-in-up">
       <div class="spinner-box">
@@ -26,13 +27,16 @@
     </div>
     }
 
-    <!-- Dashboard Content -->
+
+    <!-- MAIN DASHBOARD (when loaded) -->
     @if (!isLoading()) {
+
     <div class="dashboard-content">
 
-      <!-- Filter Pills -->
+      <!-- FILTER BUTTONS -->
       <section class="controls-section fade-in-up">
         <nav class="filter-pills">
+
           <button class="pill" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
             <span>All</span>
             <span class="pill-badge">{{ totalCount() }}</span>
@@ -57,29 +61,38 @@
             <span>Matches</span>
             <span class="pill-badge">{{ jdResumes().length }}</span>
           </button>
+
         </nav>
       </section>
 
-      <!-- Resumes Grid -->
+
+      <!-- RESUME GRID -->
       @if (filteredResumes().length > 0) {
       <section class="resumes-grid">
 
-        <!-- "Create New" card only on page 1 -->
+        <!-- CREATE NEW CARD (Only on page 1) -->
         @if (currentPage() === 1) {
         <article class="resume-card create-new enter-animation" tabindex="0" (click)="createNew()" style="--i: 0">
+
           <div class="dashed-border">
-            <div class="icon-circle"><mat-icon>add</mat-icon></div>
+            <div class="icon-circle">
+              <mat-icon>add</mat-icon>
+            </div>
             <h3>Create New</h3>
             <p>Start from scratch</p>
           </div>
+
         </article>
         }
 
-        <!-- Resume Cards -->
-        @for (resume of paginatedResumes(); track resume.id; let i = $index) {
-        <article class="resume-card enter-animation" [class.draft]="resume.isDraft"
-          [style.--i]="currentPage() === 1 ? i + 1 : i" (click)="handleResumeClick(resume)" tabindex="0">
 
+        <!-- RESUME CARDS -->
+        @for (resume of paginatedResumes(); track resume.id; let i = $index) {
+
+        <article class="resume-card enter-animation" [class.draft]="resume.isDraft"
+          [style.--i]="currentPage() === 1 ? i + 1 : i" tabindex="0" (click)="handleResumeClick(resume)">
+
+          <!-- Top Tag -->
           <div class="card-top">
             <div class="type-tag" [ngClass]="resume.type">
               <mat-icon>{{ getTypeIcon(resume.type) }}</mat-icon>
@@ -87,8 +100,11 @@
             </div>
           </div>
 
+          <!-- Main Content -->
           <div class="card-main">
-            <h3 class="title" [matTooltip]="resume.title">{{ resume.title }}</h3>
+            <h3 class="title">
+              {{ resume.title }}
+            </h3>
 
             <div class="meta-info">
 
@@ -101,29 +117,39 @@
 
               @if (resume.type === 'ats') {
               <div class="score-pill" [ngClass]="getScoreClass(resume.atsScore)">
-                <span class="val">{{ resume.atsScore }}</span><span class="lbl">/100</span>
+                <span class="val">{{ resume.atsScore }}</span>
+                <span class="lbl">/100</span>
               </div>
               }
 
               @if (resume.type === 'jd') {
               <div class="score-pill" [ngClass]="getScoreClass(resume.matchScore)">
-                <span class="val">{{ resume.matchScore }}%</span><span class="lbl">Match</span>
+                <span class="val">{{ resume.matchScore }}%</span>
+                <span class="lbl">Match</span>
               </div>
               }
 
               @if (resume.isDraft) {
               <span class="draft-badge">DRAFT</span>
               }
+
             </div>
           </div>
 
+
+          <!-- Bottom Row -->
           <div class="card-bottom">
             <span class="date">{{ formatDate(resume.updatedAt) }}</span>
+
             <div class="action-btn">
-              <mat-icon>{{ resume.type === 'builder' ? 'edit' : 'arrow_forward' }}</mat-icon>
+              <mat-icon>
+                {{ resume.type === 'builder' ? 'edit' : 'arrow_forward' }}
+              </mat-icon>
             </div>
           </div>
 
+
+          <!-- Progress Bar (builder only) -->
           @if (resume.completionPercentage !== undefined) {
           <div class="progress-line">
             <div class="fill" [style.width.%]="resume.completionPercentage"
@@ -131,14 +157,19 @@
             </div>
           </div>
           }
+
         </article>
-        }
+
+        } <!-- END resume loop -->
+
       </section>
       }
 
-      <!-- Pagination -->
+
+      <!-- PAGINATION -->
       @if (totalPages() > 1) {
       <div class="pagination-container fade-in-up">
+
         <button class="page-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
           <mat-icon>chevron_left</mat-icon>
         </button>
@@ -152,15 +183,19 @@
         <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
           <mat-icon>chevron_right</mat-icon>
         </button>
+
       </div>
       }
 
-      <!-- Empty State -->
+
+      <!-- EMPTY STATE -->
       @if (filteredResumes().length === 0) {
       <div class="empty-state-modern fade-in-up">
+
         <div class="illustration-circle">
           <mat-icon>{{ getEmptyStateActionIcon() }}</mat-icon>
         </div>
+
         <h2>{{ getEmptyStateTitle() }}</h2>
         <p>{{ getEmptyStateDescription() }}</p>
 
@@ -169,11 +204,13 @@
             Start Now
           </button>
         </div>
+
       </div>
       }
 
-    </div>
-    }
+    </div><!-- dashboard-content -->
 
-  </div>
-</div>
+    } <!-- END @if (!isLoading()) -->
+
+  </div><!-- content-wrapper -->
+</div><!-- dashboard-container -->

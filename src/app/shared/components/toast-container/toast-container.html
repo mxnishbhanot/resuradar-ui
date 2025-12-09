@@ -1,24 +1,30 @@
-    <div class="toast-wrapper">
-      <div
-        class="toast-card"
-        *ngFor="let toast of toastService.toasts$ | async"
-        [class]="toast.type"
-        animate.enter="toast-enter"
-        animate.leave="toast-exit">
-
-        <div class="toast-icon-wrapper">
-          <mat-icon>{{ getIcon(toast.type) }}</mat-icon>
-        </div>
-
-        <div class="toast-content">
-          <div class="toast-title">{{ toast.title }}</div>
-          <div class="toast-message">{{ toast.message }}</div>
-        </div>
-
-        <button mat-icon-button (click)="toastService.remove(toast.id)" class="close-btn">
-          <mat-icon>close</mat-icon>
-        </button>
-
-        <div class="toast-progress" [style.animation-duration]="toast.duration + 'ms'"></div>
+<div class="toast-wrapper">
+  @for (toast of toasts(); track toast.id) {
+    <div
+      class="toast-card"
+      [class]="toast.type"
+      enterAnimation="toast-enter"
+      leaveAnimation="toast-exit"
+    >
+      <div class="toast-icon-wrapper">
+        <mat-icon>{{ getIcon(toast.type) }}</mat-icon>
       </div>
+
+      <div class="toast-content">
+        <div class="toast-title">{{ toast.title }}</div>
+        <div class="toast-message">{{ toast.message }}</div>
+      </div>
+
+      <button mat-icon-button (click)="remove(toast.id)" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      @if (toast.duration) {
+        <div
+          class="toast-progress"
+          [style.animation-duration.ms]="toast.duration"
+        ></div>
+      }
     </div>
+  }
+</div>

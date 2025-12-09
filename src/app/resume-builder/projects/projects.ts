@@ -1,6 +1,14 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common'; // Import DatePipe
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { Component, effect, inject, signal } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  FormArray,
+  FormControl
+} from '@angular/forms';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -12,15 +20,17 @@ import { MatChipsModule, MatChipInputEvent } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { ENTER, COMMA } from '@angular/cdk/keycodes';
+
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { Project } from '../../shared/models/resume-builder.model';
 
 @Component({
-  selector: 'rr-projects',
   standalone: true,
-  // Add DatePipe to providers
+  selector: 'rr-projects',
   providers: [DatePipe],
+  templateUrl: './projects.html',
+  styleUrl: './projects.scss',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -36,59 +46,52 @@ import { Project } from '../../shared/models/resume-builder.model';
     MatDatepickerModule,
     MatNativeDateModule,
     CdkTextareaAutosize
-  ],
-  templateUrl: './projects.html',
-  styleUrl: './projects.scss',
+  ]
 })
-export class ProjectsComponent implements OnInit {
-  form!: FormGroup;
-  showForm = false;
-  editingIndex: number | null = null;
-  projects: Project[] = [];
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+export class ProjectsComponent {
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
-  private datePipe = inject(DatePipe); // Inject DatePipe for formatting
+  private datePipe = inject(DatePipe);
+
+  /** Signal-backed UI state */
+  showForm = signal(false);
+  editingIndex = signal<number | null>(null);
+  projects = signal<Project[]>([]);
+
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+
+  form: FormGroup = this.fb.group({
+    title: ['', Validators.required],
+    role: [''],
+    link: ['', Validators.pattern('^(https?:\\/\\/)?[\\w.-]+\\.[a-z\\.]{2,6}([\\/\\w .-]*)*\\/?$')],
+    startDate: ['', Validators.required],
+    endDate: [''],
+    isCurrent: [false],
+    techStack: this.fb.array([]),
+    bullets: this.fb.array([])
+  });
 
   constructor() {
-    this.initForm();
-    this.setupEndDateToggle();
-  }
-
-  // Helper to format ISO string (or Date object) to "Month, Year" string for display
-  private formatDateForDisplay(dateValue: any): string {
-    if (!dateValue) return '';
-    // Use Angular's DatePipe to format the ISO string or Date object
-    return this.datePipe.transform(dateValue, 'MMMM, yyyy') || '';
-  }
-
-  // No need for parseDisplayDateToDateObject anymore since we store ISO
-
-  private initForm(): void {
-    // Added Validators.pattern for URL validation
-    this.form = this.fb.group({
-      title: ['', Validators.required],
-      role: [''],
-      link: ['', Validators.pattern('^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$')],
-      startDate: ['', Validators.required], // Start Date is required
-      endDate: [''],
-      isCurrent: [false],
-      techStack: this.fb.array([]),
-      bullets: this.fb.array([])
+    /** Sync global project state → local projects signal */
+    effect(() => {
+      const state = this.store.state();
+      this.projects.set(state.projects ?? []);
     });
-  }
 
-  private setupEndDateToggle(): void {
-    this.form.get('isCurrent')?.valueChanges.subscribe(isCurrent => {
-      const endDateControl = this.form.get('endDate');
+    /** Enable/disable endDate based on "isCurrent" */
+    effect(() => {
+      const isCurrent = this.form.get('isCurrent')?.value;
+      const endCtrl = this.form.get('endDate');
       if (isCurrent) {
-        endDateControl?.setValue('');
-        endDateControl?.disable();
+        endCtrl?.disable({ emitEvent: false });
+        endCtrl?.setValue('');
       } else {
-        endDateControl?.enable();
+        endCtrl?.enable({ emitEvent: false });
       }
     });
   }
+
+  // ---------- FORM ARRAY HELPERS ----------
 
   get bullets(): FormArray {
     return this.form.get('bullets') as FormArray;
@@ -98,29 +101,28 @@ export class ProjectsComponent implements OnInit {
     return this.form.get('techStack') as FormArray;
   }
 
-  get techStackControls() {
+  get techStackControls(): FormControl[] {
     return this.techStackArray.controls as FormControl[];
   }
 
-  ngOnInit(): void {
-    this.store.state$.subscribe(state => {
-      this.projects = state.projects || [];
-    });
-  }
+  // ---------- UI ACTIONS ----------
 
   showAddForm(): void {
-    this.showForm = true;
-    this.editingIndex = null;
+    this.showForm.set(true);
+    this.editingIndex.set(null);
     this.form.reset({ isCurrent: false });
+
     this.bullets.clear();
     this.techStackArray.clear();
+
     this.addBullet();
   }
 
   cancelForm(): void {
-    this.showForm = false;
-    this.editingIndex = null;
+    this.showForm.set(false);
+    this.editingIndex.set(null);
     this.form.reset({ isCurrent: false });
+
     this.bullets.clear();
     this.techStackArray.clear();
   }
@@ -129,96 +131,84 @@ export class ProjectsComponent implements OnInit {
     this.bullets.push(this.fb.control(''));
   }
 
-  removeBullet(index: number): void {
+  removeBullet(index: number) {
     this.bullets.removeAt(index);
   }
 
   addTech(event: MatChipInputEvent): void {
-    const value = (event.value || '').trim();
+    const value = (event.value ?? '').trim();
     if (value) {
       this.techStackArray.push(this.fb.control(value));
     }
-    event.chipInput!.clear();
+    event.chipInput?.clear();
   }
 
   removeTech(index: number): void {
     this.techStackArray.removeAt(index);
   }
 
-  editProject(index: number): void {
-    this.editingIndex = index;
-    const proj = this.projects[index];
-    const isOngoing = proj.isCurrent;
+  // ---------- EDIT ----------
+
+  editProject(index: number) {
+    const project = this.projects()[index];
+    this.editingIndex.set(index);
+
+    this.showForm.set(true);
 
     this.bullets.clear();
-    if (proj.bullets && proj.bullets.length > 0) {
-      proj.bullets.forEach(bullet => this.bullets.push(this.fb.control(bullet)));
-    } else {
-      this.addBullet();
-    }
+    project.bullets?.forEach(b => this.bullets.push(this.fb.control(b)));
 
     this.techStackArray.clear();
-    if (proj.techStack && proj.techStack.length > 0) {
-      proj.techStack.forEach(tech => this.techStackArray.push(this.fb.control(tech)));
-    }
+    project.techStack?.forEach(t => this.techStackArray.push(this.fb.control(t)));
 
-    // Since we now store ISO strings, we can directly patch the values.
-    // The DatePicker will correctly read the ISO string and pre-select the date.
     this.form.patchValue({
-      title: proj.title,
-      role: proj.role || '',
-      link: proj.link || '',
-      startDate: proj.startDate,
-      endDate: proj.endDate,
-      isCurrent: isOngoing
+      title: project.title,
+      role: project.role || '',
+      link: project.link || '',
+      startDate: project.startDate,
+      endDate: project.endDate,
+      isCurrent: project.isCurrent
     });
-
-    if (isOngoing) {
-      this.form.get('endDate')?.disable();
-    } else {
-      this.form.get('endDate')?.enable();
-    }
-    this.showForm = true;
   }
+
+  // ---------- SAVE ----------
 
   saveProject(): void {
     if (this.form.invalid) return;
 
-    // getRawValue includes disabled controls
-    const formValue = this.form.getRawValue();
-    const filteredBullets = formValue.bullets.filter((b: string) => b && b.trim());
-    const filteredTechStack = formValue.techStack.filter((t: string) => t && t.trim());
-
-    // The DatePicker input value is typically an ISO string or a Date object.
-    // We will save it as is to keep the full date information.
-    const rawStartDate = formValue.startDate;
-    const rawEndDate = formValue.isCurrent ? '' : formValue.endDate;
+    const v = this.form.getRawValue();
 
     const project: Project = {
-      id: this.editingIndex !== null ? this.projects[this.editingIndex].id : Date.now().toString(),
-      title: formValue.title,
-      role: formValue.role || undefined,
-      link: formValue.link || undefined,
-      startDate: rawStartDate, // Save as ISO string/Date object
-      endDate: rawEndDate,     // Save as ISO string/Date object or empty string
-      isCurrent: formValue.isCurrent,
-      techStack: filteredTechStack,
-      bullets: filteredBullets
+      id:
+        this.editingIndex() !== null
+          ? this.projects()[this.editingIndex()!].id
+          : Date.now().toString(),
+      title: v.title,
+      role: v.role || undefined,
+      link: v.link || undefined,
+      startDate: v.startDate,
+      endDate: v.isCurrent ? '' : v.endDate,
+      isCurrent: v.isCurrent,
+      techStack: v.techStack.filter((t: string) => t.trim()),
+      bullets: v.bullets.filter((b: string) => b.trim())
     };
 
-    let updatedProjects = [...this.projects];
-    if (this.editingIndex !== null) {
-      updatedProjects[this.editingIndex] = project;
+    const updated = [...this.projects()];
+
+    if (this.editingIndex() !== null) {
+      updated[this.editingIndex()!] = project;
     } else {
-      updatedProjects.push(project);
+      updated.push(project);
     }
 
-    this.store.update({ projects: updatedProjects });
+    this.store.update({ projects: updated });
     this.cancelForm();
   }
 
-  deleteProject(index: number): void {
-    const updatedProjects = this.projects.filter((_, i) => i !== index);
-    this.store.update({ projects: updatedProjects });
+  // ---------- DELETE ----------
+
+  deleteProject(index: number) {
+    const updated = this.projects().filter((_, i) => i !== index);
+    this.store.update({ projects: updated });
   }
 }

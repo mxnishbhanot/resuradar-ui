@@ -1,226 +1,207 @@
 <div class="education-container">
-    <div class="section-header">
-        <div class="header-icon-wrapper">
-            <mat-icon class="header-icon">school</mat-icon>
-        </div>
-        <div class="header-content">
-            <h2 class="section-title">Education & Certifications</h2>
-            <p class="section-subtitle">List your academic history, degrees, and relevant professional certifications.</p>
-        </div>
-    </div>
 
-    @if (educationEntries.length > 0 && !showForm) {
+  <div class="section-header">
+    <div class="header-icon-wrapper">
+      <mat-icon class="header-icon">school</mat-icon>
+    </div>
+    <div class="header-content">
+      <h2 class="section-title">Education & Certifications</h2>
+      <p class="section-subtitle">List your academic history, degrees, and relevant professional certifications.</p>
+    </div>
+  </div>
+
+  <!-- List View -->
+  @if (educationEntries().length > 0 && !showForm()) {
     <div class="education-list">
-        @for (entry of educationEntries; track $index) {
+      @for (entry of educationEntries(); track entry.id; let i = $index) {
         <div class="education-card">
-            <div class="card-header">
-                <div class="card-badge">
-                    <mat-icon>menu_book</mat-icon>
-                </div>
-                <div class="card-title-section">
-                    <h3 class="card-title">{{ entry.institution }}</h3>
-                    <p class="card-degree">{{ entry.degree }} in {{ entry.major }}</p>
-                </div>
-                <div class="card-actions">
-                    <button mat-icon-button (click)="editEntry($index)" class="action-btn edit-btn" matTooltip="Edit">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="deleteEntry($index)" class="action-btn delete-btn" matTooltip="Delete">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </div>
+          <div class="card-header">
+            <div class="card-badge"><mat-icon>menu_book</mat-icon></div>
+            <div class="card-title-section">
+              <h3 class="card-title">{{ entry.institution }}</h3>
+              <p class="card-degree">{{ entry.degree }} in {{ entry.major }}</p>
             </div>
-            <div class="card-meta">
-                <div class="meta-item">
-                    <mat-icon class="meta-icon">calendar_today</mat-icon>
-                    <span>{{ entry.startDate | date: 'MMMM, yyyy' }} - {{ entry.isCurrent ? 'Expected ' : '' }}{{ entry.endDate | date: 'MMMM, yyyy' }}</span>
-                </div>
-                @if (entry.gpa) {
-                <div class="meta-item meta-gpa">
-                    <mat-icon class="meta-icon">trending_up</mat-icon>
-                    <span><strong>GPA/Result:</strong> {{ entry.gpa }}</span>
-                </div>
-                }
-                @if (entry.isCurrent) {
-                <div class="meta-badge">
-                    <mat-icon>pending</mat-icon>
-                    <span>In Progress</span>
-                </div>
-                }
+            <div class="card-actions">
+              <button mat-icon-button (click)="editEntry(i)" matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteEntry(i)" matTooltip="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
-            @if (entry.bullets && entry.bullets.length > 0) {
-            <div class="card-bullets">
-                <ul class="bullets-list">
-                    @for (bullet of entry.bullets; track $index) {
-                    <li class="bullet-item">
-                        <mat-icon class="bullet-icon">star</mat-icon>
-                        <span>{{ bullet }}</span>
-                    </li>
-                    }
-                </ul>
+          </div>
+
+          <div class="card-meta">
+            <div class="meta-item">
+              <mat-icon class="meta-icon">calendar_today</mat-icon>
+              <span>
+                {{ entry.startDate | date:'MMMM, yyyy' }}
+                -
+                {{ entry.isCurrent ? 'Present' : (entry.endDate | date:'MMMM, yyyy') || '—' }}
+              </span>
             </div>
+            @if (entry.gpa) {
+              <div class="meta-item meta-gpa">
+                <mat-icon class="meta-icon">trending_up</mat-icon>
+                <span><strong>GPA:</strong> {{ entry.gpa }}</span>
+              </div>
             }
-        </div>
-        }
-    </div>
-    }
+            @if (entry.isCurrent) {
+              <div class="meta-badge">
+                <mat-icon>pending</mat-icon>
+                <span>In Progress</span>
+              </div>
+            }
+          </div>
 
-    @if (educationEntries.length === 0 && !showForm) {
-    <div class="empty-state">
-        <div class="empty-state-icon">
-            <mat-icon>history_edu</mat-icon>
+          @if (entry.bullets.length > 0) {
+            <div class="card-bullets">
+              <ul class="bullets-list">
+                @for (bullet of entry.bullets; track bullet) {
+                  <li class="bullet-item">
+                    <mat-icon class="bullet-icon">star</mat-icon>
+                    <span>{{ bullet }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
         </div>
-        <h3 class="empty-state-title">No Education Details Added</h3>
-        <p class="empty-state-description">Add your highest degree first, followed by relevant certifications or secondary degrees.</p>
-        <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
-            <mat-icon>add_circle</mat-icon>
-            Add Education Entry
+      }
+
+      <div class="controls">
+        <button mat-stroked-button (click)="showAddForm()">
+          <mat-icon>add</mat-icon>
+          Add Another Entry
         </button>
+      </div>
     </div>
-    }
+  }
 
-    @if (educationEntries.length > 0 && !showForm) {
-    <button mat-stroked-button class="add-more-button" (click)="showAddForm()">
-        <mat-icon>add</mat-icon>
-        Add Another Entry
-    </button>
-    }
+  <!-- Empty State -->
+  @else if (!showForm()) {
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <mat-icon>history_edu</mat-icon>
+      </div>
+      <h3 class="empty-state-title">No Education Details Added</h3>
+      <p class="empty-state-description">Add your highest degree first, followed by relevant certifications.</p>
+      <button mat-flat-button color="primary" (click)="showAddForm()">
+        <mat-icon>add_circle</mat-icon>
+        Add Education Entry
+      </button>
+    </div>
+  }
 
-    @if (showForm) {
+  <!-- Form -->
+  @if (showForm()) {
     <div class="form-container">
-        <div class="form-header">
-            <div class="form-header-icon">
-                <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
-            </div>
-            <div class="form-header-text">
-                <h3 class="form-title">{{ editingIndex !== null ? 'Edit Education' : 'Add New Education Entry' }}</h3>
-                <p class="form-subtitle">{{ editingIndex !== null ? 'Update degree or certificate details' : 'Detail your academic background' }}</p>
-            </div>
+      <div class="form-header">
+        <div class="form-header-icon">
+          <mat-icon>{{ editingIndex() !== null ? 'edit' : 'add_circle' }}</mat-icon>
         </div>
-        <form [formGroup]="form" class="education-form">
-            <div class="form-section">
-                <h4 class="form-section-title">
-                    <mat-icon>business</mat-icon>
-                    Institution Details
-                </h4>
-                <div class="form-row">
-                    <mat-form-field appearance="outline" class="form-field full-width">
-                        <mat-label>Institution Name</mat-label>
-                        <input matInput formControlName="institution" placeholder="e.g., Stanford University, Coursera" />
-                        <mat-icon matPrefix>school</mat-icon>
-                        @if (form.get('institution')?.hasError('required')) {
-                        <mat-error>Institution name is required</mat-error>
-                        }
-                    </mat-form-field>
-                </div>
-                <div class="form-row form-row-two">
-                    <mat-form-field appearance="outline" class="form-field">
-                        <mat-label>Degree/Certification</mat-label>
-                        <input matInput formControlName="degree" placeholder="e.g., Master of Science, PMP Certificate" />
-                        <mat-icon matPrefix>badge</mat-icon>
-                        @if (form.get('degree')?.hasError('required')) {
-                        <mat-error>Degree is required</mat-error>
-                        }
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="form-field">
-                        <mat-label>Major/Field of Study</mat-label>
-                        <input matInput formControlName="major" placeholder="e.g., Computer Science, Project Management" />
-                        <mat-icon matPrefix>auto_stories</mat-icon>
-                        @if (form.get('major')?.hasError('required')) {
-                        <mat-error>Major is required</mat-error>
-                        }
-                    </mat-form-field>
-                </div>
-            </div>
-            <div class="form-section">
-                <h4 class="form-section-title">
-                    <mat-icon>date_range</mat-icon>
-                    Timeline & Result
-                </h4>
-                <div class="form-row form-row-three">
-                    <mat-form-field appearance="outline" class="form-field">
-                        <mat-label>Start Date</mat-label>
-                        <input matInput [matDatepicker]="startPickerEdu" formControlName="startDate" placeholder="Select start date" />
-                        <mat-icon matPrefix>event_available</mat-icon>
-                        <mat-datepicker-toggle matIconSuffix [for]="startPickerEdu"></mat-datepicker-toggle>
-                        <mat-datepicker panelClass="custom-dark-datepicker" #startPickerEdu></mat-datepicker>
-                        @if (form.get('startDate')?.hasError('required')) {
-                        <mat-error>Start Date is required</mat-error>
-                        }
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="form-field" [class.disabled-field]="form.get('isCurrent')?.value">
-                        <mat-label>End Date/Expected</mat-label>
-                        <input matInput [matDatepicker]="endPickerEdu" formControlName="endDate" placeholder="Select end date" [disabled]="form.get('isCurrent')?.value" />
-                        <mat-icon matPrefix>event_busy</mat-icon>
-                        <mat-datepicker-toggle matIconSuffix [for]="endPickerEdu"></mat-datepicker-toggle>
-                        <mat-datepicker panelClass="custom-dark-datepicker" #endPickerEdu></mat-datepicker>
-                        @if (form.get('endDate')?.hasError('required') && !form.get('isCurrent')?.value) {
-                        <mat-error>End Date is required</mat-error>
-                        }
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="form-field">
-                        <mat-label>GPA/Result (Optional)</mat-label>
-                        <input matInput formControlName="gpa" placeholder="e.g., 3.8/4.0, First Class" />
-                        <mat-icon matPrefix>grade</mat-icon>
-                    </mat-form-field>
-                </div>
-                <div class="form-row">
-                    <mat-checkbox formControlName="isCurrent" class="current-checkbox" color="primary">
-                        <span class="checkbox-label">
-                            This education is ongoing
-                        </span>
-                    </mat-checkbox>
-                </div>
-            </div>
-            <div class="form-section bullets-section">
-                <div class="bullets-section-header">
-                    <h4 class="form-section-title">
-                        <mat-icon>military_tech</mat-icon>
-                        Honors & Relevant Coursework
-                    </h4>
-                </div>
-                <p class="bullets-hint">
-                    <mat-icon class="hint-icon">lightbulb</mat-icon>
-                    Include distinctions, scholarships, or relevant project work/course titles.
-                </p>
-                <div formArrayName="bullets" class="bullets-container">
-                    @for (bullet of bullets.controls; track $index) {
-                    <div class="bullet-row">
-                        <div class="bullet-number-badge">{{ $index + 1 }}</div>
-                        <mat-form-field appearance="outline" class="bullet-field">
-                            <mat-label>Achievement Point {{ $index + 1 }}</mat-label>
-                            <textarea
-                                matInput
-                                [formControlName]="$index"
-                                rows="3"
-                                placeholder="e.g., Dean's List (4 semesters), Relevant Course: Data Structures (A+)"
-                                cdkTextareaAutosize
-                                cdkAutosizeMinRows="2"
-                                cdkAutosizeMaxRows="5">
-                            </textarea>
-                        </mat-form-field>
-                        <button mat-icon-button type="button" (click)="removeBullet($index)" class="bullet-delete-btn" matTooltip="Remove">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </div>
-                    }
-                    <button mat-stroked-button type="button" (click)="addBullet()" class="add-bullet-btn">
-                        <mat-icon>add</mat-icon>
-                        Add Another Point
-                    </button>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
-                    <mat-icon>close</mat-icon>
-                    Cancel
+        <div class="form-header-text">
+          <h3 class="form-title">{{ editingIndex() !== null ? 'Edit Education' : 'Add New Education Entry' }}</h3>
+        </div>
+      </div>
+
+      <form [formGroup]="form" class="education-form" (ngSubmit)="saveEntry()">
+        <!-- Institution Details -->
+        <div class="form-section">
+          <h4 class="form-section-title"><mat-icon>business</mat-icon> Institution Details</h4>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Institution Name</mat-label>
+              <input matInput formControlName="institution" placeholder="e.g., Stanford University" />
+              <mat-icon matPrefix>school</mat-icon>
+              <mat-error>Institution name is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row form-row-two">
+            <mat-form-field appearance="outline">
+              <mat-label>Degree</mat-label>
+              <input matInput formControlName="degree" />
+              <mat-icon matPrefix>badge</mat-icon>
+              <mat-error>Degree is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Major/Field</mat-label>
+              <input matInput formControlName="major" />
+              <mat-icon matPrefix>auto_stories</mat-icon>
+              <mat-error>Major is required</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="form-section">
+          <h4 class="form-section-title"><mat-icon>date_range</mat-icon> Timeline & Result</h4>
+
+          <div class="form-row form-row-three">
+            <mat-form-field appearance="outline">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+              <mat-error>Start date is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate" [disabled]="!!form.value.isCurrent" />
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>GPA (Optional)</mat-label>
+              <input matInput formControlName="gpa" placeholder="e.g., 3.8/4.0" />
+              <mat-icon matPrefix>grade</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <mat-checkbox formControlName="isCurrent" color="primary">
+            This education is ongoing
+          </mat-checkbox>
+        </div>
+
+        <!-- Bullets -->
+        <div class="form-section bullets-section">
+          <h4 class="form-section-title"><mat-icon>military_tech</mat-icon> Honors & Coursework</h4>
+          <p class="bullets-hint"><mat-icon class="hint-icon">lightbulb</mat-icon> Dean's List, scholarships, relevant courses...</p>
+
+          <div formArrayName="bullets">
+            @for (ctrl of bullets.controls; track ctrl; let i = $index) {
+              <div class="bullet-row">
+                <div class="bullet-number-badge">{{ i + 1 }}</div>
+                <mat-form-field appearance="outline" class="bullet-field">
+                  <textarea matInput [formControlName]="i" rows="3"
+                            placeholder="e.g., Graduated with Honors"></textarea>
+                </mat-form-field>
+                <button mat-icon-button type="button" (click)="removeBullet(i)" matTooltip="Remove">
+                  <mat-icon>close</mat-icon>
                 </button>
-                <button mat-flat-button color="primary" (click)="saveEntry()" [disabled]="form.invalid" class="save-btn">
-                    <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
-                    {{ editingIndex !== null ? 'Update Entry' : 'Add Entry' }}
-                </button>
-            </div>
-        </form>
+              </div>
+            }
+          </div>
+
+          <button mat-stroked-button type="button" (click)="addBullet()">
+            <mat-icon>add</mat-icon> Add Another Point
+          </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="cancelForm()">Cancel</button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+            <mat-icon>{{ editingIndex() !== null ? 'check' : 'add' }}</mat-icon>
+            {{ editingIndex() !== null ? 'Update' : 'Add' }} Entry
+          </button>
+        </div>
+      </form>
     </div>
-    }
+  }
 </div>

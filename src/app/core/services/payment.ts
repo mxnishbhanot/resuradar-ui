@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -15,7 +15,7 @@ export interface InitiatePaymentResponse {
 export interface VerifyPaymentResponse {
   success: boolean;
   data: {
-    status: string;  // 'COMPLETED', 'PENDING', 'FAILED'
+    status: string;  // 'COMPLETED' | 'PENDING' | 'FAILED'
     transactionId?: string;
     amount: number;
     errorCode?: string;
@@ -28,32 +28,35 @@ export interface VerifyPaymentResponse {
 })
 export class PaymentService {
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
-  // Utility method to build headers with bearer token
+  /** 🔐 Build Authorization header */
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('auth_token'); // <-- stored after login
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-    return headers;
+    const token = localStorage.getItem('auth_token');
+    return token
+      ? new HttpHeaders({
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        })
+      : new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 
-  initiatePayment(request: InitiatePaymentRequest): Observable<InitiatePaymentResponse> {
-    const headers = this.getAuthHeaders();
+  /** 💳 Initiate payment session */
+  initiatePayment(
+    request: InitiatePaymentRequest
+  ): Observable<InitiatePaymentResponse> {
     return this.http.post<InitiatePaymentResponse>(
       `${environment.apiUrl}/initiate-payment`,
       request,
-      { headers }
+      { headers: this.getAuthHeaders() }
     );
   }
 
+  /** 🧾 Verify payment status */
   verifyPayment(orderId: string): Observable<VerifyPaymentResponse> {
-    const headers = this.getAuthHeaders();
     return this.http.get<VerifyPaymentResponse>(
       `${environment.apiUrl}/verify-payment/${orderId}`,
-      { headers }
+      { headers: this.getAuthHeaders() }
     );
   }
 }

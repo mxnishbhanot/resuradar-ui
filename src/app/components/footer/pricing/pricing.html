@@ -5,6 +5,7 @@
     <div class="gradient-orb orb-2"></div>
     <div class="mesh-overlay"></div>
   </div>
+
   <div class="container">
     <div class="hero-content">
       <h1 class="hero-title">Simple, Transparent Pricing</h1>
@@ -17,46 +18,67 @@
 <section class="pricing-content">
   <div class="container">
     <div class="pricing-grid">
-      <mat-card
-        *ngFor="let plan of plans"
-        class="plan-card"
-        [class.highlight]="plan.highlight"
-        [class.coming-soon]="plan.comingSoon"
-      >
-        <h3 class="plan-name">{{ plan.name }}</h3>
-        <p class="plan-price">{{ plan.price }}</p>
-        <p class="plan-cycle" *ngIf="plan.cycle">{{ plan.cycle }}</p>
 
-        <ul class="features-list">
-          <li *ngFor="let f of plan.features">
-            <div class="feature-icon-wrapper">
-              <mat-icon class="feature-icon">check</mat-icon>
+      @for (plan of plans; track plan.name) {
+        <mat-card
+          class="plan-card"
+          [class.highlight]="plan.highlight"
+          [class.coming-soon]="plan.comingSoon">
+
+          <h3 class="plan-name">{{ plan.name }}</h3>
+          <p class="plan-price">{{ plan.price }}</p>
+          @if (plan.cycle) {
+            <p class="plan-cycle">{{ plan.cycle }}</p>
+          }
+
+          <ul class="features-list">
+            @for (f of plan.features; track $index) {
+              <li>
+                <div class="feature-icon-wrapper">
+                  <mat-icon class="feature-icon">check</mat-icon>
+                </div>
+                {{ f }}
+              </li>
+            }
+          </ul>
+
+          <!-- Plan CTA / Status -->
+          @if (!plan.comingSoon) {
+
+            @if (plan.type === 'free') {
+              <button
+                mat-flat-button
+                class="plan-cta"
+                (click)="selectPlan(plan)">
+                Get Started
+              </button>
+            }
+
+            @if (plan.type === 'pro' && !isPro()) {
+              <button
+                mat-flat-button
+                class="plan-cta highlight-cta"
+                (click)="selectPlan(plan)">
+                Subscribe
+              </button>
+            }
+
+            @if (plan.type === 'pro' && isPro()) {
+              <div class="pro-status-badge">
+                <mat-icon>check_circle</mat-icon>
+                <span>You're a Pro Member!</span>
+              </div>
+            }
+
+          } @else {
+            <div class="coming-soon-badge">
+              <span class="badge-shimmer"></span>
+              🚧 Coming Soon
             </div>
-            {{ f }}
-          </li>
-        </ul>
+          }
 
-        <ng-container *ngIf="!plan.comingSoon">
-          <button *ngIf="plan.type === 'free'" mat-flat-button class="plan-cta" (click)="selectPlan(plan)">
-            Get Started
-          </button>
-
-          <button *ngIf="plan.type === 'pro' && !isPro" mat-flat-button class="plan-cta highlight-cta"
-            (click)="selectPlan(plan)">
-            Subscribe
-          </button>
-
-          <div *ngIf="plan.type === 'pro' && isPro" class="pro-status-badge">
-            <mat-icon>check_circle</mat-icon>
-            <span>You're a Pro Member!</span>
-          </div>
-        </ng-container>
-
-        <div *ngIf="plan.comingSoon" class="coming-soon-badge">
-          <span class="badge-shimmer"></span>
-          🚧 Coming Soon
-        </div>
-      </mat-card>
+        </mat-card>
+      }
     </div>
 
     <!-- Legacy Note -->
@@ -66,5 +88,6 @@
       </div>
       <p>Users who purchased lifetime access before Feb 2026 retain full Premium benefits.</p>
     </div>
+
   </div>
 </section>

@@ -1,10 +1,20 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { UserService } from '../../../core/services/user';
+
+interface PricingPlan {
+  name: string;
+  type: 'free' | 'pro';
+  price: string;
+  cycle?: string;
+  highlight: boolean;
+  comingSoon: boolean;
+  features: string[];
+}
 
 @Component({
   selector: 'app-pricing',
@@ -14,10 +24,16 @@ import { UserService } from '../../../core/services/user';
   styleUrls: ['./pricing.scss']
 })
 export class Pricing {
+  private router = inject(Router);
   private userService = inject(UserService);
-  user: any = null;
 
-  plans = [
+  /** The user signal from updated service */
+  user = this.userService.user; // <-- this is a signal<UserProfile | null>
+
+  /** Computed signal for Pro status */
+  isPro = computed(() => this.user()?.isPremium === true);
+
+  plans: PricingPlan[] = [
     {
       name: 'Free',
       type: 'free',
@@ -52,37 +68,26 @@ export class Pricing {
       ]
     },
     {
-      name: 'Pro',
+      name: 'Pro (Quarterly)',
       type: 'pro',
       price: '$7.99',
       cycle: 'quarterly',
       highlight: false,
       comingSoon: true,
-      features: [
-        'Everything in Pro'
-      ]
+      features: ['Everything in Pro']
     }
   ];
 
-  constructor(private router: Router) {
-    // Subscribe to user state
-    this.userService.user$.subscribe(user => {
-      this.user = user;
-    });
-  }
-
-  get isPro(): boolean {
-    return this.user?.isPremium === true;
-  }
-
-  selectPlan(plan: any) {
+  /** Called when clicking Free or Pro buttons */
+  selectPlan(plan: PricingPlan) {
     if (plan.type === 'free') {
       this.router.navigate(['/upload']);
-    } else if (plan.type === 'pro' && !this.isPro) {
-      // Only allow upgrade if not already Pro
-      alert('Redirecting to secure checkout...');
-      // TODO: integrate payment flow
+      return;
     }
-    // If already Pro, do nothing (button won't appear)
+
+    if (plan.type === 'pro' && !this.isPro()) {
+      alert('Redirecting to secure checkout...');
+      // TODO: integrate payment
+    }
   }
 }

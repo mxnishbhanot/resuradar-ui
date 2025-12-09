@@ -1,17 +1,29 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common'; // <-- ADD DatePipe
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  inject,
+  signal,
+  computed,
+  effect,
+  untracked,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormArray,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
-// <-- ADD Datepicker Imports
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { TextFieldModule } from '@angular/cdk/text-field';
+
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
 export interface EducationEntry {
@@ -19,8 +31,8 @@ export interface EducationEntry {
   institution: string;
   degree: string;
   major: string;
-  startDate: string; // Stored as ISO string
-  endDate: string;   // Stored as ISO string or ''
+  startDate: string;
+  endDate: string;
   isCurrent: boolean;
   gpa?: string;
   bullets: string[];
@@ -29,177 +41,160 @@ export interface EducationEntry {
 @Component({
   selector: 'rr-education',
   standalone: true,
-  providers: [DatePipe], // <-- ADD DatePipe provider
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    TextFieldModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatCardModule,
     MatCheckboxModule,
     MatTooltipModule,
-    CdkTextareaAutosize,
-    MatDatepickerModule, // <-- ADD MatDatepickerModule
-    MatNativeDateModule,  // <-- ADD MatNativeDateModule
+    MatDatepickerModule,
+    MatNativeDateModule,
+    TextFieldModule,
   ],
   templateUrl: './education.component.html',
   styleUrl: './education.component.scss',
 })
-export class EducationComponent implements OnInit {
-  form!: FormGroup;
-  showForm = false;
-  editingIndex: number | null = null;
-  educationEntries: EducationEntry[] = [];
+export class EducationComponent {
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
-  private datePipe = inject(DatePipe); // Inject DatePipe
+
+  // UI State
+  showForm = signal(false);
+  editingIndex = signal<number | null>(null);
+
+  // Reactive Form
+  form = this.fb.group({
+    institution: ['', Validators.required],
+    degree: ['', Validators.required],
+    major: ['', Validators.required],
+    startDate: [null as Date | null, Validators.required],
+    endDate: [null as Date | null],
+    isCurrent: [false],
+    gpa: [''],
+    bullets: this.fb.array<FormControl<string | null>>([]),
+  });
+
+  educationEntries = computed(() => this.store.state()?.educations ?? []);
+
+  get bullets(): FormArray<FormControl<string | null>> {
+    return this.form.controls.bullets as FormArray<FormControl<string | null>>;
+  }
 
   constructor() {
-    this.initForm();
-    this.setupEndDateToggle();
-  }
-
-  private initForm(): void {
-    this.form = this.fb.group({
-      institution: ['', Validators.required],
-      degree: ['', Validators.required],
-      major: ['', Validators.required],
-      startDate: ['', Validators.required], // <-- Added required validation
-      endDate: [''],
-      isCurrent: [false],
-      gpa: [''],
-      bullets: this.fb.array([])
-    });
-  }
-
-  private setupEndDateToggle(): void {
-    this.form.get('isCurrent')?.valueChanges.subscribe(isCurrent => {
-      const endDateControl = this.form.get('endDate');
-      if (isCurrent) {
-        endDateControl?.clearValidators();
-        endDateControl?.setValue('');
-        endDateControl?.disable();
-      } else {
-        // End date is required only if it's not ongoing
-        endDateControl?.setValidators(Validators.required);
-        endDateControl?.enable();
+    // Auto-add first bullet when form opens
+    effect(() => {
+      if (this.showForm() && this.bullets.length === 0) {
+        untracked(() => this.addBullet());
       }
-      endDateControl?.updateValueAndValidity();
+    });
+
+    // React to isCurrent changes → toggle endDate validation
+    effect(() => {
+      const isCurrent = this.form.controls.isCurrent.value ?? false; // ← Fixed: null-safe
+      const endDateCtrl = this.form.controls.endDate;
+
+      if (isCurrent) {
+        endDateCtrl.setValue(null);
+        endDateCtrl.clearValidators();
+        endDateCtrl.disable({ emitEvent: false });
+      } else {
+        endDateCtrl.enable({ emitEvent: false });
+        endDateCtrl.setValidators(Validators.required);
+      }
+      endDateCtrl.updateValueAndValidity({ emitEvent: false });
     });
   }
 
-  get bullets(): FormArray {
-    return this.form.get('bullets') as FormArray;
+  showAddForm() {
+    this.editingIndex.set(null);
+    this.resetForm();
+    this.showForm.set(true);
   }
 
-  ngOnInit(): void {
-    this.store.state$.subscribe(state => {
-      this.educationEntries = state.educations || [];
-    });
+  cancelForm() {
+    this.showForm.set(false);
+    this.editingIndex.set(null);
   }
 
-  addBullet(): void {
-    this.bullets.push(this.fb.control(''));
-  }
+  editEntry(index: number) {
+    const entry = this.educationEntries()[index];
+    if (!entry) return;
 
-  removeBullet(index: number): void {
-    this.bullets.removeAt(index);
-  }
-
-  showAddForm(): void {
-    this.showForm = true;
-    this.editingIndex = null;
-    this.form.reset({ isCurrent: false });
+    this.editingIndex.set(index);
     this.bullets.clear();
-    this.addBullet();
-    // Ensure endDate validation is active if not 'Ongoing'
-    this.form.get('endDate')?.setValidators(Validators.required);
-    this.form.get('endDate')?.updateValueAndValidity();
-  }
 
-  cancelForm(): void {
-    this.showForm = false;
-    this.editingIndex = null;
-    this.form.reset({ isCurrent: false });
-    this.bullets.clear();
-  }
+    entry.bullets.forEach(b => this.bullets.push(this.fb.control(b)));
 
-  editEntry(index: number): void {
-    this.editingIndex = index;
-    const entry = this.educationEntries[index];
-    const isOngoing = entry.isCurrent;
-
-    this.bullets.clear();
-    if (entry.bullets && entry.bullets.length > 0) {
-      entry.bullets.forEach(bullet => this.bullets.push(this.fb.control(bullet)));
-    } else {
-      this.addBullet();
-    }
-
-    // Patch with stored ISO strings/values for DatePicker and other fields
     this.form.patchValue({
       institution: entry.institution,
       degree: entry.degree,
       major: entry.major,
-      startDate: entry.startDate, // ISO string - DatePicker will read this
-      endDate: entry.endDate,     // ISO string - DatePicker will read this
-      isCurrent: isOngoing,
-      gpa: entry.gpa
+      startDate: entry.startDate ? new Date(entry.startDate) : null,
+      endDate: entry.isCurrent ? null : (entry.endDate ? new Date(entry.endDate) : null),
+      isCurrent: entry.isCurrent,
+      gpa: entry.gpa ?? '',
     });
 
-    // Manually run setup logic to handle required validator for endDate
-    const endDateControl = this.form.get('endDate');
-    if (isOngoing) {
-      endDateControl?.clearValidators();
-      endDateControl?.disable();
-    } else {
-      endDateControl?.setValidators(Validators.required);
-      endDateControl?.enable();
+    this.showForm.set(true);
+  }
+
+  deleteEntry(index: number) {
+    const updated = this.educationEntries().filter((_, i) => i !== index);
+    this.store.update({ educations: updated });
+  }
+
+  addBullet() {
+    this.bullets.push(this.fb.control(''));
+  }
+
+  removeBullet(index: number) {
+    this.bullets.removeAt(index);
+  }
+
+  saveEntry() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
-    endDateControl?.updateValueAndValidity();
 
-    this.showForm = true;
-  }
+    const raw = this.form.getRawValue();
 
-  deleteEntry(index: number): void {
-    const updatedEntries = [...this.educationEntries];
-    updatedEntries.splice(index, 1);
-    this.store.update({ educations: updatedEntries });
-  }
-
-  saveEntry(): void {
-    if (this.form.invalid) return;
-
-    const formValue = this.form.getRawValue();
-    const filteredBullets = formValue.bullets.filter((b: string) => b && b.trim());
-
-    // Store raw date value (ISO string or Date object from DatePicker)
-    const rawStartDate = formValue.startDate;
-    const rawEndDate = formValue.isCurrent ? '' : formValue.endDate;
-
-    const entryData: EducationEntry = {
-      id: this.editingIndex !== null ? this.educationEntries[this.editingIndex].id : Date.now().toString(),
-      institution: formValue.institution,
-      degree: formValue.degree,
-      major: formValue.major,
-      startDate: rawStartDate, // Save as ISO string
-      endDate: rawEndDate,     // Save as ISO string or empty string
-      isCurrent: formValue.isCurrent,
-      gpa: formValue.gpa,
-      bullets: filteredBullets
+    const newEntry: EducationEntry = {
+      id: Date.now().toString(),
+      institution: (raw.institution ?? '').trim(),
+      degree: (raw.degree ?? '').trim(),
+      major: (raw.major ?? '').trim(),
+      startDate: raw.startDate!.toISOString(),
+      endDate: raw.isCurrent ? '' : (raw.endDate?.toISOString() ?? ''),
+      isCurrent: !!raw.isCurrent,
+      gpa: raw.gpa?.trim() || undefined,
+      bullets: (raw.bullets ?? [])
+        .map((b): string => (b ?? '').trim())
+        .filter(Boolean),
     };
 
-    let updatedEntries = [...this.educationEntries];
-    if (this.editingIndex !== null) {
-      updatedEntries[this.editingIndex] = entryData;
-    } else {
-      updatedEntries.push(entryData);
-    }
+    const current = this.educationEntries();
+    const updated = this.editingIndex() !== null
+      ? current.map((e, i) => (i === this.editingIndex() ? { ...newEntry, id: e.id } : e))
+      : [...current, newEntry];
 
-    this.store.update({ educations: updatedEntries });
+    this.store.update({ educations: updated });
     this.cancelForm();
+  }
+
+  private resetForm() {
+    this.form.reset({
+      institution: '',
+      degree: '',
+      major: '',
+      startDate: null,
+      endDate: null,
+      isCurrent: false,
+      gpa: '',
+    });
+    this.bullets.clear();
   }
 }

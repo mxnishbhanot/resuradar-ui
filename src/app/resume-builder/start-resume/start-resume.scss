@@ -1,9 +1,5 @@
 @use '../../../theme/variables' as *;
 
-// ==============================
-// START RESUME SECTION STYLES (unified theme)
-// ==============================
-
 .start-resume-section {
   position: relative;
   max-width: 900px;
@@ -19,7 +15,7 @@
   }
 }
 
-// Animated Background (same as other components)
+// Animated Background
 .background-gradient {
   position: fixed;
   top: 0;
@@ -58,7 +54,7 @@
   66% { transform: translate(-20px, 20px) rotate(240deg); }
 }
 
-// Header (same styling as other components)
+// Header
 .start-resume-header {
   text-align: center;
   margin-bottom: $spacing-2xl;
@@ -123,7 +119,7 @@
   50% { transform: scale(1.05); }
 }
 
-// Options Card (same as other components)
+// Options Card
 .start-resume-card {
   background: $card-bg;
   border-radius: $radius-xl;
@@ -153,7 +149,7 @@
   }
 }
 
-// Choice Buttons (new component specific)
+// Choice Buttons
 .choice-buttons {
   display: flex;
   flex-direction: column;
@@ -231,7 +227,7 @@
   }
 }
 
-// Upload Area (unified styling)
+// Upload Area
 .upload-area {
   border: 2px dashed $border-color;
   border-radius: $radius-lg;
@@ -291,7 +287,7 @@
   }
 }
 
-// Upload States (unified with other components)
+// Upload States
 .upload-initial,
 .upload-loading,
 .upload-complete {
@@ -364,7 +360,7 @@
   }
 }
 
-// File Requirements (same as other components)
+// File Requirements
 .file-requirements {
   display: flex;
   gap: $spacing-lg;
@@ -394,7 +390,7 @@
   }
 }
 
-// Loading Animation (same as other components)
+// Loading Animation
 .loading-animation {
   position: relative;
   width: 120px;
@@ -471,7 +467,7 @@
   100% { width: 100%; }
 }
 
-// Success Animation (same as other components)
+// Success Animation
 .success-animation {
   width: 80px;
   height: 80px;
@@ -512,7 +508,7 @@
   }
 }
 
-// File Info (same as other components)
+// File Info
 .file-info {
   display: flex;
   align-items: center;
@@ -575,7 +571,7 @@
   }
 }
 
-// Reupload Button (same as other components)
+// Reupload Button
 .reupload-btn {
   background: $card-bg !important;
   border: 2px solid $accent-color !important;
@@ -597,7 +593,7 @@
   }
 }
 
-// Privacy Notice (same as other components)
+// Privacy Notice
 .privacy-notice {
   display: flex;
   align-items: center;

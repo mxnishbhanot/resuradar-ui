@@ -1,22 +1,22 @@
-// skeleton.service.ts
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkeletonService {
-  private loadingSubject = new BehaviorSubject<boolean>(true);
-  public loading$ = this.loadingSubject.asObservable();
 
-  // Simulates initial app load
-  setLoading(isLoading: boolean) {
-    this.loadingSubject.next(isLoading);
+  // Signal replaces BehaviorSubject
+  loading = signal<boolean>(true);
+
+  // Update loading state
+  setLoading(isLoading: boolean): void {
+    this.loading.set(isLoading);
   }
 
-  // Simulate content load with minimum display time for smooth UX
-  simulateLoad(minDuration: number = 800) {
+  // Simulate initial loading animation with a minimum duration
+  simulateLoad(minDuration: number = 800): void {
     this.setLoading(true);
+
     setTimeout(() => {
       this.setLoading(false);
     }, minDuration);

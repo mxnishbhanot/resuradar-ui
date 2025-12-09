@@ -1,136 +1,206 @@
-    <div class="skills-container">
-      <!-- Section Header -->
-      <div class="section-header">
-        <div class="header-icon-wrapper">
-          <mat-icon class="header-icon">stars</mat-icon>
+<div class="skills-container">
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <div class="header-icon-wrapper">
+      <mat-icon class="header-icon">stars</mat-icon>
+    </div>
+
+    <div class="header-content">
+      <h2 class="section-title">Skills & Competencies</h2>
+      <p class="section-subtitle">
+        Categorize and list your key skills to highlight your expertise.
+      </p>
+    </div>
+  </div>
+
+  <!-- LIST OF CATEGORIES -->
+  @if (skillCategories().length > 0 && !showForm()) {
+
+  <div class="skills-list">
+
+    @for (category of skillCategories(); track category.id) {
+
+    <div class="skill-card">
+
+      <div class="card-header">
+
+        <div class="card-badge">
+          <mat-icon>category</mat-icon>
         </div>
-        <div class="header-content">
-          <h2 class="section-title">Skills & Competencies</h2>
-          <p class="section-subtitle">Categorize and list your key skills to highlight your expertise.</p>
+
+        <div class="card-title-section">
+          <h3 class="card-title">{{ category.name }}</h3>
+        </div>
+
+        <div class="card-actions">
+          <button mat-icon-button matTooltip="Edit"
+                  (click)="editCategory($index)"
+                  class="action-btn edit-btn">
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <button mat-icon-button matTooltip="Delete"
+                  (click)="deleteCategory($index)"
+                  class="action-btn delete-btn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="card-skills-content">
+        <div class="read-only-chip-set">
+          @for (skill of category.skills; track skill) {
+            <span class="skill-chip">{{ skill }}</span>
+          }
         </div>
       </div>
 
-      <!-- Skills Categories List -->
-      @if (skillCategories.length > 0 && !showForm) {
-        <div class="skills-list">
-          @for (category of skillCategories; track $index) {
-            <div class="skill-card">
-              <div class="card-header">
-                <div class="card-badge">
-                  <mat-icon>category</mat-icon>
-                </div>
-                <div class="card-title-section">
-                  <h3 class="card-title">{{ category.name }}</h3>
-                </div>
-                <div class="card-actions">
-                  <button mat-icon-button (click)="editCategory($index)" class="action-btn edit-btn" matTooltip="Edit">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button (click)="deleteCategory($index)" class="action-btn delete-btn" matTooltip="Delete">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </div>
-              <div class="card-skills-content">
-                <div class="read-only-chip-set">
-                  @for (skill of category.skills; track $index) {
-                    <span class="skill-chip">{{ skill }}</span>
-                  }
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- Empty State -->
-      @if (skillCategories.length === 0 && !showForm) {
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <mat-icon>stars</mat-icon>
-          </div>
-          <h3 class="empty-state-title">No Skills Added Yet</h3>
-          <p class="empty-state-description">Start by creating a category (e.g., Technical, Soft Skills) and add your relevant abilities.</p>
-          <button mat-flat-button color="primary" class="empty-state-button" (click)="showAddForm()">
-            <mat-icon>add_circle</mat-icon>
-            Add Your First Skill Category
-          </button>
-        </div>
-      }
-
-      @if (skillCategories.length > 0 && !showForm) {
-        <button mat-stroked-button class="add-more-button" (click)="showAddForm()">
-          <mat-icon>add</mat-icon>
-          Add Another Category
-        </button>
-      }
-
-      <!-- Skill Category Form -->
-      @if (showForm) {
-        <div class="form-container">
-          <div class="form-header">
-            <div class="form-header-icon">
-              <mat-icon>{{ editingIndex !== null ? 'edit' : 'add_circle' }}</mat-icon>
-            </div>
-            <div class="form-header-text">
-              <h3 class="form-title">{{ editingIndex !== null ? 'Edit Skill Category' : 'Add New Skill Category' }}</h3>
-              <p class="form-subtitle">{{ editingIndex !== null ? 'Update category name and skills' : 'Name your category and list relevant skills' }}</p>
-            </div>
-          </div>
-          <form [formGroup]="form" class="skill-form">
-            <div class="form-section">
-              <h4 class="form-section-title">
-                <mat-icon>info</mat-icon>
-                Category Details
-              </h4>
-              <mat-form-field appearance="outline" class="form-field full-width">
-                <mat-label>Category Name</mat-label>
-                <input matInput formControlName="name" placeholder="e.g., Technical Skills, Languages" />
-                <mat-icon matPrefix>label</mat-icon>
-                @if (form.get('name')?.hasError('required')) {
-                  <mat-error>Category name is required</mat-error>
-                }
-              </mat-form-field>
-            </div>
-            <div class="form-section">
-              <h4 class="form-section-title">
-                <mat-icon>build</mat-icon>
-                Skills in this Category
-              </h4>
-              <div class="chips-input-container">
-                <mat-form-field appearance="outline" class="form-field full-width">
-                  <mat-label>Add Skills</mat-label>
-                  <mat-chip-grid #chipGrid>
-                    @for (skill of skillsControls; track $index) {
-                      <mat-chip-row [editable]="true" (edited)="editSkill($index, $event)">
-                        {{ skill.value }}
-                        <button matChipRemove (click)="removeSkill($index)">
-                          <mat-icon>cancel</mat-icon>
-                        </button>
-                      </mat-chip-row>
-                    }
-                  </mat-chip-grid>
-                  <input
-                    placeholder="e.g., JavaScript, Python, Leadership..."
-                    [matChipInputFor]="chipGrid"
-                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                    (matChipInputTokenEnd)="addSkill($event)"
-                  />
-                  <mat-icon matPrefix>code</mat-icon>
-                </mat-form-field>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
-                <mat-icon>close</mat-icon>
-                Cancel
-              </button>
-              <button mat-flat-button color="primary" (click)="saveCategory()" [disabled]="form.invalid || skillsArray.length === 0" class="save-btn">
-                <mat-icon>{{ editingIndex !== null ? 'check' : 'add' }}</mat-icon>
-                {{ editingIndex !== null ? 'Update Category' : 'Add Category' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      }
     </div>
+
+    }
+
+  </div>
+  }
+
+  <!-- EMPTY STATE -->
+  @if (skillCategories().length === 0 && !showForm()) {
+
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <mat-icon>stars</mat-icon>
+    </div>
+
+    <h3 class="empty-state-title">No Skills Added Yet</h3>
+    <p class="empty-state-description">
+      Start by creating a category (e.g., Technical, Soft Skills) and list your abilities.
+    </p>
+
+    <button mat-flat-button color="primary"
+            class="empty-state-button"
+            (click)="showAddForm()">
+      <mat-icon>add_circle</mat-icon>
+      Add Your First Skill Category
+    </button>
+  </div>
+
+  }
+
+  <!-- ADD MORE BUTTON -->
+  @if (skillCategories().length > 0 && !showForm()) {
+
+    <button mat-stroked-button class="add-more-button"
+            (click)="showAddForm()">
+      <mat-icon>add</mat-icon>
+      Add Another Category
+    </button>
+
+  }
+
+  <!-- CATEGORY FORM -->
+  @if (showForm()) {
+
+  <div class="form-container">
+
+    <div class="form-header">
+      <div class="form-header-icon">
+        <mat-icon>
+          {{ editingIndex() !== null ? 'edit' : 'add_circle' }}
+        </mat-icon>
+      </div>
+
+      <div class="form-header-text">
+        <h3 class="form-title">
+          {{ editingIndex() !== null ? 'Edit Skill Category' : 'Add New Skill Category' }}
+        </h3>
+
+        <p class="form-subtitle">
+          {{ editingIndex() !== null ? 'Update category name and skills'
+                                     : 'Name your category and list relevant skills' }}
+        </p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="skill-form">
+
+      <!-- CATEGORY NAME -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <mat-icon>info</mat-icon>
+          Category Details
+        </h4>
+
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Category Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g., Technical Skills, Languages" />
+          <mat-icon matPrefix>label</mat-icon>
+
+          @if (form.get('name')?.hasError('required')) {
+          <mat-error>Category name is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- SKILLS LIST -->
+      <div class="form-section">
+        <h4 class="form-section-title">
+          <mat-icon>build</mat-icon>
+          Skills in this Category
+        </h4>
+
+        <div class="chips-input-container">
+
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Add Skills</mat-label>
+
+            <mat-chip-grid #chipGrid>
+              @for (skill of skillsControls(); track $index) {
+              <mat-chip-row [editable]="true"
+                            (edited)="editSkill($index, $event)">
+                {{ skill.value }}
+                <button matChipRemove (click)="removeSkill($index)">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+              }
+            </mat-chip-grid>
+
+            <input
+              placeholder="e.g., JavaScript, Python, Leadership..."
+              [matChipInputFor]="chipGrid"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              (matChipInputTokenEnd)="addSkill($event)" />
+
+            <mat-icon matPrefix>code</mat-icon>
+          </mat-form-field>
+        </div>
+
+      </div>
+
+      <!-- FORM ACTIONS -->
+      <div class="form-actions">
+
+        <button mat-stroked-button type="button"
+                class="cancel-btn"
+                (click)="cancelForm()">
+          <mat-icon>close</mat-icon>
+          Cancel
+        </button>
+
+        <button mat-flat-button color="primary"
+                class="save-btn"
+                [disabled]="form.invalid || skillsArray().length === 0"
+                (click)="saveCategory()">
+          <mat-icon>{{ editingIndex() !== null ? 'check' : 'add' }}</mat-icon>
+          {{ editingIndex() !== null ? 'Update Category' : 'Add Category' }}
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+  }
+
+</div>

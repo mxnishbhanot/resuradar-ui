@@ -11,9 +11,12 @@
     <div class="mesh-overlay"></div>
   </div>
 
+  <!-- HEADER -->
   <header class="app-header">
     <div class="header-container">
       <div class="toolbar">
+
+        <!-- Left -->
         <div class="toolbar-left">
           <div class="logo" (click)="navigate('')">
             <div class="logo-icon-wrapper">
@@ -23,17 +26,17 @@
             <span class="logo-text">Resu<span class="logo-highlight">Radar</span></span>
           </div>
 
+          <!-- DESKTOP NAV -->
           <nav class="nav-links desktop-nav">
             <button
               class="nav-link"
               (click)="navigate('upload'); setActiveTab('upload')"
               [class.active]="activeTab() === 'upload'"
               matTooltip="Analyze your resume"
-              matTooltipPosition="below"
-            >
-              <mat-icon>insights</mat-icon>
-              <span>Score</span>
-              <div class="nav-link-indicator"></div>
+              matTooltipPosition="below">
+                <mat-icon>insights</mat-icon>
+                <span>Score</span>
+                <div class="nav-link-indicator"></div>
             </button>
 
             <button
@@ -41,11 +44,10 @@
               (click)="navigate('scan'); setActiveTab('scan')"
               [class.active]="activeTab() === 'scan'"
               matTooltip="Compare resume to JD"
-              matTooltipPosition="below"
-            >
-              <mat-icon>document_scanner</mat-icon>
-              <span>Scan</span>
-              <div class="nav-link-indicator"></div>
+              matTooltipPosition="below">
+                <mat-icon>document_scanner</mat-icon>
+                <span>Scan</span>
+                <div class="nav-link-indicator"></div>
             </button>
 
             <button
@@ -53,20 +55,22 @@
               (click)="navigate('start'); setActiveTab('start')"
               [class.active]="activeTab() === 'start'"
               matTooltip="Build Resume"
-              matTooltipPosition="below"
-            >
-              <mat-icon>description</mat-icon>
-              <span>Build</span>
-              <span class="coming-soon-badge">
-                <span class="badge-shimmer"></span>
-                Beta
-              </span>
-              <div class="nav-link-indicator"></div>
+              matTooltipPosition="below">
+                <mat-icon>description</mat-icon>
+                <span>Build</span>
+                <span class="coming-soon-badge">
+                  <span class="badge-shimmer"></span>
+                  Beta
+                </span>
+                <div class="nav-link-indicator"></div>
             </button>
           </nav>
         </div>
 
+        <!-- RIGHT -->
         <div class="toolbar-right">
+
+          <!-- UPGRADE BUTTON -->
           @if (isLoggedIn() && !isPremium() && !isIpadView()) {
             <button mat-flat-button class="upgrade-btn desktop-only" (click)="openUpgradeModal()">
               <span class="btn-shine"></span>
@@ -75,6 +79,7 @@
             </button>
           }
 
+          <!-- PROFILE OR LOGIN -->
           @if (isLoggedIn()) {
             <div class="user-profile desktop-only">
               <button mat-button class="profile-trigger" (click)="toggleProfileMenu()">
@@ -97,35 +102,35 @@
             </button>
           }
 
-          <button class="mobile-nav-toggle mobile-only" (click)="toggleMobileNav()" mat-icon-button aria-label="Menu">
+          <!-- MOBILE MENU TOGGLE -->
+          <button class="mobile-nav-toggle mobile-only" (click)="toggleMobileNav()" mat-icon-button>
             <mat-icon>{{ mobileNavOpen() ? 'close' : 'menu' }}</mat-icon>
           </button>
         </div>
       </div>
     </div>
 
+    <!-- PROFILE MENU OVERLAY -->
     <div class="profile-menu-overlay" [class.active]="profileMenuOpen()" (click)="toggleProfileMenu()"></div>
 
+    <!-- PROFILE DROPDOWN -->
     <div class="profile-menu-dropdown" [class.active]="profileMenuOpen()">
       <div class="menu-header" (click)="$event.stopPropagation()">
         <div class="avatar-wrapper large">
           @if (avatar()) {
-            <img [src]="avatar()" alt="Profile" class="avatar-image" />
+            <img [src]="avatar()" class="avatar-image" />
           } @else {
-            <div class="avatar-icon">
-              <mat-icon>person</mat-icon>
-            </div>
+            <div class="avatar-icon"><mat-icon>person</mat-icon></div>
           }
-          <div class="avatar-status"></div>
         </div>
 
         <div class="menu-user-info">
           <p class="menu-user-name">{{ userName() }}</p>
           <p class="menu-user-email">{{ userEmail() }}</p>
+
           @if (isPremium()) {
             <span class="premium-badge">
-              <mat-icon>workspace_premium</mat-icon>
-              Pro Member
+              <mat-icon>workspace_premium</mat-icon> Pro Member
             </span>
           }
         </div>
@@ -134,19 +139,15 @@
       <mat-divider></mat-divider>
 
       <button class="menu-item" (click)="navigate('profile'); toggleProfileMenu()">
-        <div class="menu-item-icon">
-          <mat-icon>person_outline</mat-icon>
-        </div>
-        <span class="menu-item-text">My Profile</span>
+        <div class="menu-item-icon"><mat-icon>person_outline</mat-icon></div>
+        <span>My Profile</span>
         <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
       </button>
 
       @if (isLoggedIn()) {
         <button class="menu-item" (click)="navigate('custom-list'); toggleProfileMenu()">
-          <div class="menu-item-icon">
-            <mat-icon>folder_open</mat-icon>
-          </div>
-          <span class="menu-item-text">My Resumes</span>
+          <div class="menu-item-icon"><mat-icon>folder_open</mat-icon></div>
+          <span>My Resumes</span>
           <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
         </button>
       }
@@ -154,53 +155,46 @@
       <mat-divider></mat-divider>
 
       <button class="menu-item sign-out" (click)="googleAuth.logout(); toggleProfileMenu()">
-        <div class="menu-item-icon">
-          <mat-icon>logout</mat-icon>
-        </div>
-        <span class="menu-item-text">Sign Out</span>
+        <div class="menu-item-icon"><mat-icon>logout</mat-icon></div>
+        <span>Sign Out</span>
       </button>
     </div>
   </header>
 
+  <!-- MOBILE NAV OVERLAY -->
   <div class="mobile-nav-overlay" [class.active]="mobileNavOpen()" (click)="toggleMobileNav()"></div>
 
+  <!-- MOBILE DRAWER -->
   <div class="mobile-nav-drawer" [class.active]="mobileNavOpen()">
+
     <div class="mobile-nav-header">
       <div class="logo" (click)="navigate(''); toggleMobileNav()">
-        <div class="logo-icon-wrapper">
-          <img class="logo-icon" src="resuradar.png" alt="ResuRadar" />
-        </div>
+        <div class="logo-icon-wrapper"><img class="logo-icon" src="resuradar.png" /></div>
         <span class="logo-text">Resu<span class="logo-highlight">Radar</span></span>
       </div>
-      <button mat-icon-button (click)="toggleMobileNav()" class="close-btn">
-        <mat-icon>close</mat-icon>
-      </button>
+      <button mat-icon-button (click)="toggleMobileNav()"><mat-icon>close</mat-icon></button>
     </div>
 
     @if (isLoggedIn()) {
+      <!-- MOBILE PROFILE CARD -->
       <div class="mobile-user-section">
         <div class="mobile-user-card" (click)="navigate('profile'); toggleMobileNav()">
           <div class="avatar-wrapper">
             @if (avatar()) {
-              <img [src]="avatar()" alt="Profile" class="avatar-image" />
+              <img [src]="avatar()" class="avatar-image"/>
             } @else {
-              <div class="avatar-icon">
-                <mat-icon>person</mat-icon>
-              </div>
+              <div class="avatar-icon"><mat-icon>person</mat-icon></div>
             }
-            <div class="avatar-status"></div>
           </div>
 
           <div class="mobile-user-info">
             <p class="mobile-user-name">{{ userName() }}</p>
             <p class="mobile-user-email">{{ userEmail() }}</p>
             @if (isPremium()) {
-              <span class="premium-badge-mobile">
-                <mat-icon>workspace_premium</mat-icon>
-                Pro
-              </span>
+              <span class="premium-badge-mobile"><mat-icon>workspace_premium</mat-icon> Pro</span>
             }
           </div>
+
           <mat-icon class="chevron">chevron_right</mat-icon>
         </div>
       </div>
@@ -208,54 +202,63 @@
       <mat-divider></mat-divider>
     }
 
+    <!-- MOBILE NAV LINKS -->
     <nav class="mobile-nav-links">
-      <button
-        class="mobile-nav-link"
+      <!-- SCORE -->
+      <button class="mobile-nav-link"
         [class.active]="activeTab() === 'upload'"
-        (click)="navigate('upload'); setActiveTab('upload'); toggleMobileNav()"
-      >
+        (click)="navigate('upload'); setActiveTab('upload'); toggleMobileNav()">
+
         <div class="mobile-nav-icon"><mat-icon>insights</mat-icon></div>
+
         <div class="mobile-nav-content">
           <span class="mobile-nav-title">Score Resume</span>
           <span class="mobile-nav-desc">Get AI-powered analysis</span>
         </div>
+
         <mat-icon class="chevron">chevron_right</mat-icon>
       </button>
 
-      <button
-        class="mobile-nav-link"
+      <!-- SCAN -->
+      <button class="mobile-nav-link"
         [class.active]="activeTab() === 'scan'"
-        (click)="navigate('scan'); setActiveTab('scan'); toggleMobileNav()"
-      >
+        (click)="navigate('scan'); setActiveTab('scan'); toggleMobileNav()">
+
         <div class="mobile-nav-icon"><mat-icon>document_scanner</mat-icon></div>
+
         <div class="mobile-nav-content">
           <span class="mobile-nav-title">Scan Resume</span>
           <span class="mobile-nav-desc">Compare with job description</span>
         </div>
+
         <mat-icon class="chevron">chevron_right</mat-icon>
       </button>
 
-      <button
-        class="mobile-nav-link"
+      <!-- BUILD -->
+      <button class="mobile-nav-link"
         [class.active]="activeTab() === 'start'"
-        (click)="navigate('start'); setActiveTab('start'); toggleMobileNav()"
-      >
+        (click)="navigate('start'); setActiveTab('start'); toggleMobileNav()">
+
         <div class="mobile-nav-icon"><mat-icon>description</mat-icon></div>
+
         <div class="mobile-nav-content">
           <span class="mobile-nav-title">Build Resume</span>
           <span class="mobile-nav-desc">Create from scratch</span>
           <span class="beta-tag">Beta</span>
         </div>
+
         <mat-icon class="chevron">chevron_right</mat-icon>
       </button>
 
       @if (isLoggedIn()) {
         <button class="mobile-nav-link" (click)="navigate('custom-list'); toggleMobileNav()">
           <div class="mobile-nav-icon"><mat-icon>folder_open</mat-icon></div>
+
           <div class="mobile-nav-content">
             <span class="mobile-nav-title">My Resumes</span>
             <span class="mobile-nav-desc">View saved resumes</span>
           </div>
+
           <mat-icon class="chevron">chevron_right</mat-icon>
         </button>
       }
@@ -263,23 +266,27 @@
 
     <mat-divider></mat-divider>
 
+    <!-- MOBILE ACTIONS -->
     <div class="mobile-nav-actions">
       @if (isLoggedIn() && !isPremium()) {
-        <button mat-flat-button class="mobile-upgrade-btn" (click)="openUpgradeModal(); toggleMobileNav()">
+        <button mat-flat-button class="mobile-upgrade-btn"
+          (click)="openUpgradeModal(); toggleMobileNav()">
           <mat-icon>workspace_premium</mat-icon>
           <span>Upgrade to Pro</span>
         </button>
       }
 
       @if (!isLoggedIn()) {
-        <button mat-flat-button class="mobile-login-btn" (click)="loginWithGoogle(); toggleMobileNav()">
+        <button mat-flat-button class="mobile-login-btn"
+          (click)="loginWithGoogle(); toggleMobileNav()">
           <mat-icon>login</mat-icon>
           <span>Sign In</span>
         </button>
       }
 
       @if (isLoggedIn()) {
-        <button mat-stroked-button class="mobile-logout-btn" (click)="googleAuth.logout(); toggleMobileNav()">
+        <button mat-stroked-button class="mobile-logout-btn"
+          (click)="googleAuth.logout(); toggleMobileNav()">
           <mat-icon>logout</mat-icon>
           <span>Sign Out</span>
         </button>
@@ -287,27 +294,31 @@
     </div>
   </div>
 
+  <!-- MAIN CONTENT -->
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
 
+  <!-- FOOTER -->
   @if (shouldRender()) {
     <footer class="app-footer">
       <div class="footer-content">
         <div class="footer-grid">
+
           <div class="footer-brand">
             <div class="logo" (click)="navigate('')">
-              <div class="logo-icon-wrapper">
-                <img class="logo-icon" src="resuradar.png" alt="ResuRadar" />
-              </div>
+              <div class="logo-icon-wrapper"><img class="logo-icon" src="resuradar.png" /></div>
               <span class="logo-text">Resu<span class="logo-highlight">Radar</span></span>
             </div>
+
             <p class="footer-tagline">AI-powered resume optimization for ambitious professionals</p>
+
             <div class="social-links">
-              <button mat-icon-button class="social-btn" (click)="exteranlLink('site')" matTooltip="Visit Website">
+              <button mat-icon-button matTooltip="Website" (click)="externalLink('site')">
                 <mat-icon>language</mat-icon>
               </button>
-              <button mat-icon-button class="social-btn" (click)="exteranlLink('linkedin')" matTooltip="LinkedIn">
+
+              <button mat-icon-button matTooltip="LinkedIn" (click)="externalLink('linkedin')">
                 <mat-icon>link</mat-icon>
               </button>
             </div>
@@ -332,20 +343,25 @@
               <a routerLink="/contact">Contact</a>
             </div>
           </div>
+
         </div>
 
         <div class="footer-bottom">
           <p>&copy; 2025 ResuRadar. All rights reserved.</p>
+
           <div class="footer-bottom-links">
-            <a routerLink="/terms-of-service">Terms of Service</a>
-            <span class="separator">•</span>
+            <a routerLink="/terms-of-service">Terms</a>
+            <span>•</span>
             <a routerLink="/privacy-policy">Privacy</a>
           </div>
         </div>
       </div>
     </footer>
 
-    <button class="scroll-to-top-btn" [class.visible]="showBackToTop()" (click)="scrollToTop()" mat-fab aria-label="Scroll to top" matTooltip="Back to Top">
+    <!-- SCROLL TO TOP -->
+    <button class="scroll-to-top-btn" mat-fab matTooltip="Back to Top"
+      [class.visible]="showBackToTop()"
+      (click)="scrollToTop()">
       <mat-icon>arrow_upward</mat-icon>
     </button>
   }

@@ -1,169 +1,185 @@
 <div class="start-resume-section">
-  <!-- Animated Background -->
+
   <div class="background-gradient"></div>
 
-  <!-- Header -->
   <div class="start-resume-header">
     <div class="header-badge">
       <mat-icon>auto_awesome</mat-icon>
       <span>AI-Powered Builder</span>
     </div>
+
     <h1 class="start-resume-title">Build Your Professional Resume</h1>
+
     <p class="start-resume-subtitle">
       Start fresh or upload an existing resume to enhance with our AI-powered builder
     </p>
   </div>
 
-  <!-- Options Card -->
-  <mat-card class="start-resume-card" [class.drag-over]="isDragOver">
+
+  <mat-card class="start-resume-card" [class.drag-over]="isDragOver()">
+
     <mat-card-content>
+
       <div class="start-resume-content">
-        <!-- Show sign-in section if not authenticated -->
-        <div class="auth-required-section" *ngIf="!isLoggedIn">
-          <div class="auth-icon-wrapper">
-            <div class="auth-icon-bg"></div>
-            <mat-icon class="auth-icon">lock</mat-icon>
-          </div>
-          <h3 class="auth-state-title">Sign In to Continue</h3>
-          <p class="auth-state-desc">
-            Unlock the full resume builder experience with your Google account
-          </p>
 
-          <div class="feature-highlights">
-            <div class="feature-item">
-              <mat-icon class="feature-icon">check_circle</mat-icon>
-              <span>Save your progress</span>
-            </div>
-            <div class="feature-item">
-              <mat-icon class="feature-icon">check_circle</mat-icon>
-              <span>Access premium templates</span>
-            </div>
-            <div class="feature-item">
-              <mat-icon class="feature-icon">check_circle</mat-icon>
-              <span>Export to multiple formats</span>
-            </div>
-          </div>
+        <!-- AUTH REQUIRED -->
+        @if (!isLoggedIn()) {
+          <div class="auth-required-section">
 
-          <button
-            mat-flat-button
-            class="signin-btn"
-            (click)="openLogin()">
-            <mat-icon>login</mat-icon>
-            <span>Sign In with Google</span>
-          </button>
-        </div>
-
-        <!-- Choice Buttons (shown when logged in) -->
-        <div class="choice-buttons" *ngIf="isLoggedIn">
-          <button
-            mat-flat-button
-            color="primary"
-            class="choice-btn"
-            (click)="startFromScratch()">
-            <mat-icon>add</mat-icon>
-            <span>Start from Scratch</span>
-          </button>
-
-          <div class="or-separator">
-            <span>or</span>
-          </div>
-
-          <!-- Upload Area -->
-          <div
-            class="upload-area"
-            (click)="fileInput.click()"
-            (drop)="onFileDropped($event)"
-            (dragover)="onDragOver($event)"
-            (dragleave)="onDragLeave($event)"
-            [class.has-file]="selectedFileName"
-          >
-            <input
-              type="file"
-              #fileInput
-              (change)="onFileSelected($event)"
-              accept=".pdf,.doc,.docx"
-              hidden
-            />
-
-            <!-- Initial State -->
-            <div class="upload-initial" *ngIf="!selectedFileName && !isUploading">
-              <div class="upload-icon-wrapper">
-                <div class="upload-icon-bg"></div>
-                <mat-icon class="upload-icon">cloud_upload</mat-icon>
-              </div>
-              <h3 class="upload-state-title">Upload Existing Resume</h3>
-              <p class="upload-state-desc">
-                Drag & drop your PDF or DOCX file here, or <span class="highlight-text">click to browse</span>
-              </p>
-              <div class="file-requirements">
-                <div class="requirement-item">
-                  <mat-icon>check_circle</mat-icon>
-                  <span>PDF & DOCX supported</span>
-                </div>
-                <div class="requirement-item">
-                  <mat-icon>check_circle</mat-icon>
-                  <span>Max 5MB</span>
-                </div>
-                <div class="requirement-item">
-                  <mat-icon>check_circle</mat-icon>
-                  <span>AI processing</span>
-                </div>
-              </div>
+            <div class="auth-icon-wrapper">
+              <div class="auth-icon-bg"></div>
+              <mat-icon class="auth-icon">lock</mat-icon>
             </div>
 
-            <!-- Loading State -->
-            <div class="upload-loading" *ngIf="isUploading">
-              <div class="loading-animation">
-                <div class="spinner"></div>
-                <div class="pulse-ring"></div>
-              </div>
-              <h3 class="upload-state-title">Processing Resume</h3>
-              <p class="upload-state-desc">Extracting and structuring your resume data...</p>
-            </div>
+            <h3 class="auth-state-title">Sign In to Continue</h3>
 
-            <!-- File Selected -->
-            <div class="upload-complete" *ngIf="selectedFileName && !isUploading">
-              <div class="success-animation">
+            <p class="auth-state-desc">
+              Unlock the full resume builder experience with your Google account
+            </p>
+
+            <div class="feature-highlights">
+              <div class="feature-item">
                 <mat-icon>check_circle</mat-icon>
+                <span>Save your progress</span>
               </div>
-              <div class="file-info">
-                <div class="file-icon">
-                  <mat-icon>description</mat-icon>
-                </div>
-                <div class="file-details">
-                  <h4>{{ selectedFileName }}</h4>
-                </div>
-                <button
-                  mat-icon-button
-                  class="remove-btn"
-                  (click)="resetUpload(); $event.stopPropagation()"
-                  matTooltip="Remove file">
-                  <mat-icon>close</mat-icon>
-                </button>
+              <div class="feature-item">
+                <mat-icon>check_circle</mat-icon>
+                <span>Access premium templates</span>
               </div>
-              <button
-                mat-flat-button
-                color="primary"
-                class="reupload-btn"
-                (click)="fileInput.click(); $event.stopPropagation()">
-                <mat-icon>swap_horiz</mat-icon>
-                <span>Choose Different File</span>
-              </button>
+              <div class="feature-item">
+                <mat-icon>check_circle</mat-icon>
+                <span>Export to multiple formats</span>
+              </div>
+            </div>
+
+            <button mat-flat-button class="signin-btn" (click)="openLogin()">
+              <mat-icon>login</mat-icon>
+              <span>Sign In with Google</span>
+            </button>
+
+          </div>
+        }
+
+
+        <!-- OPTIONS WHEN LOGGED IN -->
+        @if (isLoggedIn()) {
+          <div class="choice-buttons">
+
+            <button mat-flat-button class="choice-btn" (click)="startFromScratch()">
+              <mat-icon>add</mat-icon>
+              <span>Start from Scratch</span>
+            </button>
+
+            <div class="or-separator"><span>or</span></div>
+
+            <!-- UPLOAD AREA -->
+            <div class="upload-area"
+                 (click)="fileInput.click()"
+                 (drop)="onFileDropped($event)"
+                 (dragover)="onDragOver($event)"
+                 (dragleave)="onDragLeave($event)"
+                 [class.has-file]="selectedFileName()">
+
+              <input type="file"
+                     #fileInput
+                     hidden
+                     accept=".pdf,.doc,.docx"
+                     (change)="onFileSelected($event)" />
+
+
+              <!-- Initial -->
+              @if (!selectedFileName() && !isUploading()) {
+                <div class="upload-initial">
+                  <div class="upload-icon-wrapper">
+                    <div class="upload-icon-bg"></div>
+                    <mat-icon>cloud_upload</mat-icon>
+                  </div>
+
+                  <h3 class="upload-state-title">Upload Existing Resume</h3>
+
+                  <p class="upload-state-desc">
+                    Drag & drop your file here, or <span class="highlight-text">click to browse</span>
+                  </p>
+
+                  <div class="file-requirements">
+                    <div class="requirement-item">
+                      <mat-icon>check_circle</mat-icon> PDF & DOCX supported
+                    </div>
+                    <div class="requirement-item">
+                      <mat-icon>check_circle</mat-icon> Max 5MB
+                    </div>
+                    <div class="requirement-item">
+                      <mat-icon>check_circle</mat-icon> AI processing
+                    </div>
+                  </div>
+                </div>
+              }
+
+
+              <!-- Uploading -->
+              @if (isUploading()) {
+                <div class="upload-loading">
+                  <div class="loading-animation">
+                    <div class="spinner"></div>
+                    <div class="pulse-ring"></div>
+                  </div>
+                  <h3 class="upload-state-title">Processing Resume</h3>
+                  <p class="upload-state-desc">Extracting and structuring your resume...</p>
+                </div>
+              }
+
+
+              <!-- File Uploaded -->
+              @if (selectedFileName() && !isUploading()) {
+                <div class="upload-complete">
+
+                  <div class="success-animation">
+                    <mat-icon>check_circle</mat-icon>
+                  </div>
+
+                  <div class="file-info">
+                    <mat-icon>description</mat-icon>
+
+                    <div class="file-details">
+                      <h4>{{ selectedFileName() }}</h4>
+                    </div>
+
+                    <button mat-icon-button
+                            class="remove-btn"
+                            (click)="resetUpload(); $event.stopPropagation()">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+
+                  <button mat-flat-button
+                          class="reupload-btn"
+                          (click)="fileInput.click(); $event.stopPropagation()">
+                    <mat-icon>swap_horiz</mat-icon>
+                    Choose Different File
+                  </button>
+                </div>
+              }
+
             </div>
           </div>
-        </div>
+        }
+
       </div>
+
     </mat-card-content>
+
   </mat-card>
 
-  <!-- Privacy Notice -->
+
   <div class="privacy-notice">
     <div class="privacy-icon">
       <mat-icon>verified_user</mat-icon>
     </div>
+
     <div class="privacy-content">
       <strong>Bank-Grade Security</strong>
-      <span>We use enterprise-grade encryption and never share your resume with third parties.</span>
+      <span>Your resume is encrypted and never shared with third parties.</span>
     </div>
   </div>
+
 </div>

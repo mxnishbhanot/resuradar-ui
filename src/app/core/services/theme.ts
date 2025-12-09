@@ -1,35 +1,52 @@
-import { Injectable } from '@angular/core';
-import { signal } from '@angular/core';
+import { Injectable, signal, effect } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-  // 'light' | 'dark'
-  theme = signal<'light' | 'dark'>(this._initialTheme());
+
+  // Reactive theme signal
+  theme = signal<'light' | 'dark'>(this.getInitialTheme());
 
   constructor() {
-    this.apply(this.theme());
+    // Reactive auto-apply — runs whenever theme() changes
+    effect(() => {
+      const current = this.theme();
+      this.applyThemeClass(current);
+      localStorage.setItem('theme', current);
+    });
   }
 
-  private _initialTheme(): 'light' | 'dark' {
+  // Determine initial theme
+  private getInitialTheme(): 'light' | 'dark' {
+    if (typeof window === 'undefined') return 'light';
+
     const stored = localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') return stored;
-    // respect system preference
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDark ? 'dark' : 'light';
+
+    // System preference
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
   }
 
-  apply(mode: 'light' | 'dark') {
+  // Applies class to document body
+  private applyThemeClass(mode: 'light' | 'dark'): void {
+    if (typeof document === 'undefined') return;
+
     const body = document.body;
     body.classList.remove('light-theme', 'dark-theme');
     body.classList.add(`${mode}-theme`);
-    localStorage.setItem('theme', mode);
-    this.theme.set(mode);
   }
 
-  toggle() {
+  // Toggle theme mode
+  toggle(): void {
     const next = this.theme() === 'light' ? 'dark' : 'light';
-    this.apply(next);
+    this.theme.set(next);
+  }
+
+  // Explicit setter (optional)
+  setTheme(mode: 'light' | 'dark') {
+    this.theme.set(mode);
   }
 }

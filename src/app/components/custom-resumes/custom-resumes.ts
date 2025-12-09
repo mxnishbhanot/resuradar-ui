@@ -2,113 +2,136 @@ import { Component, inject, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ResumeService } from '../../core/services/resume';
+import { AtsResume, BuilderResume, JdResume, ResumeListResponse, ResumeType } from '../../shared/models/resume.model';
 
-type ResumeType = 'builder' | 'ats' | 'jd';
-type FilterType = 'all' | ResumeType;
-
-interface Resume {
+interface UnifiedResume {
   id: string;
   title: string;
   type: ResumeType;
   isDraft: boolean;
   updatedAt: string;
-  completionPercentage?: number;
+  completionPercentage: number;
   atsScore?: number;
   matchScore?: number;
   jobTitle?: string;
   analysis?: any;
 }
 
+type FilterType = 'all' | ResumeType;
+
 @Component({
   selector: 'rr-custom-resumes',
   standalone: true,
+  templateUrl: './custom-resumes.html',
+  styleUrls: ['./custom-resumes.scss'],
   imports: [
     CommonModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule,
-    MatTooltipModule
-  ],
-  templateUrl: './custom-resumes.html',
-  styleUrls: ['./custom-resumes.scss']
+    MatTooltipModule,
+    MatProgressSpinnerModule
+  ]
 })
 export class CustomResumesComponent implements OnInit {
-
-  // --- Signals for Resume Buckets ---
-  builderResumes = signal<Resume[]>([]);
-  atsResumes = signal<Resume[]>([]);
-  jdResumes = signal<Resume[]>([]);
-
-  // UI Signals
-  isLoading = signal<boolean>(true);
-  activeFilter = signal<FilterType>('all');
-  currentPage = signal<number>(1);
-  itemsPerPage = signal<number>(8);
 
   private router = inject(Router);
   private resumeBuilderService = inject(ResumeBuilderService);
   private resumeService = inject(ResumeService);
 
+  // Signals for all resume categories
+  builderResumes = signal<UnifiedResume[]>([]);
+  atsResumes = signal<UnifiedResume[]>([]);
+  jdResumes = signal<UnifiedResume[]>([]);
+
+  // UI signals
+  isLoading = signal<boolean>(true);
+  activeFilter = signal<FilterType>('all');
+  currentPage = signal<number>(1);
+  itemsPerPage = signal<number>(8);
+
+  // -------------------------------
+  // INIT
+  // -------------------------------
   ngOnInit(): void {
     this.loadAllResumes();
   }
 
+  // -------------------------------
+  // LOAD ALL RESUME SOURCES STRICTLY
+  // -------------------------------
   loadAllResumes(): void {
     this.isLoading.set(true);
 
     forkJoin({
-      builder: this.resumeBuilderService.getAllResumes().pipe(catchError(() => of({ resumes: [] }))),
-      ats: this.resumeService.getResumeHistory('ats').pipe(catchError(() => of({ data: [] }))),
-      jd: this.resumeService.getResumeHistory('jd').pipe(catchError(() => of({ data: [] })))
+      builder: this.resumeBuilderService.getAllResumes().pipe(
+        catchError(() => of({ resumes: [] } satisfies ResumeListResponse<BuilderResume>))
+      ),
+      ats: this.resumeService.getResumeHistory('ats').pipe(
+        catchError(() => of({ data: [] } satisfies ResumeListResponse<AtsResume>))
+      ),
+      jd: this.resumeService.getResumeHistory('jd').pipe(
+        catchError(() => of({ data: [] } satisfies ResumeListResponse<JdResume>))
+      )
     }).subscribe({
       next: (results) => {
+        // -------------------------
+        // SAFE EXTRACTION HELPERS
+        // -------------------------
+        const extract = <T>(res: ResumeListResponse<T>): T[] =>
+          Array.isArray(res.resumes) ? res.resumes :
+            Array.isArray(res.data) ? res.data :
+              [];
 
-        // Builder
+        const builderList = extract(results.builder);
+        const atsList = extract(results.ats);
+        const jdList = extract(results.jd);
+
+        // -------------------------
+        // NORMALIZATION TO UNIFIED FORMAT
+        // -------------------------
         this.builderResumes.set(
-          (results.builder?.resumes || []).map((r: any) => ({
-            id: r._id || r.id,
-            title: this.getBuilderTitle(r),
+          builderList.map((r: BuilderResume) => ({
+            id: r._id,
+            title: r.personal?.headline || 'Untitled Resume',
             type: 'builder',
-            isDraft: r.isDraft ?? true,
-            completionPercentage: r.completionPercentage || 0,
-            updatedAt: r.updatedAt
+            isDraft: r.isDraft,
+            updatedAt: r.updatedAt,
+            completionPercentage: r.completionPercentage ?? 0
           }))
         );
 
-        // ATS scans
         this.atsResumes.set(
-          (results.ats?.data || []).map((r: any) => ({
+          atsList.map((r: any) => ({
             id: r._id,
             title: r.filename || 'ATS Scan',
             type: 'ats',
             isDraft: false,
-            atsScore: r.score || 0,
-            analysis: r.analysis,
             updatedAt: r.updatedAt,
-            completionPercentage: r.score
+            completionPercentage: r.score ?? 0,
+            atsScore: r.score ?? 0,
+            analysis: r.analysis
           }))
         );
 
-        // Job Match scans
         this.jdResumes.set(
-          (results.jd?.data || []).map((r: any) => ({
+          jdList.map((r: any) => ({
             id: r._id,
             title: r.filename || 'Job Match',
             type: 'jd',
             isDraft: false,
-            matchScore: r.score || 0,
-            jobTitle: r.jobDescription?.title,
-            analysis: r.analysis,
             updatedAt: r.updatedAt,
-            completionPercentage: r.score
+            completionPercentage: r.score ?? 0,
+            matchScore: r.score ?? 0,
+            jobTitle: r.jobDescription?.title,
+            analysis: r.analysis
           }))
         );
 
@@ -118,25 +141,26 @@ export class CustomResumesComponent implements OnInit {
     });
   }
 
+  // -------------------------------
+  // COMPUTED SIGNALS
+  // -------------------------------
   allResumes = computed(() => [
     ...this.builderResumes(),
     ...this.atsResumes(),
     ...this.jdResumes()
   ]);
 
-  filteredResumes = computed<Resume[]>(() => {
+  filteredResumes = computed(() => {
     const filter = this.activeFilter();
-    let list;
 
-    switch (filter) {
-      case 'builder': list = this.builderResumes(); break;
-      case 'ats':     list = this.atsResumes(); break;
-      case 'jd':      list = this.jdResumes(); break;
-      default:        list = this.allResumes();
-    }
+    let list =
+      filter === 'builder' ? this.builderResumes() :
+        filter === 'ats' ? this.atsResumes() :
+          filter === 'jd' ? this.jdResumes() :
+            this.allResumes();
 
-    return [...list].sort((a, b) =>
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    return [...list].sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
   });
 
@@ -144,7 +168,7 @@ export class CustomResumesComponent implements OnInit {
     Math.ceil(this.filteredResumes().length / this.itemsPerPage())
   );
 
-  paginatedResumes = computed<Resume[]>(() => {
+  paginatedResumes = computed(() => {
     const page = this.currentPage();
     const perPage = this.itemsPerPage();
     const start = (page - 1) * perPage;
@@ -162,6 +186,9 @@ export class CustomResumesComponent implements OnInit {
     this.jdResumes().length
   );
 
+  // -------------------------------
+  // UI HANDLERS
+  // -------------------------------
   setFilter(filter: FilterType): void {
     this.activeFilter.set(filter);
     this.currentPage.set(1);
@@ -176,7 +203,7 @@ export class CustomResumesComponent implements OnInit {
     this.router.navigate(['/start']);
   }
 
-  handleResumeClick(resume: Resume): void {
+  handleResumeClick(resume: UnifiedResume): void {
     if (resume.type === 'builder') {
       this.router.navigate(['/build'], { queryParams: { resumeId: resume.id } });
       return;
@@ -196,24 +223,26 @@ export class CustomResumesComponent implements OnInit {
 
   getTypeIcon(type: ResumeType): string {
     return type === 'builder' ? 'edit_document' :
-           type === 'ats'     ? 'analytics' :
-                                'work';
+      type === 'ats' ? 'analytics' :
+        'work';
   }
 
   getTypeLabel(type: ResumeType): string {
     return type === 'builder' ? 'Builder' :
-           type === 'ats'     ? 'ATS Scan' :
-                                'Job Match';
+      type === 'ats' ? 'ATS Scan' :
+        'Job Match';
   }
 
-  getScoreClass(score?: number): string {
-    const s = score || 0;
-    return s >= 80 ? 'score-high' : s >= 50 ? 'score-medium' : 'score-low';
+  getScoreClass(score = 0): string {
+    return score >= 80 ? 'score-high' :
+      score >= 50 ? 'score-medium' :
+        'score-low';
   }
 
-  getProgressClass(percentage?: number): string {
-    const p = percentage || 0;
-    return p >= 80 ? 'progress-high' : p >= 50 ? 'progress-medium' : 'progress-low';
+  getProgressClass(p = 0): string {
+    return p >= 80 ? 'progress-high' :
+      p >= 50 ? 'progress-medium' :
+        'progress-low';
   }
 
   formatDate(dateStr: string): string {
@@ -224,11 +253,6 @@ export class CustomResumesComponent implements OnInit {
     });
   }
 
-  getBuilderTitle(resume: any): string {
-    return resume.personal?.headline || 'Untitled Resume';
-  }
-
-  // Empty State Helpers
   getEmptyStateTitle(): string {
     return 'No Resumes Found';
   }

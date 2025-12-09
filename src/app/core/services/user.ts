@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface UserProfile {
@@ -11,7 +11,6 @@ export interface UserProfile {
   joinedDate?: any;
   resumeCount?: number;
   picture: string;
-
 }
 
 @Injectable({
@@ -19,49 +18,56 @@ export interface UserProfile {
 })
 export class UserService {
 
-  private userSubject = new BehaviorSubject<UserProfile | null>(null);
-  user$ = this.userSubject.asObservable(); // public observable for components
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) { }
+  user = signal<UserProfile | null>(null);
 
-  /** Utility: build headers with auth token */
+  isLoggedIn = computed(() => !!this.user());
+
+  isProUser = computed(() => !!this.user()?.isPremium);
+
+  constructor() {}
+
+  /** 🔐 Build Authorization Header */
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('auth_token');
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
-    return headers;
+    return token
+      ? new HttpHeaders({
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        })
+      : new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 
-  /** Fetch current user from backend and update BehaviorSubject */
-  fetchCurrentUser(): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${environment.apiUrl}/user/me`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      tap(user => this.userSubject.next(user))
-    );
+  /** 👤 Fetch current user */
+  fetchCurrentUser() {
+    return this.http
+      .get<UserProfile>(`${environment.apiUrl}/user/me`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(tap((user) => this.user.set(user)));
   }
 
-  /** Get latest value synchronously (optional helper) */
+  /** 🔄 Synchronous getter (optional utility) */
   get currentUser(): UserProfile | null {
-    return this.userSubject.value;
+    return this.user();
   }
 
-  /** Update user in subject manually after payment success */
+  /** ⭐ Mark user as Pro after successful payment */
   markUserAsPro() {
-    const current = this.userSubject.value;
+    const current = this.user();
     if (current) {
-      this.userSubject.next({ ...current, isPremium: true });
+      this.user.set({ ...current, isPremium: true });
     }
   }
 
-  /** Clear user state on logout */
+  /** 🚪 Logout / clear user state */
   clearUser() {
-    this.userSubject.next(null);
+    this.user.set(null);
   }
 
-  sendContact(payload: any): Observable<any> {
+  /** ✉ Contact Support */
+  sendContact(payload: any) {
     return this.http.post(`${environment.apiUrl}/contact`, payload);
   }
-
-
 }

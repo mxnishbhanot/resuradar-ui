@@ -5,6 +5,7 @@
     <div class="gradient-orb orb-2"></div>
     <div class="mesh-overlay"></div>
   </div>
+
   <div class="container">
     <div class="hero-content">
       <h1 class="hero-title">Contact Us</h1>
@@ -15,72 +16,69 @@
   </div>
 </section>
 
-<!-- Form Only -->
+<!-- Form -->
 <section class="contact-content">
   <div class="container">
     <mat-card class="form-card">
-      <form *ngIf="!submitted" (ngSubmit)="onSubmit()" class="contact-form">
-        <div class="form-group">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Full Name</mat-label>
-            <input
-              matInput
-              [(ngModel)]="name"
-              name="name"
-              type="text"
-              required
-              placeholder="Enter your name"
-            />
-            <mat-icon matPrefix>person</mat-icon>
-          </mat-form-field>
-        </div>
 
-        <div class="form-group">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Email Address</mat-label>
-            <input
-              matInput
-              [(ngModel)]="email"
-              name="email"
-              type="email"
-              required
-              placeholder="you@example.com"
-            />
-            <mat-icon matPrefix>email</mat-icon>
-          </mat-form-field>
-        </div>
+      @if (!submitted()) {
+        <form (ngSubmit)="onSubmit()" class="contact-form">
 
-        <div class="form-group">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Message</mat-label>
-            <textarea
-              matInput
-              [(ngModel)]="message"
-              name="message"
-              rows="5"
-              required
-              placeholder="How can we help you?"
-              cdkTextareaAutosize
-              cdkAutosizeMinRows="5"
-              cdkAutosizeMaxRows="10"
-            ></textarea>
-            <mat-icon matPrefix>message</mat-icon>
-          </mat-form-field>
-        </div>
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Full Name</mat-label>
+              <input
+                matInput
+                [value]="name()"
+                (input)="name.set($any($event.target).value)"
+                type="text"
+                required
+                placeholder="Enter your name"
+              />
+              <mat-icon matPrefix>person</mat-icon>
+            </mat-form-field>
+          </div>
 
-        <button type="submit" class="submit-btn" [disabled]="!name || !email || !message">
-          <mat-icon>send</mat-icon>
-          Send Message
-        </button>
-      </form>
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Email Address</mat-label>
+              <input
+                matInput
+                [value]="email()"
+                (input)="email.set($any($event.target).value)"
+                type="email"
+                required
+                placeholder="you@example.com"
+              />
+              <mat-icon matPrefix>email</mat-icon>
+            </mat-form-field>
+          </div>
 
-      <div *ngIf="submitted" class="success-message">
-        <div class="check-icon">
-          <mat-icon>check_circle</mat-icon>
-        </div>
-        <h2 class="success-title">Message Sent!</h2>
-        <p class="success-description">Thanks for reaching out, {{ name }}. Our team will get back to you shortly.</p>
-      </div>
-    </mat-card>
-  </div>
-</section>
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Message</mat-label>
+              <textarea
+                matInput
+                [value]="message()"
+                (input)="message.set($any($event.target).value)"
+                rows="5"
+                required
+                placeholder="How can we help you?"
+                cdkTextareaAutosize
+                cdkAutosizeMinRows="5"
+                cdkAutosizeMaxRows="10"
+              ></textarea>
+              <mat-icon matPrefix>message</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <button
+            type="submit"
+            class="submit-btn"
+            [disabled]="!name() || !email() || !message()"
+          >
+            <mat-icon>send</mat-icon>
+            Send Message
+          </button>
+        </form>
+      }

@@ -1,25 +1,38 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { ToastService } from '../../../core/services/toast';
+import { ToastService, Toast } from '../../../core/services/toast';
 
 @Component({
   selector: 'app-toast-container',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule,
+  ],
   templateUrl: './toast-container.html',
-  styleUrls: ['./toast-container.scss']
+  styleUrl: './toast-container.scss',
+  // Optional: animate with Angular animations (or use CSS)
+  // animations: [toastAnimation]
 })
 export class ToastContainerComponent {
-  constructor(public toastService: ToastService) {}
+  private toastService = inject(ToastService);
 
-  getIcon(type: string): string {
-    switch (type) {
-      case 'success': return 'check_circle';
-      case 'error': return 'error_outline';
-      case 'warning': return 'warning_amber';
-      default: return 'info_outline';
-    }
+  // Direct signal access — no async pipe needed!
+  toasts = this.toastService.toasts.asReadonly();
+
+  getIcon(type: Toast['type']): string {
+    return {
+      success: 'check_circle',
+      error: 'error_outline',
+      warning: 'warning_amber',
+      info: 'info_outline',
+    }[type] || 'info_outline';
+  }
+
+  remove(id: string) {
+    this.toastService.remove(id);
   }
 }

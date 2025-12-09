@@ -1,15 +1,16 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+
+import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ToastService } from '../../core/services/toast';
 import { GoogleAuthService } from '../../core/services/google-auth';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'rr-start-resume',
@@ -25,30 +26,28 @@ import { GoogleAuthService } from '../../core/services/google-auth';
   styleUrls: ['./start-resume.scss']
 })
 export class StartResumeComponent {
-  isUploading = false;
-  selectedFileName = '';
-  isDragOver = false;
+
+  private router = inject(Router);
+  private store = inject(ResumeBuilderService);
+  private http = inject(HttpClient);
+  private toast = inject(ToastService);
+  private googleAuth = inject(GoogleAuthService);
+
+  // Signals instead of normal properties
+  isUploading = signal(false);
+  selectedFileName = signal<string>('');
+  isDragOver = signal(false);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  constructor(
-    private router: Router,
-    private store: ResumeBuilderService,
-    private http: HttpClient,
-    private toast: ToastService,
-    public googleAuth: GoogleAuthService
-  ) { }
-
-  get isLoggedIn(): boolean {
-    return this.googleAuth.isLoggedIn;
-  }
+  isLoggedIn = computed(() => this.googleAuth.isLoggedIn);
 
   openLogin(): void {
     this.googleAuth.signIn();
   }
 
   startFromScratch(): void {
-    this.store.clearLocal();
+    this.store.startNewResume();
     this.router.navigate(['/build']);
   }
 
@@ -60,26 +59,23 @@ export class StartResumeComponent {
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = true;
+    this.isDragOver.set(true);
   }
 
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
+    this.isDragOver.set(false);
   }
 
   onFileDropped(event: DragEvent): void {
     event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
+    this.isDragOver.set(false);
 
     const file = event.dataTransfer?.files?.[0];
     this.processFile(file);
   }
 
-  private processFile(file: File | undefined): void {
+  private processFile(file?: File): void {
     if (!file) return;
 
     const allowedTypes = [
@@ -98,30 +94,31 @@ export class StartResumeComponent {
       return;
     }
 
-    this.selectedFileName = file.name;
+    this.selectedFileName.set(file.name);
     this.uploadResume(file);
   }
 
   private uploadResume(file: File): void {
-    this.isUploading = true;
+    this.isUploading.set(true);
 
     const formData = new FormData();
     formData.append('resume', file);
 
     const token = localStorage.getItem('auth_token');
     const headers = new HttpHeaders({
-      ...(token && { 'Authorization': `Bearer ${token}` })
+      ...(token && { Authorization: `Bearer ${token}` })
     });
 
     this.http.post(`${environment.apiUrl}/custom-resume/upload`, formData, { headers })
       .subscribe({
         next: (response: any) => {
-          if (response?.resume) {
-            this.store.replace(response.resume);
-            this.router.navigate(['/build']);
-          } else {
+          const resume = response?.resume;
+          if (!resume) {
             throw new Error('Invalid resume data');
           }
+
+          this.store.replace(resume);
+          this.router.navigate(['/build']);
         },
         error: () => {
           this.toast.show(
@@ -130,18 +127,17 @@ export class StartResumeComponent {
             'Failed to parse resume. Please try again or start from scratch.',
             5000
           );
-
           this.resetUpload();
         },
         complete: () => {
-          this.isUploading = false;
+          this.isUploading.set(false);
         }
       });
   }
 
   resetUpload(): void {
-    this.isUploading = false;
-    this.selectedFileName = '';
+    this.isUploading.set(false);
+    this.selectedFileName.set('');
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }

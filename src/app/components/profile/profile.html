@@ -5,24 +5,17 @@
     <div class="header-content">
       <div class="avatar-section">
         @if (user().picture) {
-          <img
-            [src]="user().picture"
-            alt="Profile"
-            class="avatar-large"
-          />
+          <img [src]="user().picture" alt="Profile" class="avatar-large" />
         } @else {
-          <div class="avatar-placeholder">
-            {{ userInitials() }}
-          </div>
+          <div class="avatar-placeholder">{{ userInitials() }}</div>
         }
       </div>
 
       <div class="user-info">
         <h1 class="user-name">{{ user().name }}</h1>
         <p class="user-email">{{ user().email }}</p>
-
         <div class="user-meta">
-          <span>Member since {{ user().joinedDate | date: 'MMM y' }}</span>
+          <span>Member since {{ user().joinedDate | date:'MMM y' }}</span>
         </div>
       </div>
     </div>
@@ -30,9 +23,8 @@
     <button
       mat-icon-button
       class="theme-toggle-btn"
-      (click)="toggleTheme()"
       matTooltip="Switch theme"
-    >
+      (click)="toggleTheme()">
       <mat-icon>{{ isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
   </header>
@@ -78,9 +70,7 @@
     </div>
     <div class="privacy-content">
       <strong>Bank-Grade Security</strong>
-      <span>
-        We never sell or share your information. All resumes are encrypted and auto-deleted after 30 days.
-      </span>
+      <span>We never sell or share your information.</span>
     </div>
   </div>
 

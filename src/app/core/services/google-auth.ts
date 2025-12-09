@@ -1,34 +1,40 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { finalize, tap } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 import { SkeletonService } from './skeleton';
+import { environment } from '../../../environments/environment';
 
 declare const google: any;
 
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthService {
-  private client: any;
-  private userSubject = new BehaviorSubject<any>(null);
-  user$ = this.userSubject.asObservable();
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  private skeleton = inject(SkeletonService);
 
-  constructor(private http: HttpClient, private router: Router, private skeltonLoader: SkeletonService) { }
+  /** 🔥 Angular Signals replace BehaviorSubject */
+  user = signal<any | null>(null);
 
-  // 1️⃣ Initialize Google OAuth client + auto prompt setup
-  initialize(clientId: string) {
-    // Prevent re-initializing
-    if (this.client) return;
+  /** Derived signals */
+  isLoggedIn = computed(() => !!localStorage.getItem('auth_token'));
+  isUserLoaded = computed(() => !!this.user());
 
-    // Skip auto popup if already logged in
+  private client: any = null;
+
+  constructor() {
+    this.loadUserFromStorage();
+  }
+
+  // ----------------------------------------------------------
+  // 1️⃣ Initialize Google OAuth + One Tap
+  // ----------------------------------------------------------
+  initialize(clientId: string): void {
+    if (this.client) return; // Prevent re-init
+
     const alreadyLoggedIn = !!localStorage.getItem('auth_token');
-    if (alreadyLoggedIn) {
-      console.log('User already logged in, skipping auto popup');
-      return;
-    }
+    if (alreadyLoggedIn) return;
 
-    // Load One Tap / auto sign-in script
     const startGsi = () => {
       google.accounts.id.initialize({
         client_id: clientId,
@@ -37,26 +43,24 @@ export class GoogleAuthService {
         cancel_on_tap_outside: true,
       });
 
-      // Prevent repeated popup spam: check a short-lived flag
       const lastPromptTime = localStorage.getItem('gsi_last_prompt');
       const shouldPrompt =
         !lastPromptTime ||
-        Date.now() - Number(lastPromptTime) > 6 * 60 * 60 * 1000; // every 6h max
+        Date.now() - Number(lastPromptTime) > 6 * 60 * 60 * 1000;
 
       if (shouldPrompt) {
-        console.log('Showing Google One Tap prompt');
-        google.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            console.log('User dismissed One Tap or it was not shown');
-          }
-        });
+        google.accounts.id.prompt();
         localStorage.setItem('gsi_last_prompt', Date.now().toString());
-      } else {
-        console.log('Skipping One Tap (recently shown)');
       }
+
+      // Init manual OAuth client
+      this.client = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'email profile openid',
+        callback: (response: any) => this.handleManualSignIn(response),
+      });
     };
 
-    // Load GSI script if not loaded
     if (!(window as any).google) {
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
@@ -67,29 +71,25 @@ export class GoogleAuthService {
     } else {
       startGsi();
     }
-
-    // Initialize your existing OAuth token client (manual sign-in)
-    this.client = google.accounts.oauth2.initTokenClient({
-      client_id: clientId,
-      scope: 'email profile openid',
-      callback: (response: any) => this.handleGoogleResponse(response),
-    });
   }
 
-
-  // 2️⃣ Manual sign-in (your existing working flow)
+  // ----------------------------------------------------------
+  // 2️⃣ Manual Sign-In Flow
+  // ----------------------------------------------------------
   signIn() {
     if (!this.client) {
-      console.error('Google client not initialized.');
-      this.initialize('159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com');
+      console.error('Google client not initialized — initializing now...');
+      this.initialize(
+        '159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com'
+      );
       return;
     }
     this.client.requestAccessToken();
   }
 
-  // 3️⃣ Handle manual sign-in (existing logic)
-  private handleGoogleResponse(response: any) {
-    this.skeltonLoader.setLoading(true);
+  // Manual sign-in callback
+  private handleManualSignIn(response: any) {
+    this.skeleton.setLoading(true);
 
     this.http
       .post<{ token: string; user: any }>(
@@ -97,69 +97,66 @@ export class GoogleAuthService {
         { token: response.access_token }
       )
       .pipe(
-        tap((res) => {
-          localStorage.setItem('auth_token', res.token);
-          localStorage.setItem('user', JSON.stringify(res.user));
-          this.setUser(res.user);
-        }),
-        finalize(() => {
-          // This always runs (success or error)
-          this.skeltonLoader.setLoading(false);
-        })
+        tap((res) => this.storeAuthData(res)),
+        finalize(() => this.skeleton.setLoading(false))
       )
       .subscribe({
-        next: () => console.log('User authenticated successfully!'),
-        error: (err) => console.error('Auth failed:', err),
+        next: () => console.log('Manual sign-in success'),
+        error: (err) => console.error('Manual sign-in failed', err),
       });
   }
 
-
-  // 4️⃣ Handle auto One Tap login callback
-  private handleAutoSignIn(response: any) {
+  // ----------------------------------------------------------
+  // 3️⃣ One Tap Login Flow
+  // ----------------------------------------------------------
+  private handleAutoSignIn(response: any): void {
     if (!response?.credential) return;
-    console.log('Auto sign-in credential received');
 
     this.http
       .post<{ token: string; user: any }>(
         `${environment.apiUrl}/auth/google`,
         { idToken: response.credential }
       )
-      .pipe(
-        tap((res) => {
-          localStorage.setItem('auth_token', res.token);
-          localStorage.setItem('user', JSON.stringify(res.user));
-          this.setUser(res.user);
-        })
-      )
+      .pipe(tap((res) => this.storeAuthData(res)))
       .subscribe({
-        next: () => console.log('Auto sign-in successful'),
-        error: (err) => console.error('Auto sign-in failed:', err),
+        next: () => console.log('One Tap Login Success'),
+        error: (err) => console.error('One Tap Login Failed:', err),
       });
   }
 
-  // 5️⃣ Helpers
-  logout() {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('activeTab');
-    this.userSubject.next(null);
-    if (google?.accounts?.id) google.accounts.id.disableAutoSelect();
-    this.router.navigate(['/'])
-  }
-
-  get isLoggedIn(): boolean {
-    return !!localStorage.getItem('auth_token');
+  // ----------------------------------------------------------
+  // 4️⃣ User + Token Helpers
+  // ----------------------------------------------------------
+  private storeAuthData(res: { token: string; user: any }) {
+    localStorage.setItem('auth_token', res.token);
+    localStorage.setItem('user', JSON.stringify(res.user));
+    this.user.set(res.user);
   }
 
   setUser(user: any) {
-    this.userSubject.next(user);
+    this.user.set(user);
     localStorage.setItem('user', JSON.stringify(user));
   }
 
   loadUserFromStorage() {
     const stored = localStorage.getItem('user');
-    if (stored) {
-      this.userSubject.next(JSON.parse(stored));
+    if (stored) this.user.set(JSON.parse(stored));
+  }
+
+  // ----------------------------------------------------------
+  // 5️⃣ Logout
+  // ----------------------------------------------------------
+  logout() {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('activeTab');
+
+    this.user.set(null);
+
+    if (google?.accounts?.id) {
+      google.accounts.id.disableAutoSelect();
     }
+
+    this.router.navigate(['/']);
   }
 }

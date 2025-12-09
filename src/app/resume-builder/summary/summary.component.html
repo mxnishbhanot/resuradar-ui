@@ -1,101 +1,135 @@
-    <div class="summary-container">
-      <!-- Section Header -->
-      <div class="section-header">
-        <div class="header-icon-wrapper">
-          <mat-icon class="header-icon">format_quote</mat-icon>
+<div class="summary-container">
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <div class="header-icon-wrapper">
+      <mat-icon class="header-icon">format_quote</mat-icon>
+    </div>
+    <div class="header-content">
+      <h2 class="section-title">Professional Summary</h2>
+      <p class="section-subtitle">
+        Craft a compelling summary that highlights your unique value proposition.
+      </p>
+    </div>
+  </div>
+
+  <!-- Summary Display -->
+  @if (summaryText() && !showForm()) {
+    <div class="summary-card">
+      <div class="card-header">
+        <div class="card-badge"><mat-icon>description</mat-icon></div>
+        <div class="card-title-section">
+          <h3 class="card-title">Your Summary</h3>
         </div>
-        <div class="header-content">
-          <h2 class="section-title">Professional Summary</h2>
-          <p class="section-subtitle">Craft a compelling summary that highlights your unique value proposition.</p>
+
+        <div class="card-actions">
+          <button mat-icon-button matTooltip="Edit"
+                  (click)="showEditForm()"
+                  class="action-btn edit-btn">
+            <mat-icon>edit</mat-icon>
+          </button>
         </div>
       </div>
 
-      <!-- Summary Display -->
-      @if (summaryText && !showForm) {
-        <div class="summary-card">
-          <div class="card-header">
-            <div class="card-badge">
-              <mat-icon>description</mat-icon>
-            </div>
-            <div class="card-title-section">
-              <h3 class="card-title">Your Summary</h3>
-            </div>
-            <div class="card-actions">
-              <button mat-icon-button (click)="showEditForm()" class="action-btn edit-btn" matTooltip="Edit">
-                <mat-icon>edit</mat-icon>
-              </button>
-            </div>
-          </div>
-          <div class="summary-text-wrapper">
-            <p class="summary-text">{{ summaryText }}</p>
-          </div>
-        </div>
-      }
+      <div class="summary-text-wrapper">
+        <p class="summary-text">{{ summaryText() }}</p>
+      </div>
+    </div>
+  }
 
-      <!-- Empty State -->
-      @if (!summaryText && !showForm) {
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <mat-icon>format_quote</mat-icon>
-          </div>
-          <h3 class="empty-state-title">No Summary Yet</h3>
-          <p class="empty-state-description">A strong summary can set you apart. It's a concise snapshot of your skills and career goals.</p>
-          <button mat-flat-button color="primary" class="empty-state-button" (click)="showEditForm()">
-            <mat-icon>add_circle</mat-icon>
-            Write Your Summary
+  <!-- EMPTY STATE -->
+  @if (!summaryText() && !showForm()) {
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <mat-icon>format_quote</mat-icon>
+      </div>
+
+      <h3 class="empty-state-title">No Summary Yet</h3>
+
+      <p class="empty-state-description">
+        A strong summary can set you apart. It’s a concise snapshot of your skills and goals.
+      </p>
+
+      <button mat-flat-button color="primary"
+              class="empty-state-button"
+              (click)="showEditForm()">
+        <mat-icon>add_circle</mat-icon>
+        Write Your Summary
+      </button>
+    </div>
+  }
+
+  <!-- FORM -->
+  @if (showForm()) {
+    <div class="form-container">
+
+      <div class="form-header">
+        <div class="form-header-icon">
+          <mat-icon>{{ summaryText() ? 'edit' : 'add_circle' }}</mat-icon>
+        </div>
+
+        <div class="form-header-text">
+          <h3 class="form-title">
+            {{ summaryText() ? 'Edit Summary' : 'Add New Summary' }}
+          </h3>
+
+          <p class="form-subtitle">
+            {{ summaryText() ? 'Update your professional summary'
+                              : 'Introduce yourself to potential employers' }}
+          </p>
+        </div>
+      </div>
+
+      <form [formGroup]="form" class="summary-form">
+
+        <div class="form-section">
+          <h4 class="form-section-title">
+            <mat-icon>info</mat-icon>
+            Your Professional Summary
+          </h4>
+
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Summary Content</mat-label>
+
+            <textarea
+              matInput
+              formControlName="summary"
+              rows="6"
+              placeholder="e.g., Results-driven software engineer with 5+ years experience..."
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="4"
+              cdkAutosizeMaxRows="10">
+            </textarea>
+
+            <mat-hint>Keep it concise, impactful, and tailored.</mat-hint>
+
+            @if (form.get('summary')?.hasError('required')) {
+              <mat-error>Summary is required</mat-error>
+            }
+
+            @if (form.get('summary')?.hasError('maxlength')) {
+              <mat-error>Summary cannot exceed 500 characters</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
+            <mat-icon>close</mat-icon>
+            Cancel
+          </button>
+
+          <button mat-flat-button color="primary"
+                  [disabled]="form.invalid"
+                  class="save-btn"
+                  (click)="saveSummary()">
+            <mat-icon>check</mat-icon>
+            {{ summaryText() ? 'Update Summary' : 'Save Summary' }}
           </button>
         </div>
-      }
 
-      <!-- Summary Form -->
-      @if (showForm) {
-        <div class="form-container">
-          <div class="form-header">
-            <div class="form-header-icon">
-              <mat-icon>{{ summaryText ? 'edit' : 'add_circle' }}</mat-icon>
-            </div>
-            <div class="form-header-text">
-              <h3 class="form-title">{{ summaryText ? 'Edit Summary' : 'Add New Summary' }}</h3>
-              <p class="form-subtitle">{{ summaryText ? 'Update your professional summary' : 'Introduce yourself to potential employers' }}</p>
-            </div>
-          </div>
-          <form [formGroup]="form" class="summary-form">
-            <div class="form-section">
-              <h4 class="form-section-title">
-                <mat-icon>info</mat-icon>
-                Your Professional Summary
-              </h4>
-              <mat-form-field appearance="outline" class="form-field full-width">
-                <mat-label>Summary Content</mat-label>
-                <textarea
-                  matInput
-                  formControlName="summary"
-                  placeholder="e.g., Results-driven software engineer with 5+ years of experience in full-stack development..."
-                  rows="6"
-                  cdkTextareaAutosize
-                  cdkAutosizeMinRows="4"
-                  cdkAutosizeMaxRows="10">
-                </textarea>
-                <mat-hint>Keep it concise, impactful, and tailored to your target role.</mat-hint>
-                @if (form.get('summary')?.hasError('required')) {
-                  <mat-error>Summary content is required</mat-error>
-                }
-                @if (form.get('summary')?.hasError('maxlength')) {
-                  <mat-error>Summary cannot exceed 500 characters</mat-error>
-                }
-              </mat-form-field>
-            </div>
-            <div class="form-actions">
-              <button mat-stroked-button type="button" (click)="cancelForm()" class="cancel-btn">
-                <mat-icon>close</mat-icon>
-                Cancel
-              </button>
-              <button mat-flat-button color="primary" (click)="saveSummary()" [disabled]="form.invalid" class="save-btn">
-                <mat-icon>check</mat-icon>
-                {{ summaryText ? 'Update Summary' : 'Save Summary' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      }
+      </form>
     </div>
+  }
+
+</div>

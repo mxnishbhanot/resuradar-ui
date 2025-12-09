@@ -5,34 +5,38 @@
     <div class="gradient-orb orb-2"></div>
     <div class="mesh-overlay"></div>
   </div>
+
   <div class="container">
     <div class="hero-content">
+
       <h1 class="hero-title">ResuRadar — Intelligent Resume Analysis</h1>
+
       <p class="hero-subtitle">
         Instant AI feedback to improve your resume and match it to real jobs.<br />
-        <ng-container *ngIf="!isPro">
+
+        @if (!isPro()) {
           Try up to <strong>{{ freeLimit }}</strong> free analyses — Google sign-in required.
-        </ng-container>
-        <ng-container *ngIf="isPro">
+        }
+
+        @if (isPro()) {
           You have <strong>unlimited</strong> access as a Pro member.
-        </ng-container>
+        }
       </p>
 
       <div class="hero-cta">
-        <button mat-flat-button class="cta-primary" routerLink="{{ ctaRoute }}">
+        <button mat-flat-button class="cta-primary" [routerLink]="ctaRoute">
           <mat-icon>auto_awesome</mat-icon>
-          {{ isPro ? 'Go to Dashboard' : 'Try ' + freeLimit + ' Free Analyses' }}
+          {{ isPro() ? 'Go to Dashboard' : 'Try ' + freeLimit + ' Free Analyses' }}
         </button>
 
-        <button
-          *ngIf="!isPro"
-          mat-stroked-button
-          class="cta-ghost"
-          (click)="openUpgradeModal()">
-          <mat-icon>workspace_premium</mat-icon>
-          Upgrade — {{ premiumPrice }} Lifetime
-        </button>
+        @if (!isPro()) {
+          <button mat-stroked-button class="cta-ghost" (click)="openUpgradeModal()">
+            <mat-icon>workspace_premium</mat-icon>
+            Upgrade — {{ premiumPrice }} Lifetime
+          </button>
+        }
       </div>
+
     </div>
   </div>
 </section>
@@ -40,48 +44,43 @@
 <!-- Features Grid -->
 <section class="features-section">
   <div class="container">
+
     <div class="features-grid">
-      <!-- Executive summary -->
+
+      <!-- Free Features -->
       <mat-card class="feature-card free">
-        <div class="card-icon free">
-          <mat-icon>summarize</mat-icon>
-        </div>
+        <div class="card-icon free"><mat-icon>summarize</mat-icon></div>
         <h3>Executive Summary</h3>
         <p>Concise overview of your resume: strengths, improvement areas, and actionable next steps.</p>
       </mat-card>
 
-      <!-- ATS Score -->
       <mat-card class="feature-card free">
-        <div class="card-icon free">
-          <mat-icon>score</mat-icon>
-        </div>
+        <div class="card-icon free"><mat-icon>score</mat-icon></div>
         <h3>ATS Score (0–10)</h3>
-        <p>A simple, interpretable score showing ATS & recruiter friendliness with category breakdown.</p>
+        <p>ATS-friendly scoring with breakdown across key resume categories.</p>
       </mat-card>
 
-      <!-- Actionable tips -->
       <mat-card class="feature-card free">
-        <div class="card-icon free">
-          <mat-icon>tips_and_updates</mat-icon>
-        </div>
+        <div class="card-icon free"><mat-icon>tips_and_updates</mat-icon></div>
         <h3>Actionable Suggestions</h3>
         <p>Specific, copy-paste suggestions to improve bullets, summary, and keywords.</p>
       </mat-card>
 
-      <!-- REVAMPED Premium Card (now informative for Pro, persuasive for free) -->
+      <!-- Premium Card -->
       <mat-card class="feature-card premium-card">
+
         <div class="premium-header">
-          <div class="premium-icon">
-            <mat-icon>workspace_premium</mat-icon>
-          </div>
-          <h3>{{ isPro ? 'You’re a Pro Member!' : 'Go Premium' }}</h3>
+          <div class="premium-icon"><mat-icon>workspace_premium</mat-icon></div>
+          <h3>{{ isPro() ? 'You’re a Pro Member!' : 'Go Premium' }}</h3>
           <div class="premium-tag">Lifetime Access</div>
         </div>
+
         <p class="premium-subtitle">
-          {{ isPro
+          {{ isPro()
             ? 'Enjoy unlimited, expert-level insights on every resume.'
             : 'Unlock the full power of ResuRadar with unlimited, expert-level insights.' }}
         </p>
+
         <ul class="premium-features">
           <li><mat-icon>check</mat-icon> Unlimited resume uploads</li>
           <li><mat-icon>check</mat-icon> Professional Level detection</li>
@@ -91,19 +90,23 @@
           <li><mat-icon>check</mat-icon> Portfolio enhancement tips</li>
         </ul>
 
-        <ng-container *ngIf="!isPro">
+        @if (!isPro()) {
           <button mat-flat-button class="premium-cta" (click)="openUpgradeModal()">
             <mat-icon>rocket_launch</mat-icon>
             Upgrade Now — {{ premiumPrice }}
           </button>
-        </ng-container>
-        <ng-container *ngIf="isPro">
+        }
+
+        @if (isPro()) {
           <div class="pro-status">
             <mat-icon>check_circle</mat-icon>
             <span>Active Pro Membership</span>
           </div>
-        </ng-container>
+        }
+
       </mat-card>
+
     </div>
+
   </div>
 </section>

@@ -1,84 +1,116 @@
-  <div class="skeleton-wrapper" [class.mobile]="isMobile">
-      <!-- Header Skeleton -->
-      <div class="skeleton-header">
-        <div class="skeleton-header-content">
-          <div class="skeleton-logo">
-            <div class="skeleton-circle skeleton-pulse"></div>
-            <div class="skeleton-text skeleton-text-lg skeleton-shimmer"></div>
-          </div>
-          <div class="skeleton-nav" *ngIf="!isMobile">
-            <div class="skeleton-nav-item skeleton-shimmer" *ngFor="let item of [1,2,3]"></div>
-          </div>
-          <div class="skeleton-actions">
-            <div class="skeleton-button skeleton-shimmer" *ngIf="!isMobile"></div>
-            <div class="skeleton-circle skeleton-pulse"></div>
-          </div>
-        </div>
+<div class="skeleton-wrapper" [class.mobile]="isMobile()">
+
+  <!-- Header Skeleton -->
+  <div class="skeleton-header">
+    <div class="skeleton-header-content">
+
+      <div class="skeleton-logo">
+        <div class="skeleton-circle skeleton-pulse"></div>
+        <div class="skeleton-text skeleton-text-lg skeleton-shimmer"></div>
       </div>
 
-      <!-- Main Content Skeleton -->
-      <div class="skeleton-main">
-        <!-- Hero Section -->
-        <div class="skeleton-hero">
-          <div class="skeleton-text skeleton-text-xl skeleton-shimmer" style="width: 60%; margin-bottom: 16px;"></div>
-          <div class="skeleton-text skeleton-text-lg skeleton-shimmer" style="width: 45%; margin-bottom: 24px;"></div>
-          <div class="skeleton-text skeleton-shimmer" style="width: 80%; margin-bottom: 12px;"></div>
-          <div class="skeleton-text skeleton-shimmer" style="width: 70%;"></div>
+      @if (!isMobile()) {
+        <div class="skeleton-nav">
+          @for (item of [1,2,3]; track $index) {
+            <div class="skeleton-nav-item skeleton-shimmer"></div>
+          }
         </div>
+      }
 
-        <!-- Card Grid -->
-        <div class="skeleton-grid">
-          <div class="skeleton-card skeleton-fade-in" *ngFor="let card of [1,2,3]; let i = index"
-               [style.animation-delay.ms]="i * 100">
-            <div class="skeleton-card-header">
-              <div class="skeleton-circle skeleton-pulse" style="width: 48px; height: 48px;"></div>
-              <div style="flex: 1;">
-                <div class="skeleton-text skeleton-shimmer" style="width: 60%; margin-bottom: 8px;"></div>
-                <div class="skeleton-text skeleton-text-sm skeleton-shimmer" style="width: 80%;"></div>
-              </div>
-            </div>
-            <div class="skeleton-card-body">
-              <div class="skeleton-text skeleton-shimmer" style="width: 100%; margin-bottom: 8px;"></div>
-              <div class="skeleton-text skeleton-shimmer" style="width: 90%; margin-bottom: 8px;"></div>
-              <div class="skeleton-text skeleton-shimmer" style="width: 95%;"></div>
-            </div>
-            <div class="skeleton-card-footer">
-              <div class="skeleton-button skeleton-button-sm skeleton-shimmer" style="width: 120px;"></div>
+      <div class="skeleton-actions">
+        @if (!isMobile()) {
+          <div class="skeleton-button skeleton-shimmer"></div>
+        }
+        <div class="skeleton-circle skeleton-pulse"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main Content Skeleton -->
+  <div class="skeleton-main">
+
+    <!-- Hero Section -->
+    <div class="skeleton-hero">
+      <div class="skeleton-text skeleton-text-xl skeleton-shimmer" style="width: 60%; margin-bottom: 16px;"></div>
+      <div class="skeleton-text skeleton-text-lg skeleton-shimmer" style="width: 45%; margin-bottom: 24px;"></div>
+      <div class="skeleton-text skeleton-shimmer" style="width: 80%; margin-bottom: 12px;"></div>
+      <div class="skeleton-text skeleton-shimmer" style="width: 70%;"></div>
+    </div>
+
+    <!-- Card Grid -->
+    <div class="skeleton-grid">
+      @for (card of [1,2,3]; track $index; let i = $index) {
+        <div class="skeleton-card skeleton-fade-in" [style.animation-delay.ms]="i * 100">
+          <div class="skeleton-card-header">
+            <div class="skeleton-circle skeleton-pulse" style="width: 48px; height: 48px;"></div>
+            <div style="flex: 1;">
+              <div class="skeleton-text skeleton-shimmer" style="width: 60%; margin-bottom: 8px;"></div>
+              <div class="skeleton-text skeleton-text-sm skeleton-shimmer" style="width: 80%;"></div>
             </div>
           </div>
-        </div>
 
-        <!-- Features Section -->
-        <div class="skeleton-features">
-          <div class="skeleton-feature" *ngFor="let feature of [1,2]; let i = index"
-               [style.animation-delay.ms]="(i + 3) * 100">
-            <div class="skeleton-text skeleton-text-lg skeleton-shimmer" style="width: 40%; margin-bottom: 16px;"></div>
-            <div class="skeleton-feature-grid">
-              <div class="skeleton-feature-item" *ngFor="let item of [1,2,3,4]">
+          <div class="skeleton-card-body">
+            <div class="skeleton-text skeleton-shimmer" style="width: 100%; margin-bottom: 8px;"></div>
+            <div class="skeleton-text skeleton-shimmer" style="width: 90%; margin-bottom: 8px;"></div>
+            <div class="skeleton-text skeleton-shimmer" style="width: 95%;"></div>
+          </div>
+
+          <div class="skeleton-card-footer">
+            <div class="skeleton-button skeleton-button-sm skeleton-shimmer" style="width: 120px;"></div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Features -->
+    <div class="skeleton-features">
+      @for (feature of [1,2]; track $index; let i = $index) {
+        <div class="skeleton-feature" [style.animation-delay.ms]="(i + 3) * 100">
+
+          <div class="skeleton-text skeleton-text-lg skeleton-shimmer" style="width: 40%; margin-bottom: 16px;"></div>
+
+          <div class="skeleton-feature-grid">
+            @for (item of [1,2,3,4]; track $index) {
+              <div class="skeleton-feature-item">
                 <div class="skeleton-circle skeleton-pulse" style="width: 40px; height: 40px;"></div>
                 <div class="skeleton-text skeleton-shimmer" style="width: 80%;"></div>
               </div>
-            </div>
+            }
           </div>
+
         </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="skeleton-footer">
+    <div class="skeleton-footer-content">
+
+      <div class="skeleton-footer-section">
+        <div class="skeleton-logo">
+          <div class="skeleton-circle skeleton-pulse"></div>
+          <div class="skeleton-text skeleton-shimmer"></div>
+        </div>
+        <div class="skeleton-text skeleton-text-sm skeleton-shimmer" style="width: 80%; margin-top: 12px;"></div>
       </div>
 
-      <!-- Footer Skeleton -->
-      <div class="skeleton-footer">
-        <div class="skeleton-footer-content">
-          <div class="skeleton-footer-section">
-            <div class="skeleton-logo">
-              <div class="skeleton-circle skeleton-pulse"></div>
-              <div class="skeleton-text skeleton-shimmer"></div>
-            </div>
-            <div class="skeleton-text skeleton-text-sm skeleton-shimmer" style="width: 80%; margin-top: 12px;"></div>
-          </div>
-          <div class="skeleton-footer-links" *ngIf="!isMobile">
-            <div *ngFor="let section of [1,2,3]">
+      @if (!isMobile()) {
+        <div class="skeleton-footer-links">
+          @for (section of [1,2,3]; track $index) {
+            <div>
               <div class="skeleton-text skeleton-shimmer" style="width: 80px; margin-bottom: 12px;"></div>
-              <div class="skeleton-text skeleton-text-sm skeleton-shimmer" style="width: 100px; margin-bottom: 6px;" *ngFor="let link of [1,2,3]"></div>
+              @for (link of [1,2,3]; track $index) {
+                <div class="skeleton-text skeleton-text-sm skeleton-shimmer" style="width: 100px; margin-bottom: 6px;"></div>
+              }
             </div>
-          </div>
+          }
         </div>
-      </div>
+      }
+
     </div>
+  </div>
+
+</div>

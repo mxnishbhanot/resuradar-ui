@@ -1,10 +1,12 @@
 import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Still useful for pipes
+import { CommonModule } from '@angular/common';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+
 import { ActivatedRoute } from '@angular/router';
 
 // Feature Components
@@ -15,8 +17,16 @@ import { SummaryComponent } from '../summary/summary.component';
 import { ProjectsComponent } from '../projects/projects';
 import { SkillsComponent } from '../skills/skills.component';
 import { PreviewComponent } from '../preview/preview.component';
+
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
-import { tap } from 'rxjs';
+import { ResumeBuilderState } from '../../shared/models/resume-builder.model';
+
+/** UI Tab Type */
+interface BuilderTab {
+  label: string;
+  icon: string;
+  component: string;
+}
 
 @Component({
   selector: 'rr-resume-builder',
@@ -25,34 +35,43 @@ import { tap } from 'rxjs';
     CommonModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressBarModule,
     MatDialogModule,
+    MatProgressBarModule,
     MatTooltipModule,
+
     PersonalComponent,
     EducationComponent,
     ExperienceComponent,
     SummaryComponent,
     ProjectsComponent,
-    SkillsComponent,
+    SkillsComponent
   ],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
 })
 export class ResumeBuilderComponent implements OnInit {
-  // Services
+
+  // Inject Services
   private resumeBuilder = inject(ResumeBuilderService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
 
-  // State Signals
+  // Signals
   resumeId = signal<string | null>(null);
   currentTab = signal<number>(0);
 
-  // Resume Data State (for completion tracking)
-  private resumeState = signal<any>({});
+  /** Local copy of the resume builder state */
+  resumeState = signal<ResumeBuilderState>({
+    _id: null,
+    personal: {},
+    educations: [],
+    experiences: [],
+    skills: [],
+    projects: []
+  });
 
-  // Configuration
-  readonly tabs = [
+  /** Tab configuration (strict-typed) */
+  readonly tabs: BuilderTab[] = [
     { label: 'Contact', icon: 'person_outline', component: 'personal' },
     { label: 'Education', icon: 'school', component: 'education' },
     { label: 'Experience', icon: 'work_outline', component: 'experience' },
@@ -61,108 +80,100 @@ export class ResumeBuilderComponent implements OnInit {
     { label: 'Summary', icon: 'short_text', component: 'summary' },
   ];
 
-  // Computed Properties (Modern Reactivity)
+  /** ✔ Fully reactive progress indicator */
   completionPercentage = computed(() => {
-    const state = this.resumeState();
-    if (!state) return 0;
+    const s = this.resumeState();
 
     const checks = [
-      !!(state.personal?.firstName && state.personal?.email), // Contact
-      (state.educations?.length || 0) > 0, // Education
-      (state.experiences?.length || 0) > 0, // Experience
-      (state.projects?.length || 0) > 0,   // Projects
-      (state.skills?.reduce((acc: number, cat: any) => acc + (cat.skills?.length || 0), 0) || 0) >= 3, // Skills
-      !!state.personal?.summary // Summary
+      !!(s.personal?.firstName && s.personal?.email),
+      (s.educations?.length || 0) > 0,
+      (s.experiences?.length || 0) > 0,
+      (s.projects?.length || 0) > 0,
+      (s.skills?.reduce((sum, cat) => sum + (cat.skills?.length || 0), 0) || 0) >= 3,
+      !!s.personal?.summary
     ];
 
     return Math.round((checks.filter(Boolean).length / checks.length) * 100);
   });
 
-  // Track specific section completion for UI indicators
-  isTabCompleted(index: number): boolean {
-    const state = this.resumeState();
+  /** ✔ Track each tab individually */
+  isTabCompleted = (index: number): boolean => {
+    const s = this.resumeState();
 
     switch (index) {
-      case 0: return !!(state.personal?.firstName && state.personal?.email);
-      case 1: return (state.educations?.length || 0) > 0;
-      case 2: return (state.experiences?.length || 0) > 0;
-      case 3: return (state.projects?.length || 0) > 0;
-      case 4: return (state.skills?.reduce((acc: number, cat: any) => acc + (cat.skills?.length || 0), 0) || 0) >= 3;
-      case 5: return !!state.personal?.summary;
+      case 0: return !!(s.personal?.firstName && s.personal?.email);
+      case 1: return (s.educations?.length || 0) > 0;
+      case 2: return (s.experiences?.length || 0) > 0;
+      case 3: return (s.projects?.length || 0) > 0;
+      case 4:
+        return (s.skills?.reduce((sum, cat) => sum + (cat.skills?.length || 0), 0) || 0) >= 3;
+      case 5: return !!s.personal?.summary;
       default: return false;
     }
-  }
+  };
 
   constructor() {
-    // Read query params and update the local signal
-    this.route.queryParams.subscribe(params => {
-      this.resumeId.set(params['resumeId'] || null);
+    // Sync query params
+    this.route.queryParamMap.subscribe(params => {
+      this.resumeId.set(params.get('resumeId'));
     });
 
-    // Reactive effect to update local state when service state changes
-    this.resumeBuilder.state$.subscribe(state => {
-      console.log(state);
-
+    // Sync service → local state (using signals)
+    effect(() => {
+      const state = this.resumeBuilder.state();
       this.resumeState.set(state);
     });
   }
 
   ngOnInit(): void {
-    // FIX: Removed the explicit loadDraftFromServer call.
-    // The ResumeBuilderService's constructor now actively monitors the URL query parameters
-    // (including 'resumeId') and triggers the necessary load action automatically,
-    // avoiding the race condition that caused the empty state to load.
+    // Do NOT call loadDraftFromServer()
+    // ResumeBuilderService automatically manages loading based on URL now.
   }
 
-  // Navigation Actions
-  navigateToTab(index: number): void {
+  // Navigation
+  navigateToTab(index: number) {
     this.currentTab.set(index);
     this.scrollToTop();
   }
 
-  nextStep(): void {
+  nextStep() {
     if (this.currentTab() < this.tabs.length - 1) {
       this.currentTab.update(v => v + 1);
-      this.scrollToTop();
     }
+    this.scrollToTop();
   }
 
-  previousStep(): void {
+  previousStep() {
     if (this.currentTab() > 0) {
       this.currentTab.update(v => v - 1);
-      this.scrollToTop();
     }
+    this.scrollToTop();
   }
 
-  public scrollToTop() {
-    const contentArea = document.querySelector('.content-area');
-    if (contentArea) contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+  scrollToTop() {
+    const el = document.querySelector('.content-wrapper');
+    if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   openPreview(): void {
     const isMobile = window.innerWidth <= 768;
 
-    const dialogConfig: MatDialogConfig = {
+    const config: MatDialogConfig = {
       width: isMobile ? '100vw' : '100%',
       height: isMobile ? '100vh' : '90vh',
       maxWidth: isMobile ? '100vw' : 'none',
       maxHeight: isMobile ? '100vh' : '90vh',
       panelClass: isMobile ? 'preview-modal-mobile' : 'preview-modal-desktop',
-      // Using the ID from the service snapshot for reliability
       data: { resumeId: this.resumeBuilder.snapshot._id },
-      autoFocus: false,
-      enterAnimationDuration: '300ms',
-      exitAnimationDuration: '200ms'
+      autoFocus: false
     };
 
-    this.dialog.open(PreviewComponent, dialogConfig);
+    this.dialog.open(PreviewComponent, config);
   }
 
   markCompleted() {
-    this.resumeBuilder.completeResume()
-      .pipe(
-        tap(res => { if (res) this.openPreview(); })
-      )
-      .subscribe();
+    this.resumeBuilder.completeResume().subscribe(res => {
+      if (res) this.openPreview();
+    });
   }
 }

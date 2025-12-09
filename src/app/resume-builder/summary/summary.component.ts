@@ -1,6 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
+
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
 @Component({
@@ -28,47 +35,55 @@ import { ResumeBuilderService } from '../../core/services/resume-builder.service
   templateUrl: './summary.component.html',
   styleUrl: './summary.component.scss',
 })
-export class SummaryComponent implements OnInit {
-  form!: FormGroup;
-  showForm = false;
-  summaryText = '';
-  personal: any = {};
+export class SummaryComponent {
+
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
 
+  form: FormGroup = this.fb.group({
+    summary: ['', [Validators.required, Validators.maxLength(500)]]
+  });
+
+  // SIGNAL-BASED STATE
+  summaryText = signal('');
+  showForm     = signal(false);
+
   constructor() {
-    this.form = this.fb.group({
-      summary: ['', [Validators.required, Validators.maxLength(500)]]
-    });
-  }
+    // Auto-sync service → UI state
+    effect(() => {
+      const personal = this.store.state().personal;
+      const summary = personal?.summary ?? '';
 
-  ngOnInit(): void {
-    this.store.state$.subscribe(state => {
-      this.personal = state.personal;
-      this.summaryText = state.personal.summary || '';
-      // Update the form value when the store state changes
-      this.form.patchValue({ summary: this.summaryText });
-      console.log(this.form.value);
+      this.summaryText.set(summary);
 
+      // Patch form without triggering form changes
+      this.form.patchValue({ summary }, { emitEvent: false });
     });
   }
 
   showEditForm(): void {
-    this.showForm = true;
-    this.form.patchValue({ summary: this.summaryText });
+    this.showForm.set(true);
+    this.form.patchValue({ summary: this.summaryText() });
   }
 
   cancelForm(): void {
-    this.showForm = false;
-    this.form.patchValue({ summary: this.summaryText }); // Revert to saved value
+    this.showForm.set(false);
+    this.form.patchValue({ summary: this.summaryText() });
   }
 
   saveSummary(): void {
     if (this.form.invalid) return;
 
-    const summaryValue = this.form.get('summary')?.value;
-    this.store.update({ personal: { ...this.personal, summary: summaryValue } });
-    this.summaryText = summaryValue;
-    this.showForm = false;
+    const newSummary = this.form.value.summary;
+
+    this.store.update({
+      personal: {
+        ...this.store.state().personal,
+        summary: newSummary
+      }
+    });
+
+    this.summaryText.set(newSummary);
+    this.showForm.set(false);
   }
 }

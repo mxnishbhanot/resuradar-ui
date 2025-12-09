@@ -11,7 +11,6 @@ import { ResumeService } from '../../core/services/resume';
 import { UserService } from '../../core/services/user';
 import { Router } from '@angular/router';
 import { UpgradePro } from '../upgrade-pro/upgrade-pro';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-match-results',
@@ -35,66 +34,61 @@ export class MatchResults implements OnInit {
   private router = inject(Router);
   private dialog = inject(MatDialog);
 
-  // Reactive signals
+  // Reactive analysis result
   data = signal<any>(null);
 
-  // Convert user$ observable to a signal (Angular best-practice)
-  user = toSignal(this.userService.user$, { initialValue: null });
+  // User from updated UserService (signal)
+  user = this.userService.user;
 
-  // Is user Pro?
-  isProUser = computed(() => {
-    const u = this.user();
-    return !!u?.isPremium;
-  });
+  // Premium state
+  isProUser = computed(() => !!this.user()?.isPremium);
 
-  // Circle math signals
+  // Circle geometry
   private radius = 54;
   circumference = 2 * Math.PI * this.radius;
 
-  // Stroke offset computed from score
+  // Reactive stroke animation
   strokeDashoffset = computed(() => {
-    const d = this.data();
-    if (!d) return this.circumference;
-
-    const score = d.free_feedback.match_score ?? 0;
+    const score = this.data()?.free_feedback?.match_score ?? 0;
     return this.circumference * (1 - score / 100);
   });
 
-  // Score class (UI indicator)
+  // Score class
   scoreClass = computed(() => {
-    const score = this.data()?.free_feedback?.match_score ?? 0;
-    if (score >= 80) return 'strong';
-    if (score >= 60) return 'good';
-    if (score >= 40) return 'fair';
+    const s = this.data()?.free_feedback?.match_score ?? 0;
+    if (s >= 80) return 'strong';
+    if (s >= 60) return 'good';
+    if (s >= 40) return 'fair';
     return 'weak';
   });
 
   // Score description
   scoreDescription = computed(() => {
-    const score = this.data()?.free_feedback?.match_score ?? 0;
-    if (score >= 80) return 'Excellent match with strong alignment';
-    if (score >= 60) return 'Good match with some areas for improvement';
-    if (score >= 40) return 'Fair match with significant improvements needed';
+    const s = this.data()?.free_feedback?.match_score ?? 0;
+    if (s >= 80) return 'Excellent match with strong alignment';
+    if (s >= 60) return 'Good match with some areas for improvement';
+    if (s >= 40) return 'Fair match with significant improvements needed';
     return 'Weak match requiring major changes';
   });
 
   ngOnInit(): void {
     const result = this.resumeService.getLatestMatchAnalysis();
+
     if (!result) {
       this.router.navigate(['/scan']);
       return;
     }
+
+    // Store in signal
     this.data.set(result);
+
+    // Optional: refresh user, signal auto-updates
+    this.userService.fetchCurrentUser().subscribe();
   }
 
-  // UI wrapper functions (optional, for clarity)
-  getScoreClass(): string {
-    return this.scoreClass();
-  }
-
-  getScoreDescription(): string {
-    return this.scoreDescription();
-  }
+  // UI helpers
+  getScoreClass() { return this.scoreClass(); }
+  getScoreDescription() { return this.scoreDescription(); }
 
   openUpgradeModal(): void {
     const config: MatDialogConfig = {

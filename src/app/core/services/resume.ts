@@ -1,60 +1,73 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ResumeService {
-  private latestAnalysis: any = null;
-  private latestMatchAnalysis: any = null;
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
-  /** 🧠 Utility: Build headers with Bearer token */
+  /** Store latest analyses using Angular signals */
+  latestAnalysis = signal<any>(null);
+  latestMatchAnalysis = signal<any>(null);
+
+  /** 🔐 Build Authorization header */
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('auth_token');
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-    return headers;
+    return token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
   }
 
-  /** 📤 Upload resume with Authorization header */
+  /** 📤 Upload resume */
   uploadResume(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('resume', file);
 
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${environment.apiUrl}/resumes/upload`, formData, { headers });
+    return this.http.post(
+      `${environment.apiUrl}/resumes/upload`,
+      formData,
+      { headers: this.getAuthHeaders() }
+    );
   }
 
+  /** 📊 Match resume with job description */
   matchResume(formData: FormData): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${environment.apiUrl}/resumes/match`, formData, { headers });
+    return this.http.post(
+      `${environment.apiUrl}/resumes/match`,
+      formData,
+      { headers: this.getAuthHeaders() }
+    );
   }
 
-  /** 💾 Cache latest analysis in memory */
+  /** 💾 Signal-based caching */
   setLatestAnalysis(data: any): void {
-    this.latestAnalysis = data;
-  }
-  setLatestMatchAnalysis(data: any): void {
-    this.latestMatchAnalysis = data;
+    this.latestAnalysis.set(data);
   }
 
-  getLatestAnalysis(): any {
-    return this.latestAnalysis;
+  setLatestMatchAnalysis(data: any): void {
+    this.latestMatchAnalysis.set(data);
   }
-  getLatestMatchAnalysis(): any {
-    return this.latestMatchAnalysis;
+
+  /** 🚀 Signal-based getters (template-friendly) */
+  getLatestAnalysis() {
+    return this.latestAnalysis();
+  }
+
+  getLatestMatchAnalysis() {
+    return this.latestMatchAnalysis();
   }
 
   clearLatestAnalysis(): void {
-    this.latestAnalysis = null;
+    this.latestAnalysis.set(null);
   }
 
-  getResumeHistory(type: 'jd'| 'ats'): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${environment.apiUrl}/resumes/${type}`, { headers });
+  /** 📚 Resume history */
+  getResumeHistory(type: 'jd' | 'ats'): Observable<any> {
+    return this.http.get(
+      `${environment.apiUrl}/resumes/${type}`,
+      { headers: this.getAuthHeaders() }
+    );
   }
 }

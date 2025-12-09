@@ -1,5 +1,4 @@
-// skeleton-loader.component.ts
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,5 +9,6 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./skeleton-loader.scss']
 })
 export class SkeletonLoaderComponent {
-  @Input() isMobile: boolean = false;
+  // Signal Input
+  isMobile = input<boolean>(false);
 }
