@@ -1,10 +1,5 @@
 @use '../../../theme/variables' as *;
 
-/* ---------------------------------------------------------
-   HOME — THEME AWARE SCSS
-   (all colors use CSS variables / SCSS bridge above)
---------------------------------------------------------- */
-
 /* Base Container */
 .home-container {
   min-height: 100vh;
@@ -13,7 +8,6 @@
   position: relative;
   overflow-x: hidden;
   background: #{ $bg-primary };
-  /* fallback via SCSS var */
   color: #{ $text-primary };
   transition: background 0.25s ease, color 0.25s ease;
   padding-top: 70px;
@@ -43,7 +37,6 @@
     opacity: 0.25;
     animation: float 20s ease-in-out infinite;
 
-    /* Orb backgrounds use radial-gradients based on token RGBs */
     &.orb-1 {
       width: 500px;
       height: 500px;
@@ -126,7 +119,6 @@
   transition: all 0.3s ease;
 
   .header-container {
-    // max-width: 1400px;
     margin: 0 auto;
     padding: 0 $spacing-lg;
 
@@ -744,8 +736,6 @@
   }
 }
 
-/* Mobile nav, footer, and other sections converted likewise... */
-
 /* Mobile Navigation Drawer */
 .mobile-nav-drawer {
   position: fixed;
@@ -906,8 +896,7 @@
   }
 }
 
-/* Main Content / Footer / Misc - color tokens applied similar to above */
-
+/* Main Content / Footer / Misc */
 .main-content {
   display: grid;
   align-content: center;
@@ -933,7 +922,6 @@
   }
 }
 
-/* Footer */
 /* Footer */
 .app-footer {
   background: var(--bg-secondary);
@@ -1203,7 +1191,7 @@
     }
   }
 
-  /* Newsletter Section (Optional Enhancement) */
+  /* Newsletter Section */
   .footer-newsletter {
     margin-top: $spacing-xl;
     padding: $spacing-xl;
@@ -1275,20 +1263,7 @@
   }
 }
 
-
-/* Loading spinner override */
-::ng-deep {
-  sc-angular-loader {
-    .dots-3 {
-      .spinner {
-        border-color: rgba(var(--accent-rgb), 0.12) !important;
-        border-top-color: var(--accent-color) !important;
-      }
-    }
-  }
-}
-
-/* Smooth scrollbar (theme-aware) */
+/* Smooth scrollbar */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--accent-rgb), 0.25) transparent;
@@ -1350,14 +1325,11 @@ body.mobile-nav-open {
   bottom: 30px;
   right: 30px;
   z-index: 900;
-  /* Below modals (999+), above content */
   width: 50px;
   height: 50px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-
-  /* Gradient matching your brand */
   background: linear-gradient(var(--primary-angle),
       rgba(var(--primary-start), 1),
       rgba(var(--primary-end), 1));
@@ -1367,8 +1339,6 @@ body.mobile-nav-open {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* Animation states */
   opacity: 0;
   visibility: hidden;
   transform: translateY(20px);
@@ -1380,13 +1350,11 @@ body.mobile-nav-open {
     height: 24px;
   }
 
-  /* Hover Effect */
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(var(--primary-start), 0.6);
   }
 
-  /* Active Class added via TS */
   &.visible {
     opacity: 1;
     visibility: visible;
@@ -1411,10 +1379,6 @@ body.mobile-nav-open {
   left: 0;
   right: 0;
 }
-
-// .home-container:not(.content-loading) {
-//   animation: contentFadeIn 0.5s ease-out forwards;
-// }
 
 @keyframes contentFadeIn {
   from {
@@ -1469,22 +1433,6 @@ body.mobile-nav-open {
   }
 }
 
-// Smooth transition for all interactive elements during load
-// .home-container:not(.content-loading) {
-//   .app-header,
-//   .main-content,
-//   .app-footer {
-//     animation: slideInFromTop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-//   }
-
-//   .main-content {
-//     animation-delay: 0.1s;
-//   }
-
-//   .app-footer {
-//     animation-delay: 0.2s;
-//   }
-// }
 
 @keyframes slideInFromTop {
   from {
