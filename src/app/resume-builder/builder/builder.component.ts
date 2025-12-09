@@ -1,5 +1,7 @@
+
 import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID, Inject } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,16 +10,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
 
 import { ActivatedRoute } from '@angular/router';
-
-// Feature Components
-import { PersonalComponent } from '../personal/personal.component';
-import { EducationComponent } from '../education/education.component';
-import { ExperienceComponent } from '../experience/experience.component';
-import { SummaryComponent } from '../summary/summary.component';
-import { ProjectsComponent } from '../projects/projects';
-import { SkillsComponent } from '../skills/skills.component';
-import { PreviewComponent } from '../preview/preview.component';
-
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ResumeBuilderState } from '../../shared/models/resume-builder.model';
 
@@ -25,7 +17,7 @@ import { ResumeBuilderState } from '../../shared/models/resume-builder.model';
 interface BuilderTab {
   label: string;
   icon: string;
-  component: string;
+  loader: () => Promise<any>;
 }
 
 @Component({
@@ -37,28 +29,27 @@ interface BuilderTab {
     MatIconModule,
     MatDialogModule,
     MatProgressBarModule,
-    MatTooltipModule,
-
-    PersonalComponent,
-    EducationComponent,
-    ExperienceComponent,
-    SummaryComponent,
-    ProjectsComponent,
-    SkillsComponent
+    MatTooltipModule
   ],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
 })
 export class ResumeBuilderComponent implements OnInit {
 
-  // Inject Services
   private resumeBuilder = inject(ResumeBuilderService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
+  private platformId = inject(PLATFORM_ID);
 
   // Signals
   resumeId = signal<string | null>(null);
   currentTab = signal<number>(0);
+
+  // Holds the currently loaded step component type (or null)
+  currentStepComponent = signal<any | null>(null);
+
+  // simple runtime cache to avoid re-importing the same component
+  private loaderCache = new Map<number, any>();
 
   /** Local copy of the resume builder state */
   resumeState = signal<ResumeBuilderState>({
@@ -70,14 +61,14 @@ export class ResumeBuilderComponent implements OnInit {
     projects: []
   });
 
-  /** Tab configuration (strict-typed) */
+  /** Tab configuration (loaders perform dynamic imports) */
   readonly tabs: BuilderTab[] = [
-    { label: 'Contact', icon: 'person_outline', component: 'personal' },
-    { label: 'Education', icon: 'school', component: 'education' },
-    { label: 'Experience', icon: 'work_outline', component: 'experience' },
-    { label: 'Projects', icon: 'folder_open', component: 'projects' },
-    { label: 'Skills', icon: 'stars', component: 'skills' },
-    { label: 'Summary', icon: 'short_text', component: 'summary' },
+    { label: 'Contact', icon: 'person_outline', loader: () => import('../personal/personal.component').then(m => m.PersonalComponent) },
+    { label: 'Education', icon: 'school', loader: () => import('../education/education.component').then(m => m.EducationComponent) },
+    { label: 'Experience', icon: 'work_outline', loader: () => import('../experience/experience.component').then(m => m.ExperienceComponent) },
+    { label: 'Projects', icon: 'folder_open', loader: () => import('../projects/projects').then(m => m.ProjectsComponent) },
+    { label: 'Skills', icon: 'stars', loader: () => import('../skills/skills.component').then(m => m.SkillsComponent) },
+    { label: 'Summary', icon: 'short_text', loader: () => import('../summary/summary.component').then(m => m.SummaryComponent) },
   ];
 
   /** ✔ Fully reactive progress indicator */
@@ -96,7 +87,6 @@ export class ResumeBuilderComponent implements OnInit {
     return Math.round((checks.filter(Boolean).length / checks.length) * 100);
   });
 
-  /** ✔ Track each tab individually */
   isTabCompleted = (index: number): boolean => {
     const s = this.resumeState();
 
@@ -126,49 +116,104 @@ export class ResumeBuilderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Do NOT call loadDraftFromServer()
-    // ResumeBuilderService automatically manages loading based on URL now.
+    // Load initial tab component
+    this.loadTabComponent(this.currentTab());
   }
 
-  // Navigation
+  /** Navigation */
   navigateToTab(index: number) {
     this.currentTab.set(index);
+    this.loadTabComponent(index);
     this.scrollToTop();
   }
 
   nextStep() {
     if (this.currentTab() < this.tabs.length - 1) {
-      this.currentTab.update(v => v + 1);
+      const next = this.currentTab() + 1;
+      this.currentTab.set(next);
+      this.loadTabComponent(next);
     }
     this.scrollToTop();
   }
 
   previousStep() {
     if (this.currentTab() > 0) {
-      this.currentTab.update(v => v - 1);
+      const prev = this.currentTab() - 1;
+      this.currentTab.set(prev);
+      this.loadTabComponent(prev);
     }
     this.scrollToTop();
   }
 
   scrollToTop() {
-    const el = document.querySelector('.content-wrapper');
-    if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
+    if (isPlatformBrowser(this.platformId)) {
+      const el = document.querySelector('.content-wrapper');
+      if (el) (el as HTMLElement).scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  /**
+   * Dynamic import + cache loader for a step index
+   */
+  private async loadTabComponent(index: number) {
+    // if already cached, use it
+    if (this.loaderCache.has(index)) {
+      this.currentStepComponent.set(this.loaderCache.get(index));
+      return;
+    }
+
+    try {
+      const loader = this.tabs[index]?.loader;
+      if (!loader) return;
+
+      // show null while loading — template can show skeleton
+      this.currentStepComponent.set(null);
+
+      const comp = await loader();
+      // store in cache
+      this.loaderCache.set(index, comp);
+      this.currentStepComponent.set(comp);
+
+      // optional: prefetch next step in background
+      const next = index + 1;
+      if (this.tabs[next] && !this.loaderCache.has(next)) {
+        this.tabs[next].loader().then(c => this.loaderCache.set(next, c)).catch(() => {});
+      }
+    } catch (err) {
+      console.error('Failed to load step component', err);
+    }
+  }
+
+  /** Prefetch loader on hover or demand */
+  prefetchTab(index: number) {
+    if (this.loaderCache.has(index)) return;
+    const loader = this.tabs[index]?.loader;
+    if (!loader) return;
+    loader().then(c => this.loaderCache.set(index, c)).catch(() => {});
   }
 
   openPreview(): void {
-    const isMobile = window.innerWidth <= 768;
+    if (!isPlatformBrowser(this.platformId)) return; // only client
 
-    const config: MatDialogConfig = {
-      width: isMobile ? '100vw' : '100%',
-      height: isMobile ? '100vh' : '90vh',
-      maxWidth: isMobile ? '100vw' : 'none',
-      maxHeight: isMobile ? '100vh' : '90vh',
-      panelClass: isMobile ? 'preview-modal-mobile' : 'preview-modal-desktop',
-      data: { resumeId: this.resumeBuilder.snapshot._id },
-      autoFocus: false
-    };
+    // Lazy import preview component and open dialog with it
+    import('../preview/preview.component').then(m => {
+      const PreviewComponent = m.PreviewComponent;
 
-    this.dialog.open(PreviewComponent, config)
+      const isMobile = window.innerWidth <= 768;
+
+      const config: MatDialogConfig = {
+        width: isMobile ? '100vw' : '100%',
+        height: isMobile ? '100vh' : '90vh',
+        maxWidth: isMobile ? '100vw' : 'none',
+        maxHeight: isMobile ? '100vh' : '90vh',
+        panelClass: isMobile ? 'preview-modal-mobile' : 'preview-modal-desktop',
+        data: { resumeId: this.resumeBuilder.snapshot._id },
+        autoFocus: false
+      };
+
+      // open using the lazy component type
+      this.dialog.open(PreviewComponent, config);
+    }).catch(err => console.error('Failed to load preview component', err));
   }
 
   markCompleted() {

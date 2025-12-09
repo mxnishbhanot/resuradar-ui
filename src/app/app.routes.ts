@@ -25,6 +25,7 @@ export const routes: Routes = [
       },
       {
         path: 'build',
+        data: { preload: false },
         loadComponent: () =>
           import('./resume-builder/builder/builder.component').then((m) => m.ResumeBuilderComponent),
       },

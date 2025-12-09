@@ -140,14 +140,14 @@
 
       <button class="menu-item" (click)="navigate('profile'); toggleProfileMenu()">
         <div class="menu-item-icon"><mat-icon>person_outline</mat-icon></div>
-        <span>My Profile</span>
+        <span class="menu-item-text">My Profile</span>
         <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
       </button>
 
       @if (isLoggedIn()) {
         <button class="menu-item" (click)="navigate('custom-list'); toggleProfileMenu()">
           <div class="menu-item-icon"><mat-icon>folder_open</mat-icon></div>
-          <span>My Resumes</span>
+          <span class="menu-item-text">My Resumes</span>
           <mat-icon class="menu-item-arrow">chevron_right</mat-icon>
         </button>
       }
@@ -156,7 +156,7 @@
 
       <button class="menu-item sign-out" (click)="googleAuth.logout(); toggleProfileMenu()">
         <div class="menu-item-icon"><mat-icon>logout</mat-icon></div>
-        <span>Sign Out</span>
+        <span class="menu-item-text">Sign Out</span>
       </button>
     </div>
   </header>
