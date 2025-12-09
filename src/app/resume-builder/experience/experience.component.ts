@@ -53,7 +53,6 @@ export interface Experience {
     MatTooltipModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    CdkTextareaAutosize
   ],
   templateUrl: './experience.component.html',
   styleUrls: ['./experience.component.scss']
