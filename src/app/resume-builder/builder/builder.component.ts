@@ -168,7 +168,7 @@ export class ResumeBuilderComponent implements OnInit {
       autoFocus: false
     };
 
-    this.dialog.open(PreviewComponent, config);
+    this.dialog.open(PreviewComponent, config)
   }
 
   markCompleted() {

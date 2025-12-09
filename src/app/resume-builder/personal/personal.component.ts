@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'rr-personal',
@@ -39,6 +40,7 @@ export class PersonalComponent {
   /** UI state signals */
   isSaving = signal(false);
   showSaved = signal(false);
+  isInitialized = signal(false);
 
   /** Build the form */
   form: FormGroup = this.fb.group({
@@ -52,27 +54,41 @@ export class PersonalComponent {
     github: ['']
   });
 
+  formValue = toSignal(
+    this.form.valueChanges,
+    { initialValue: this.form.value }
+  );
+
   /** Local throttling timer */
   private saveTimer: any = null;
 
   constructor() {
-    /** Load current state into form (ONE-WAY injection) */
+    /** Load store state → form */
     effect(() => {
       const personal = this.store.state().personal;
       this.form.patchValue(personal ?? {}, { emitEvent: false });
+      this.isInitialized.set(true);
     });
 
-    /** Auto-save with SIGNAL EFFECT (replaces RxJS valueChanges) */
+    /** Auto-save with guard against empty form */
     effect(() => {
-      const formValue = this.form.value;
+      if (!this.isInitialized()) return;
+
+      const value = this.formValue();
+
+      // 🔒 Critical fix: Skip autosave if form is empty (e.g., during re-entry before data loads)
+      if (!value.firstName && !value.lastName && !value.email) {
+        return;
+      }
 
       if (this.form.invalid) return;
 
-      // debounce 700ms
-      if (this.saveTimer) clearTimeout(this.saveTimer);
+      if (this.saveTimer) {
+        clearTimeout(this.saveTimer);
+      }
 
       this.saveTimer = setTimeout(() => {
-        this.save(formValue);
+        this.save(value);
       }, 700);
     });
   }

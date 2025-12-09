@@ -582,6 +582,10 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
   button {
     flex: 1;
+
+    &.disabled {
+      cursor: not-allowed;
+    }
   }
 }
 

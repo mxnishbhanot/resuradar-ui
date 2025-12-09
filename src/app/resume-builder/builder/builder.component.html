@@ -90,7 +90,7 @@
         </div>
 
         @if (currentTab() === tabs.length - 1) {
-        <button mat-button class="deck-btn-primary finish" (click)="markCompleted()">
+        <button [disabled]="completionPercentage() != 100" mat-button class="deck-btn-primary finish" (click)="markCompleted()">
           Finish <mat-icon>stars</mat-icon>
         </button>
         } @else {
@@ -138,7 +138,7 @@
           Next Step <mat-icon>arrow_forward</mat-icon>
           </button>
           } @else {
-          <button mat-flat-button class="btn-premium btn-finish" (click)="openPreview()">
+          <button [disabled]="completionPercentage() != 100" mat-flat-button class="btn-premium btn-finish"  (click)="markCompleted()" [ngClass]="{'disabled' : completionPercentage() != 100}">
             Finish <mat-icon>stars</mat-icon>
           </button>
           }

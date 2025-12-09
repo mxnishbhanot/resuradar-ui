@@ -4,9 +4,8 @@ import {
   signal,
   effect,
   computed,
-  input,
-  output,
   OnDestroy,
+  untracked
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'; // ← Add MAT_DIALOG_DATA
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 
@@ -37,14 +37,14 @@ type Template = 'modern' | 'corporate' | 'minimal';
 })
 export class PreviewComponent implements OnDestroy {
   private store = inject(ResumeBuilderService);
+  private dialogRef = inject(MatDialogRef<PreviewComponent>); // Optional: for direct close
 
-  // Input signal – modern way instead of MAT_DIALOG_DATA
-  resumeId = input.required<string>();
+  // Inject typed dialog data (modern + safe)
+  private data = inject<{ resumeId: string }>(MAT_DIALOG_DATA);
 
-  // Output to close dialog
-  closeRequest = output<void>();
+  // Now derive a signal from data (handles null safely if needed)
+  resumeId = signal(this.data.resumeId); // ← Use this everywhere instead of input()
 
-  // Signals
   currentTemplate = signal<Template>('modern');
   pdfUrl = signal<string | null>(null);
   isLoading = signal(true);
@@ -59,23 +59,27 @@ export class PreviewComponent implements OnDestroy {
 
   zoomPercent = computed(() => `${Math.round(this.zoom() * 100)}%`);
 
-  constructor() {
-    // Reload PDF when template changes
-    effect(() => this.loadPdfPreview(this.currentTemplate()));
-  }
+constructor() {
+  effect(() => {
+    const template = this.currentTemplate();
+
+    untracked(() => {
+      this.loadPdfPreview(template);
+    });
+  });
+}
 
   private loadPdfPreview(template: Template) {
     this.isLoading.set(true);
     this.showEmptyState.set(false);
     this.zoom.set(1.0);
 
-    // Clean previous blob URL
     if (this.pdfUrl()) {
       URL.revokeObjectURL(this.pdfUrl()!);
       this.pdfUrl.set(null);
     }
 
-    const id = this.resumeId();
+    const id = this.resumeId(); // ← Now a signal
     if (!id) {
       this.showEmptyState.set(true);
       this.isLoading.set(false);
@@ -121,7 +125,7 @@ export class PreviewComponent implements OnDestroy {
 
   close() {
     if (this.pdfUrl()) URL.revokeObjectURL(this.pdfUrl()!);
-    this.closeRequest.emit();
+    this.dialogRef.close(); // ← Clean close
   }
 
   ngOnDestroy() {
