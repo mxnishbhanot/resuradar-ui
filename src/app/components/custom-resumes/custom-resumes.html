@@ -3,148 +3,177 @@
 
   <div class="content-wrapper">
 
+    <!-- Header -->
     <header class="page-header fade-in-up">
       <div class="header-text">
         <h1 class="page-title">My Resumes</h1>
         <p class="page-subtitle">Track, analyze, and optimize your career documents.</p>
       </div>
+
       <button class="btn-primary-gradient" (click)="createNew()">
         <mat-icon>add</mat-icon>
         <span>Create New</span>
       </button>
     </header>
 
-    <div class="loading-container fade-in-up" *ngIf="isLoading">
+    <!-- Loading State -->
+    @if (isLoading()) {
+    <div class="loading-container fade-in-up">
       <div class="spinner-box">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
       <p>Syncing dashboard...</p>
     </div>
+    }
 
-    <div class="dashboard-content" *ngIf="!isLoading">
+    <!-- Dashboard Content -->
+    @if (!isLoading()) {
+    <div class="dashboard-content">
 
+      <!-- Filter Pills -->
       <section class="controls-section fade-in-up">
         <nav class="filter-pills">
-          <button class="pill" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+          <button class="pill" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
             <span>All</span>
-            <span class="pill-badge">{{ getTotalCount() }}</span>
+            <span class="pill-badge">{{ totalCount() }}</span>
           </button>
 
           <div class="divider"></div>
 
-          <button class="pill" [class.active]="activeFilter === 'builder'" (click)="setFilter('builder')">
+          <button class="pill" [class.active]="activeFilter() === 'builder'" (click)="setFilter('builder')">
             <mat-icon>edit_document</mat-icon>
             <span>Builder</span>
-            <span class="pill-badge">{{ builderResumes.length }}</span>
+            <span class="pill-badge">{{ builderResumes().length }}</span>
           </button>
 
-          <button class="pill" [class.active]="activeFilter === 'ats'" (click)="setFilter('ats')">
+          <button class="pill" [class.active]="activeFilter() === 'ats'" (click)="setFilter('ats')">
             <mat-icon>analytics</mat-icon>
             <span>ATS</span>
-            <span class="pill-badge">{{ atsResumes.length }}</span>
+            <span class="pill-badge">{{ atsResumes().length }}</span>
           </button>
 
-          <button class="pill" [class.active]="activeFilter === 'jd'" (click)="setFilter('jd')">
+          <button class="pill" [class.active]="activeFilter() === 'jd'" (click)="setFilter('jd')">
             <mat-icon>work</mat-icon>
             <span>Matches</span>
-            <span class="pill-badge">{{ jdResumes.length }}</span>
+            <span class="pill-badge">{{ jdResumes().length }}</span>
           </button>
         </nav>
       </section>
 
-      <section class="resumes-grid" *ngIf="getFilteredResumes().length > 0">
+      <!-- Resumes Grid -->
+      @if (filteredResumes().length > 0) {
+      <section class="resumes-grid">
 
-        @if (currentPage === 1) {
-          <article class="resume-card create-new enter-animation" tabindex="0" (click)="createNew()" style="--i: 0">
-            <div class="dashed-border">
-              <div class="icon-circle"><mat-icon>add</mat-icon></div>
-              <h3>Create New</h3>
-              <p>Start from scratch</p>
-            </div>
-          </article>
+        <!-- "Create New" card only on page 1 -->
+        @if (currentPage() === 1) {
+        <article class="resume-card create-new enter-animation" tabindex="0" (click)="createNew()" style="--i: 0">
+          <div class="dashed-border">
+            <div class="icon-circle"><mat-icon>add</mat-icon></div>
+            <h3>Create New</h3>
+            <p>Start from scratch</p>
+          </div>
+        </article>
         }
 
-        @for (resume of paginatedResumes; track resume.id; let i = $index) {
-          <article
-            class="resume-card enter-animation"
-            [class.draft]="resume.isDraft"
-            [style.--i]="currentPage === 1 ? i + 1 : i"
-            (click)="handleResumeClick(resume)"
-            tabindex="0">
+        <!-- Resume Cards -->
+        @for (resume of paginatedResumes(); track resume.id; let i = $index) {
+        <article class="resume-card enter-animation" [class.draft]="resume.isDraft"
+          [style.--i]="currentPage() === 1 ? i + 1 : i" (click)="handleResumeClick(resume)" tabindex="0">
 
-            <div class="card-top">
-              <div class="type-tag" [ngClass]="resume.type">
-                <mat-icon>{{ getTypeIcon(resume.type) }}</mat-icon>
-                {{ getTypeLabel(resume.type) }}
-              </div>
+          <div class="card-top">
+            <div class="type-tag" [ngClass]="resume.type">
+              <mat-icon>{{ getTypeIcon(resume.type) }}</mat-icon>
+              {{ getTypeLabel(resume.type) }}
             </div>
+          </div>
 
-            <div class="card-main">
-              <h3 class="title" [matTooltip]="resume.title">{{ resume.title }}</h3>
+          <div class="card-main">
+            <h3 class="title" [matTooltip]="resume.title">{{ resume.title }}</h3>
 
-              <div class="meta-info">
-                <div class="meta-row" *ngIf="resume.type === 'builder'">
-                  <mat-icon class="accent-icon">donut_large</mat-icon>
-                  <span>{{ resume.completionPercentage }}% Done</span>
-                </div>
+            <div class="meta-info">
 
-                <div class="score-pill" *ngIf="resume.type === 'ats'" [ngClass]="getScoreClass(resume.atsScore)">
-                  <span class="val">{{ resume.atsScore }}</span><span class="lbl">/100</span>
-                </div>
-
-                <div class="score-pill" *ngIf="resume.type === 'jd'" [ngClass]="getScoreClass(resume.matchScore)">
-                  <span class="val">{{ resume.matchScore }}%</span><span class="lbl">Match</span>
-                </div>
-
-                <span class="draft-badge" *ngIf="resume.isDraft">DRAFT</span>
+              @if (resume.type === 'builder') {
+              <div class="meta-row">
+                <mat-icon class="accent-icon">donut_large</mat-icon>
+                <span>{{ resume.completionPercentage }}% Done</span>
               </div>
-            </div>
+              }
 
-            <div class="card-bottom">
-              <span class="date">{{ formatDate(resume.updatedAt) }}</span>
-              <div class="action-btn">
-                <mat-icon>{{ resume.type === 'builder' ? 'edit' : 'arrow_forward' }}</mat-icon>
+              @if (resume.type === 'ats') {
+              <div class="score-pill" [ngClass]="getScoreClass(resume.atsScore)">
+                <span class="val">{{ resume.atsScore }}</span><span class="lbl">/100</span>
               </div>
-            </div>
+              }
 
-            <div class="progress-line">
-              <div class="fill"
-                   [style.width.%]="resume.completionPercentage"
-                   [ngClass]="getProgressClass(resume.completionPercentage)">
+              @if (resume.type === 'jd') {
+              <div class="score-pill" [ngClass]="getScoreClass(resume.matchScore)">
+                <span class="val">{{ resume.matchScore }}%</span><span class="lbl">Match</span>
               </div>
+              }
+
+              @if (resume.isDraft) {
+              <span class="draft-badge">DRAFT</span>
+              }
             </div>
-          </article>
+          </div>
+
+          <div class="card-bottom">
+            <span class="date">{{ formatDate(resume.updatedAt) }}</span>
+            <div class="action-btn">
+              <mat-icon>{{ resume.type === 'builder' ? 'edit' : 'arrow_forward' }}</mat-icon>
+            </div>
+          </div>
+
+          @if (resume.completionPercentage !== undefined) {
+          <div class="progress-line">
+            <div class="fill" [style.width.%]="resume.completionPercentage"
+              [ngClass]="getProgressClass(resume.completionPercentage)">
+            </div>
+          </div>
+          }
+        </article>
         }
       </section>
+      }
 
-      <div class="pagination-container fade-in-up" *ngIf="totalPages > 1">
-        <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+      <div class="pagination-container fade-in-up">
+        <button class="page-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
           <mat-icon>chevron_left</mat-icon>
         </button>
-        @for (page of getPageNumbers(); track page) {
-          <button class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">
-            {{ page }}
-          </button>
+
+        @for (page of pageNumbers(); track page) {
+        <button class="page-btn" [class.active]="page === currentPage()" (click)="goToPage(page)">
+          {{ page }}
+        </button>
         }
-        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+
+        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
           <mat-icon>chevron_right</mat-icon>
         </button>
       </div>
+      }
 
-      <div class="empty-state-modern fade-in-up" *ngIf="getFilteredResumes().length === 0">
+      <!-- Empty State -->
+      @if (filteredResumes().length === 0) {
+      <div class="empty-state-modern fade-in-up">
         <div class="illustration-circle">
           <mat-icon>{{ getEmptyStateActionIcon() }}</mat-icon>
         </div>
         <h2>{{ getEmptyStateTitle() }}</h2>
         <p>{{ getEmptyStateDescription() }}</p>
+
         <div class="btn-content">
           <button class="btn-primary-gradient" (click)="getEmptyStateAction()">
             Start Now
           </button>
-
         </div>
       </div>
+      }
 
     </div>
+    }
+
   </div>
 </div>

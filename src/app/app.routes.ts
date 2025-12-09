@@ -39,11 +39,6 @@ export const routes: Routes = [
           import('./components/match-results/match-results').then((m) => m.MatchResults),
       },
       {
-        path: 'history',
-        loadComponent: () =>
-          import('./components/resume-history/resume-history').then((m) => m.ResumeHistory),
-      },
-      {
         path: 'features',
         loadComponent: () =>
           import('./components/footer/features/features').then((m) => m.Features),
