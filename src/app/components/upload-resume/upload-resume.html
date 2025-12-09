@@ -1,8 +1,6 @@
 <div class="upload-section">
-  <!-- Animated Background -->
   <div class="background-gradient"></div>
 
-  <!-- Header -->
   <div class="upload-header">
     <div class="header-badge">
       <mat-icon>auto_awesome</mat-icon>
@@ -14,19 +12,17 @@
     </p>
   </div>
 
-  <!-- Upload Card -->
-  <mat-card class="upload-card" [class.drag-over]="isDragOver">
+  <mat-card class="upload-card" [class.drag-over]="isDragOver()">
     <mat-card-content>
       <div class="upload-content">
-        <!-- Upload Area -->
         <div
           class="upload-area"
-          [class.disabled]="!isLoggedIn"
-          (click)="isLoggedIn ? fileInput.click() : openLogin($event)"
+          [class.disabled]="!isLoggedIn()"
+          (click)="isLoggedIn() ? fileInput.click() : openLogin($event)"
           (drop)="onFileDropped($event)"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
-          [class.has-file]="fileName"
+          [class.has-file]="fileName()"
         >
           <input
             type="file"
@@ -36,141 +32,149 @@
             #fileInput
           />
 
-          <!-- Initial State -->
-          <div class="upload-initial" *ngIf="!fileName && !loading">
-            <div class="upload-icon-wrapper">
-              <div class="upload-icon-bg"></div>
-              <mat-icon *ngIf="isLoggedIn" class="upload-icon">cloud_upload</mat-icon>
-              <mat-icon *ngIf="!isLoggedIn" class="upload-icon">lock</mat-icon>
-            </div>
-            <h3 class="upload-state-title" *ngIf="isLoggedIn">Drop Your Resume Here</h3>
-            <h3 class="upload-state-title" *ngIf="!isLoggedIn">Ready to Get Started?</h3>
-            <p class="upload-state-desc" *ngIf="isLoggedIn">
-              Drag & drop your PDF file or <span class="highlight-text">click to browse</span>
-            </p>
-            <p class="upload-state-desc" *ngIf="!isLoggedIn">
-              Sign in to unlock AI-powered resume analysis
-            </p>
+          @if (!fileName() && !loading()) {
+            <div class="upload-initial">
+              <div class="upload-icon-wrapper">
+                <div class="upload-icon-bg"></div>
+                @if (isLoggedIn()) {
+                  <mat-icon class="upload-icon">cloud_upload</mat-icon>
+                } @else {
+                  <mat-icon class="upload-icon">lock</mat-icon>
+                }
+              </div>
 
-            <div class="file-requirements" *ngIf="isLoggedIn">
-              <div class="requirement-item">
+              @if (isLoggedIn()) {
+                <h3 class="upload-state-title">Drop Your Resume Here</h3>
+                <p class="upload-state-desc">
+                  Drag & drop your PDF file or <span class="highlight-text">click to browse</span>
+                </p>
+
+                <div class="file-requirements">
+                  <div class="requirement-item">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>PDF format</span>
+                  </div>
+                  <div class="requirement-item">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Max 5MB</span>
+                  </div>
+                  <div class="requirement-item">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Instant results</span>
+                  </div>
+                </div>
+              } @else {
+                <h3 class="upload-state-title">Ready to Get Started?</h3>
+                <p class="upload-state-desc">Sign in to unlock AI-powered resume analysis</p>
+
+                <button mat-flat-button class="signin-btn" (click)="openLogin($event)">
+                  <mat-icon>login</mat-icon>
+                  <span>Sign In with Google</span>
+                </button>
+              }
+            </div>
+          }
+
+          @if (loading()) {
+            <div class="upload-loading">
+              <div class="loading-animation">
+                <div class="spinner"></div>
+                <div class="pulse-ring"></div>
+              </div>
+              <h3 class="upload-state-title">Analyzing Your Resume</h3>
+              <p class="upload-state-desc">Our AI is processing your document and generating insights...</p>
+            </div>
+          }
+
+          @if (fileName() && !loading()) {
+            <div class="upload-complete">
+              <div class="success-animation">
                 <mat-icon>check_circle</mat-icon>
-                <span>PDF format</span>
               </div>
-              <div class="requirement-item">
-                <mat-icon>check_circle</mat-icon>
-                <span>Max 5MB</span>
-              </div>
-              <div class="requirement-item">
-                <mat-icon>check_circle</mat-icon>
-                <span>Instant results</span>
-              </div>
-            </div>
 
-            <button
-              *ngIf="!isLoggedIn"
-              mat-flat-button
-              class="signin-btn"
-              (click)="openLogin($event)">
-              <mat-icon>login</mat-icon>
-              <span>Sign In with Google</span>
-            </button>
-          </div>
+              <div class="file-info">
+                <div class="file-icon">
+                  <mat-icon>description</mat-icon>
+                </div>
 
-          <!-- Loading State -->
-          <div class="upload-loading" *ngIf="loading">
-            <div class="loading-animation">
-              <div class="spinner"></div>
-              <div class="pulse-ring"></div>
-            </div>
-            <h3 class="upload-state-title">Analyzing Your Resume</h3>
-            <p class="upload-state-desc">Our AI is processing your document and generating insights...</p>
-            <!-- <div class="loading-progress">
-              <div class="progress-bar"></div>
-            </div> -->
-          </div>
+                <div class="file-details">
+                  <h4>{{ fileName() }}</h4>
+                  <p>{{ fileSize() }}</p>
+                </div>
 
-          <!-- File Selected State -->
-          <div class="upload-complete" *ngIf="fileName && !loading">
-            <div class="success-animation">
-              <mat-icon>check_circle</mat-icon>
-            </div>
-            <div class="file-info">
-              <div class="file-icon">
-                <mat-icon>description</mat-icon>
+                <button
+                  mat-icon-button
+                  class="remove-btn"
+                  (click)="resetFile(); $event.stopPropagation()"
+                  matTooltip="Remove file"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
               </div>
-              <div class="file-details">
-                <h4>{{ fileName }}</h4>
-                <p>{{ fileSize }}</p>
-              </div>
+
               <button
-                mat-icon-button
-                class="remove-btn"
-                (click)="resetFile(); $event.stopPropagation()"
-                matTooltip="Remove file"
+                mat-flat-button
+                color="primary"
+                class="reupload-btn"
+                (click)="fileInput.click(); $event.stopPropagation()"
               >
-                <mat-icon>close</mat-icon>
+                <mat-icon>swap_horiz</mat-icon>
+                <span>Choose Different File</span>
               </button>
             </div>
-            <button
-              mat-flat-button
-              color="primary"
-              class="reupload-btn"
-              (click)="fileInput.click(); $event.stopPropagation()"
-            >
-              <mat-icon>swap_horiz</mat-icon>
-              <span>Choose Different File</span>
-            </button>
-          </div>
+          }
         </div>
 
-        <!-- Features Grid -->
-        <div class="features-section" *ngIf="!fileName && isLoggedIn">
-          <h4 class="features-title">What You'll Receive</h4>
-          <div class="features-grid">
-            <div class="feature-item">
-              <div class="feature-icon-wrapper">
-                <mat-icon class="feature-icon">analytics</mat-icon>
+        @if (!fileName() && isLoggedIn()) {
+          <div class="features-section">
+            <h4 class="features-title">What You'll Receive</h4>
+            <div class="features-grid">
+              <div class="feature-item">
+                <div class="feature-icon-wrapper">
+                  <mat-icon class="feature-icon">analytics</mat-icon>
+                </div>
+                <div class="feature-content">
+                  <strong>Comprehensive Score</strong>
+                  <span>Detailed 0-10 rating with category breakdown</span>
+                </div>
               </div>
-              <div class="feature-content">
-                <strong>Comprehensive Score</strong>
-                <span>Detailed 0-10 rating with category breakdown</span>
+
+              <div class="feature-item">
+                <div class="feature-icon-wrapper">
+                  <mat-icon class="feature-icon">psychology</mat-icon>
+                </div>
+                <div class="feature-content">
+                  <strong>AI-Powered Insights</strong>
+                  <span>Identify strengths and growth opportunities</span>
+                </div>
               </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon-wrapper">
-                <mat-icon class="feature-icon">psychology</mat-icon>
+
+              <div class="feature-item">
+                <div class="feature-icon-wrapper">
+                  <mat-icon class="feature-icon">lightbulb</mat-icon>
+                </div>
+                <div class="feature-content">
+                  <strong>Expert Recommendations</strong>
+                  <span>Actionable tips for immediate improvement</span>
+                </div>
               </div>
-              <div class="feature-content">
-                <strong>AI-Powered Insights</strong>
-                <span>Identify strengths and growth opportunities</span>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon-wrapper">
-                <mat-icon class="feature-icon">lightbulb</mat-icon>
-              </div>
-              <div class="feature-content">
-                <strong>Expert Recommendations</strong>
-                <span>Actionable tips for immediate improvement</span>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon-wrapper">
-                <mat-icon class="feature-icon">search</mat-icon>
-              </div>
-              <div class="feature-content">
-                <strong>ATS Optimization</strong>
-                <span>Keywords to beat applicant tracking systems</span>
+
+              <div class="feature-item">
+                <div class="feature-icon-wrapper">
+                  <mat-icon class="feature-icon">search</mat-icon>
+                </div>
+                <div class="feature-content">
+                  <strong>ATS Optimization</strong>
+                  <span>Keywords to beat applicant tracking systems</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        }
       </div>
     </mat-card-content>
   </mat-card>
 
-  <!-- Privacy Notice -->
   <div class="privacy-notice">
     <div class="privacy-icon">
       <mat-icon>verified_user</mat-icon>

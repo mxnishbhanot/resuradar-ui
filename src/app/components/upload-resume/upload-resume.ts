@@ -1,17 +1,21 @@
-// upload-resume.component.ts
-import { Component, EventEmitter, Output } from '@angular/core';
-import { ResumeService } from '../../core/services/resume';
+import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Router } from '@angular/router';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+
+import { signal, computed, Signal } from '@angular/core';
+import { Subscription, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+import { ResumeService } from '../../core/services/resume';
 import { GoogleAuthService } from '../../core/services/google-auth';
+import { ToastService } from '../../core/services/toast';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
 import { UpgradePro } from '../upgrade-pro/upgrade-pro';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { ToastService } from '../../core/services/toast';
 
 @Component({
   selector: 'app-upload-resume',
@@ -26,12 +30,20 @@ import { ToastService } from '../../core/services/toast';
   templateUrl: './upload-resume.html',
   styleUrls: ['./upload-resume.scss']
 })
-export class UploadResume {
-  loading = false;
-  fileName: string = '';
-  fileSize: string = '';
-  isDragOver = false;
+export class UploadResume implements OnInit, OnDestroy {
   @Output() resumeAnalyzed = new EventEmitter<any>();
+
+  // Signals for UI state
+  loading = signal<boolean>(false);
+  fileName = signal<string>('');
+  fileSize = signal<string>('');
+  isDragOver = signal<boolean>(false);
+
+  // Derived signal for user state (initialized in constructor)
+  isLoggedIn!: Signal<boolean>;
+
+  // Track subscriptions for cleanup
+  private subs: Subscription[] = [];
 
   constructor(
     private resumeService: ResumeService,
@@ -39,21 +51,44 @@ export class UploadResume {
     private toast: ToastService,
     public googleAuth: GoogleAuthService,
     private dialog: MatDialog
-  ) { }
-
-  get isLoggedIn(): boolean {
-    return this.googleAuth.isLoggedIn;
+  ) {
+    // computed for login state so template reacts automatically
+    this.isLoggedIn = computed(() => {
+      // Support both boolean flag or presence of user object in service
+      // (adapt if your service exposes a different API)
+      const valAny: any = (this.googleAuth as any).isLoggedIn ?? (this.googleAuth as any).user;
+      // if isLoggedIn boolean exists use it, else check user presence
+      if (typeof (this.googleAuth as any).isLoggedIn === 'boolean') {
+        return !!(this.googleAuth as any).isLoggedIn;
+      }
+      // fallback: check user object truthiness
+      return !!(this.googleAuth as any).user;
+    });
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
+  ngOnInit(): void {
+    // no-op; kept for future extension
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach(s => {
+      try { s.unsubscribe(); } catch { /* noop */ }
+    });
+  }
+
+  // --- Template event handlers ---
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files ? input.files.item(0) : null;
     if (!file) return;
     this.processFile(file);
+    // reset input value to allow reselecting the same file later
+    input.value = '';
   }
 
-  onFileDropped(event: DragEvent) {
+  onFileDropped(event: DragEvent): void {
     event.preventDefault();
-    this.isDragOver = false;
+    this.isDragOver.set(false);
 
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
@@ -66,64 +101,68 @@ export class UploadResume {
     }
   }
 
-  onDragOver(event: DragEvent) {
+  onDragOver(event: DragEvent): void {
     event.preventDefault();
-    if (this.isLoggedIn) {
-      this.isDragOver = true;
+    if (this.isLoggedIn()) {
+      this.isDragOver.set(true);
     }
   }
 
-  onDragLeave(event: DragEvent) {
+  onDragLeave(event: DragEvent): void {
     event.preventDefault();
-    this.isDragOver = false;
+    this.isDragOver.set(false);
   }
 
-  private processFile(file: File) {
-    if (!this.isLoggedIn) return;
+  // --- Core logic ---
+  private processFile(file: File): void {
+    if (!this.isLoggedIn()) return;
 
-    // Validate file
     if (!this.isValidFileType(file) || file.size > 5 * 1024 * 1024) {
-      this.toast.show(
-        'warning',
-        'Upload Warning',
-        'Please upload a PDF file (max 5MB)'
-      );
+      this.toast.show('warning', 'Upload Warning', 'Please upload a PDF file (max 5MB)');
       return;
     }
 
     this.setFileMeta(file);
-    this.loading = true;
+    this.loading.set(true);
 
-    this.resumeService.uploadResume(file).subscribe({
-      next: (res) => {
-        this.loading = false;
-        this.toast.show('success', 'Success', 'Resume analyzed successfully.');
-        this.resumeService.setLatestAnalysis(res.data);
-        this.router.navigate(['/analysis']);
-      },
+    const sub = this.resumeService.uploadResume(file)
+      .pipe(
+        catchError(err => {
+          // pass error downstream to subscriber, but also handle here if needed
+          return of({ __uploadError: true, error: err });
+        })
+      )
+      .subscribe((res: any) => {
+        this.loading.set(false);
 
-      error: (err) => {
-        this.loading = false;
-
-        if (err.status === 403) {
-          this.handleQuotaExceeded(err);
-        } else {
-          console.error('Upload failed:', err);
-          this.toast.show(
-            'error',
-            'Upload Failed',
-            'An error occurred while uploading your resume. Please try again.'
-          );
+        if (res && res.__uploadError && res.error) {
+          const err = res.error;
+          if (err.status === 403) {
+            this.handleQuotaExceeded(err);
+          } else {
+            console.error('Upload failed:', err);
+            this.toast.show('error', 'Upload Failed', 'An error occurred while uploading your resume. Please try again.');
+          }
+          this.resetFile();
+          return;
         }
 
-        this.resetFile();
-      }
-    });
+        // success path
+        this.toast.show('success', 'Success', 'Resume analyzed successfully.');
+        if (res?.data) {
+          this.resumeService.setLatestAnalysis(res.data);
+          this.resumeAnalyzed.emit(res.data);
+        }
+        // navigate to analysis page
+        this.router.navigate(['/analysis']);
+      });
+
+    this.subs.push(sub);
   }
 
-  private setFileMeta(file: File) {
-    this.fileName = file.name;
-    this.fileSize = this.formatFileSize(file.size);
+  private setFileMeta(file: File): void {
+    this.fileName.set(file.name);
+    this.fileSize.set(this.formatFileSize(file.size));
   }
 
   private getFullScreenDialogConfig(data?: any): MatDialogConfig {
@@ -137,22 +176,24 @@ export class UploadResume {
     };
   }
 
-  private handleQuotaExceeded(err: any) {
+  private handleQuotaExceeded(err: any): void {
     const message = err.error?.message || 'You’ve used all your free analyses.';
     const modalRef = this.dialog.open(
       QuotaExhaustedModal,
       this.getFullScreenDialogConfig({ message })
     );
 
-    modalRef.afterClosed().subscribe((result) => {
+    const sub = modalRef.afterClosed().subscribe((result) => {
       if (result === 'upgrade') {
         this.dialog.open(UpgradePro, this.getFullScreenDialogConfig());
       }
     });
+
+    this.subs.push(sub);
   }
 
   private isValidFileType(file: File): boolean {
-    return file.type === 'application/pdf';
+    return file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
   }
 
   private formatFileSize(bytes: number): string {
@@ -163,12 +204,12 @@ export class UploadResume {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  resetFile() {
-    this.fileName = '';
-    this.fileSize = '';
+  resetFile(): void {
+    this.fileName.set('');
+    this.fileSize.set('');
   }
 
-  openLogin(event?: Event) {
+  openLogin(event?: Event): void {
     if (event) event.stopPropagation();
     this.googleAuth.signIn();
   }
