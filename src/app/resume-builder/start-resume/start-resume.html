@@ -18,8 +18,43 @@
   <mat-card class="start-resume-card" [class.drag-over]="isDragOver">
     <mat-card-content>
       <div class="start-resume-content">
-        <!-- Choice Buttons -->
-        <div class="choice-buttons">
+        <!-- Show sign-in section if not authenticated -->
+        <div class="auth-required-section" *ngIf="!isLoggedIn">
+          <div class="auth-icon-wrapper">
+            <div class="auth-icon-bg"></div>
+            <mat-icon class="auth-icon">lock</mat-icon>
+          </div>
+          <h3 class="auth-state-title">Sign In to Continue</h3>
+          <p class="auth-state-desc">
+            Unlock the full resume builder experience with your Google account
+          </p>
+
+          <div class="feature-highlights">
+            <div class="feature-item">
+              <mat-icon class="feature-icon">check_circle</mat-icon>
+              <span>Save your progress</span>
+            </div>
+            <div class="feature-item">
+              <mat-icon class="feature-icon">check_circle</mat-icon>
+              <span>Access premium templates</span>
+            </div>
+            <div class="feature-item">
+              <mat-icon class="feature-icon">check_circle</mat-icon>
+              <span>Export to multiple formats</span>
+            </div>
+          </div>
+
+          <button
+            mat-flat-button
+            class="signin-btn"
+            (click)="openLogin()">
+            <mat-icon>login</mat-icon>
+            <span>Sign In with Google</span>
+          </button>
+        </div>
+
+        <!-- Choice Buttons (shown when logged in) -->
+        <div class="choice-buttons" *ngIf="isLoggedIn">
           <button
             mat-flat-button
             color="primary"
@@ -84,9 +119,6 @@
               </div>
               <h3 class="upload-state-title">Processing Resume</h3>
               <p class="upload-state-desc">Extracting and structuring your resume data...</p>
-              <!-- <div class="loading-progress">
-                <div class="progress-bar"></div>
-              </div> -->
             </div>
 
             <!-- File Selected -->

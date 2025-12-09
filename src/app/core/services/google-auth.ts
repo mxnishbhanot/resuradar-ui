@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
+import { SkeletonService } from './skeleton';
 
 declare const google: any;
 
@@ -13,7 +14,7 @@ export class GoogleAuthService {
   private userSubject = new BehaviorSubject<any>(null);
   user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private skeltonLoader: SkeletonService) { }
 
   // 1️⃣ Initialize Google OAuth client + auto prompt setup
   initialize(clientId: string) {
@@ -88,7 +89,7 @@ export class GoogleAuthService {
 
   // 3️⃣ Handle manual sign-in (existing logic)
   private handleGoogleResponse(response: any) {
-    // console.log('Google access token:', response.access_token);
+    this.skeltonLoader.setLoading(true);
 
     this.http
       .post<{ token: string; user: any }>(
@@ -97,10 +98,13 @@ export class GoogleAuthService {
       )
       .pipe(
         tap((res) => {
-          // console.log('App JWT:', res.token);
           localStorage.setItem('auth_token', res.token);
           localStorage.setItem('user', JSON.stringify(res.user));
           this.setUser(res.user);
+        }),
+        finalize(() => {
+          // This always runs (success or error)
+          this.skeltonLoader.setLoading(false);
         })
       )
       .subscribe({
@@ -108,6 +112,7 @@ export class GoogleAuthService {
         error: (err) => console.error('Auth failed:', err),
       });
   }
+
 
   // 4️⃣ Handle auto One Tap login callback
   private handleAutoSignIn(response: any) {

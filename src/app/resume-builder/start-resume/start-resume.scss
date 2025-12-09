@@ -664,3 +664,198 @@
     }
   }
 }
+
+// Authentication required section
+.auth-required-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-xl 0;
+}
+
+.auth-icon-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+
+  .auth-icon-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: $primary-gradient;
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .auth-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    z-index: 1;
+  }
+}
+
+.auth-state-title {
+  font-size: clamp(1.5rem, 3vw, 1.75rem);
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.auth-state-desc {
+  font-size: 1rem;
+  color: $text-secondary;
+  margin: 0;
+  max-width: 400px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+// Feature highlights for sign-in section
+.feature-highlights {
+  display: flex;
+  gap: $spacing-lg;
+  margin: $spacing-md 0;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: $spacing-sm;
+    align-items: center;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $text-secondary;
+    font-size: 0.875rem;
+
+    .feature-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: $success-color;
+    }
+  }
+}
+
+// Sign-in button styling
+.signin-btn {
+  background: $primary-gradient !important;
+  color: $text-inverse !important;
+  padding: $spacing-md $spacing-xl !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  box-shadow: $shadow-md;
+  transition: all 0.3s ease !important;
+  margin-top: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  mat-icon {
+    margin-right: $spacing-xs;
+    color: $text-inverse;
+  }
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Ensure choice buttons are hidden when not logged in
+.choice-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xl;
+
+  @media (max-width: 768px) {
+    gap: $spacing-lg;
+  }
+
+  .choice-btn {
+    background: $primary-gradient !important;
+    color: $text-inverse !important;
+    padding: $spacing-md $spacing-xl !important;
+    border-radius: 50px !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    box-shadow: $shadow-md;
+    transition: all 0.3s ease !important;
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-xs;
+
+    mat-icon {
+      margin-right: $spacing-xs;
+    }
+
+    &:hover {
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .or-separator {
+    position: relative;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-secondary;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: $border-color;
+    }
+
+    &::before {
+      left: 0;
+    }
+
+    &::after {
+      right: 0;
+    }
+
+    span {
+      background: $card-bg;
+      padding: 0 $spacing-md;
+      z-index: 1;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+  }
+}

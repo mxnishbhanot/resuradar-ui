@@ -1,4 +1,3 @@
-// src/app/features/start-resume/start-resume.component.ts
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -10,6 +9,7 @@ import { ResumeBuilderService } from '../../core/services/resume-builder.service
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ToastService } from '../../core/services/toast';
+import { GoogleAuthService } from '../../core/services/google-auth';
 
 @Component({
   selector: 'rr-start-resume',
@@ -35,8 +35,17 @@ export class StartResumeComponent {
     private router: Router,
     private store: ResumeBuilderService,
     private http: HttpClient,
-    private toast: ToastService
+    private toast: ToastService,
+    public googleAuth: GoogleAuthService
   ) { }
+
+  get isLoggedIn(): boolean {
+    return this.googleAuth.isLoggedIn;
+  }
+
+  openLogin(): void {
+    this.googleAuth.signIn();
+  }
 
   startFromScratch(): void {
     this.store.clearLocal();

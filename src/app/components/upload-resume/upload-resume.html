@@ -40,7 +40,8 @@
           <div class="upload-initial" *ngIf="!fileName && !loading">
             <div class="upload-icon-wrapper">
               <div class="upload-icon-bg"></div>
-              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+              <mat-icon *ngIf="isLoggedIn" class="upload-icon">cloud_upload</mat-icon>
+              <mat-icon *ngIf="!isLoggedIn" class="upload-icon">lock</mat-icon>
             </div>
             <h3 class="upload-state-title" *ngIf="isLoggedIn">Drop Your Resume Here</h3>
             <h3 class="upload-state-title" *ngIf="!isLoggedIn">Ready to Get Started?</h3>
