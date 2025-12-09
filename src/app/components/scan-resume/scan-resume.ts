@@ -1,17 +1,24 @@
-// scan-resume.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+
+import { TextFieldModule } from '@angular/cdk/text-field';
+
+import { signal, computed, Signal } from '@angular/core';
+import { Subscription, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { ResumeService } from '../../core/services/resume';
-import { Router } from '@angular/router';
 import { ToastService } from '../../core/services/toast';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
 import { UpgradePro } from '../upgrade-pro/upgrade-pro';
 
@@ -25,19 +32,31 @@ import { UpgradePro } from '../upgrade-pro/upgrade-pro';
     MatCardModule,
     MatIconModule,
     MatInputModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TextFieldModule,
   ],
   templateUrl: './scan-resume.html',
-  styleUrls: ['./scan-resume.scss']
+  styleUrls: ['./scan-resume.scss'],
 })
-export class ScanResume {
-  loading = false;
-  fileName = '';
-  fileSize = '';
-  file: any = null;
-  jobDescription = '';
-  jdError = false;
-  isDragOver = false;
+export class ScanResume implements OnInit, OnDestroy {
+  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
+  // UI state as signals
+  loading = signal<boolean>(false);
+  fileName = signal<string>('');
+  fileSize = signal<string>('');
+  file = signal<File | null>(null);
+  jobDescription = signal<string>('');
+  jdError = signal<boolean>(false);
+  isDragOver = signal<boolean>(false);
+
+  // Derived signals
+  isLoggedIn!: Signal<boolean>;
+  hasFile!: Signal<boolean>;
+  wordCount!: Signal<number>;
+  canAnalyze!: Signal<boolean>;
+
+  private subs: Subscription[] = [];
 
   constructor(
     public googleAuth: GoogleAuthService,
@@ -45,116 +64,126 @@ export class ScanResume {
     private router: Router,
     private toast: ToastService,
     private dialog: MatDialog
-  ) { }
+  ) {
+    // derived signals
+    this.isLoggedIn = computed(() => {
+      // support both boolean flag or user object on service
+      const maybeBool = (this.googleAuth as any).isLoggedIn;
+      if (typeof maybeBool === 'boolean') return !!maybeBool;
+      const maybeUser = (this.googleAuth as any).user;
+      return !!maybeUser;
+    });
 
-  get isLoggedIn(): boolean {
-    return this.googleAuth.isLoggedIn;
+    this.hasFile = computed(() => !!this.fileName());
+    this.wordCount = computed(() => {
+      const txt = this.jobDescription().trim();
+      return txt ? txt.split(/\s+/).length : 0;
+    });
+
+    this.canAnalyze = computed(() =>
+      this.hasFile() && this.wordCount() > 0 && this.wordCount() <= 500 && !this.loading()
+    );
   }
 
-  get hasFile(): boolean {
-    return !!this.fileName;
+  ngOnInit(): void {
+    // nothing extra to init
   }
 
-  get wordCount(): number {
-    return this.jobDescription.trim() ? this.jobDescription.trim().split(/\s+/).length : 0;
+  ngOnDestroy(): void {
+    this.subs.forEach(s => {
+      try { s.unsubscribe(); } catch { /* noop */ }
+    });
   }
 
-  get canAnalyze(): boolean {
-    return this.hasFile && this.wordCount > 0 && this.wordCount <= 500 && !this.loading;
-  }
-
-  onFileSelected(event: any) {
-    if (!this.isLoggedIn) return;
-    const file = event.target.files[0];
+  // --- File handlers ---
+  onFileSelected(event: Event): void {
+    if (!this.isLoggedIn()) return;
+    const input = event.target as HTMLInputElement;
+    const file = input.files ? input.files.item(0) : null;
     if (file) this.processFile(file);
+    // allow reselecting same file later
+    if (input) input.value = '';
   }
 
-  onFileDropped(event: DragEvent) {
+  onFileDropped(event: DragEvent): void {
     event.preventDefault();
-    this.isDragOver = false;
-    if (!this.isLoggedIn) return;
+    this.isDragOver.set(false);
+    if (!this.isLoggedIn()) return;
 
     const files = event.dataTransfer?.files;
-    if (files?.length) {
+    if (files && files.length) {
       const file = files[0];
-      if (file.type === 'application/pdf') {
+      if (this.isValidFileType(file)) {
         this.processFile(file);
       } else {
-        this.toast.show(
-          'warning',
-          'Upload Warning',
-          'Please upload a PDF file',
-          5000
-        );
-
+        this.toast.show('warning', 'Upload Warning', 'Please upload a PDF file', 5000);
       }
     }
   }
 
-  onDragOver(event: DragEvent) {
+  onDragOver(event: DragEvent): void {
     event.preventDefault();
-    if (this.isLoggedIn) this.isDragOver = true;
+    if (this.isLoggedIn()) this.isDragOver.set(true);
   }
 
-  onDragLeave(event: DragEvent) {
+  onDragLeave(event: DragEvent): void {
     event.preventDefault();
-    this.isDragOver = false;
+    this.isDragOver.set(false);
   }
 
-  private processFile(file: File) {
+  // --- Core ---
+  private processFile(file: File): void {
     if (file.size > 5 * 1024 * 1024) {
-      this.toast.show(
-        'warning',
-        'Upload Warning',
-        'File must be under 5MB',
-        5000
-      );
-
+      this.toast.show('warning', 'Upload Warning', 'File must be under 5MB', 5000);
       return;
     }
-    this.fileName = file.name;
-    this.fileSize = this.formatFileSize(file.size);
-    this.file = file;
+
+    this.fileName.set(file.name);
+    this.fileSize.set(this.formatFileSize(file.size));
+    this.file.set(file);
   }
 
-  analyzeMatch() {
-    if (this.wordCount < 1 || this.wordCount > 500) {
-      this.jdError = true;
+  analyzeMatch(): void {
+    if (this.wordCount() < 1 || this.wordCount() > 500) {
+      this.jdError.set(true);
       this.toast.show('warning', 'Input Warning', 'Job description must be 1–500 words');
       return;
     }
 
-    this.jdError = false;
-    this.loading = true;
+    this.jdError.set(false);
+    this.loading.set(true);
 
     const formData = new FormData();
-    if (this.file) formData.append('resume', this.file);
-    formData.append('jobDescription', this.jobDescription);
+    const f = this.file();
+    if (f) formData.append('resume', f);
+    formData.append('jobDescription', this.jobDescription());
 
-    this.resumeService.matchResume(formData).subscribe({
-      next: (res) => {
-        this.loading = false;
-        this.toast.show('success', 'Analysis Complete', 'Match analysis complete!');
+    const sub = this.resumeService.matchResume(formData)
+      .pipe(
+        catchError(err => of({ __matchError: true, error: err }))
+      )
+      .subscribe((res: any) => {
+        this.loading.set(false);
 
-        this.resumeService.setLatestMatchAnalysis(res.data);
-        this.router.navigate(['/match-results']);
-      },
-
-      error: (err) => {
-        this.loading = false;
-
-        if (err.status === 403) {
-          this.handleQuotaExceeded(
-            err,
-            'JD matching is a Pro feature.'
-          );
-        } else {
-          this.toast.show('error', 'Analysis Failed', 'Analysis failed. Please try again.');
+        if (res && res.__matchError && res.error) {
+          const err = res.error;
+          if (err.status === 403) {
+            this.handleQuotaExceeded(err, 'JD matching is a Pro feature.');
+          } else {
+            this.toast.show('error', 'Analysis Failed', 'Analysis failed. Please try again.');
+          }
+          this.resetFile();
+          return;
         }
 
-        this.resetFile();
-      }
-    });
+        this.toast.show('success', 'Analysis Complete', 'Match analysis complete!');
+        if (res?.data) {
+          this.resumeService.setLatestMatchAnalysis(res.data);
+        }
+        this.router.navigate(['/match-results']);
+      });
+
+    this.subs.push(sub);
   }
 
   private getFullScreenDialogConfig(data?: any): MatDialogConfig {
@@ -168,34 +197,43 @@ export class ScanResume {
     };
   }
 
-  private handleQuotaExceeded(err: any, fallbackMsg: string) {
+  private handleQuotaExceeded(err: any, fallbackMsg: string): void {
     const message = err.error?.message || fallbackMsg;
-
     const modalRef = this.dialog.open(
       QuotaExhaustedModal,
       this.getFullScreenDialogConfig({ message })
     );
 
-    modalRef.afterClosed().subscribe(result => {
+    const sub = modalRef.afterClosed().subscribe(result => {
       if (result === 'upgrade') {
         this.dialog.open(UpgradePro, this.getFullScreenDialogConfig());
       }
     });
+
+    this.subs.push(sub);
   }
 
+  resetFile(): void {
+    this.fileName.set('');
+    this.fileSize.set('');
+    this.file.set(null);
+    this.jobDescription.set('');
+    this.jdError.set(false);
 
-
-  resetFile() {
-    this.fileName = '';
-    this.fileSize = '';
-    this.file = null;
-    const input = document.querySelector('#fileInput') as HTMLInputElement;
-    if (input) input.value = '';
+    // reset native file input if present
+    try {
+      const el = this.fileInputRef?.nativeElement;
+      if (el) el.value = '';
+    } catch { /* noop */ }
   }
 
-  openLogin(event?: Event) {
+  openLogin(event?: Event): void {
     if (event) event.stopPropagation();
     this.googleAuth.signIn();
+  }
+
+  private isValidFileType(file: File): boolean {
+    return file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
   }
 
   private formatFileSize(bytes: number): string {

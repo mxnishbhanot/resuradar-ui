@@ -1,15 +1,10 @@
 @use '../../../theme/variables' as *;
 
-// ==============================
-// SCAN SECTION STYLES (unified theme)
-// ==============================
-
 .scan-section {
   position: relative;
   max-width: 900px;
   margin: 0 auto;
   padding: $spacing-xl $spacing-lg;
-  // min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -19,19 +14,17 @@
   }
 }
 
-// Animated Background (same as upload component)
+// Animated Background
 .background-gradient {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    var(--primary-angle),
-    rgba(var(--primary-start), 0.085) 0%,
-    rgba(var(--primary-end), 0.085) 50%,
-    rgba(var(--secondary-start), 0.085) 100%
-  );
+  background: linear-gradient(var(--primary-angle),
+      rgba(var(--primary-start), 0.085) 0%,
+      rgba(var(--primary-end), 0.085) 50%,
+      rgba(var(--secondary-start), 0.085) 100%);
   z-index: -1;
   animation: gradientShift 15s ease infinite;
 
@@ -48,14 +41,31 @@
 }
 
 @keyframes gradientShift {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(30px, -30px) rotate(120deg); }
-  66% { transform: translate(-20px, 20px) rotate(240deg); }
+
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(30px, -30px) rotate(120deg);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) rotate(240deg);
+  }
 }
 
 // Header (same styling as upload component)
@@ -112,6 +122,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -119,11 +130,18 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
-// Scan Card (same as upload component)
+// Scan Card
 .scan-card {
   background: $card-bg;
   border-radius: $radius-xl;
@@ -153,7 +171,7 @@
   }
 }
 
-// Scan Area (unified styling)
+// Scan Area
 .scan-area {
   border: 2px dashed $border-color;
   border-radius: $radius-lg;
@@ -161,11 +179,9 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: linear-gradient(
-    var(--primary-angle),
-    $accent-overlay-02 0%,
-    rgba(var(--secondary-end), 0.02) 100%
-  );
+  background: linear-gradient(var(--primary-angle),
+      $accent-overlay-02 0%,
+      rgba(var(--secondary-end), 0.02) 100%);
   position: relative;
   overflow: hidden;
 
@@ -186,11 +202,9 @@
 
   &:hover:not(.disabled) {
     border-color: $accent-color;
-    background: linear-gradient(
-      var(--primary-angle),
-      rgba(var(--accent-rgb), 0.05) 0%,
-      rgba(var(--secondary-end), 0.05) 100%
-    );
+    background: linear-gradient(var(--primary-angle),
+        rgba(var(--accent-rgb), 0.05) 0%,
+        rgba(var(--secondary-end), 0.05) 100%);
     transform: translateY(-2px);
 
     &::before {
@@ -210,15 +224,13 @@
   &.has-file {
     border-style: solid;
     border-color: $success-color;
-    background: linear-gradient(
-      var(--success-angle),
-      rgba(var(--success-rgb), 0.05) 0%,
-      rgba(var(--success-end), 0.05) 100%
-    );
+    background: linear-gradient(var(--success-angle),
+        rgba(var(--success-rgb), 0.05) 0%,
+        rgba(var(--success-end), 0.05) 100%);
   }
 }
 
-// Scan States (unified with upload component)
+// Scan States
 .scan-initial,
 .scan-loading,
 .file-selected {
@@ -292,7 +304,7 @@
   }
 }
 
-// File Requirements (same as upload component)
+// File Requirements
 .file-requirements {
   display: flex;
   gap: $spacing-lg;
@@ -322,7 +334,7 @@
   }
 }
 
-// Sign In Button (same as upload component)
+// Sign In Button
 .signin-btn {
   background: $primary-gradient !important;
   color: $text-inverse !important;
@@ -349,7 +361,7 @@
   }
 }
 
-// Loading Animation (same as upload component)
+// Loading Animation
 .loading-animation {
   position: relative;
   width: 120px;
@@ -390,7 +402,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulseRing {
@@ -398,6 +412,7 @@
     transform: scale(0.8);
     opacity: 0.8;
   }
+
   100% {
     transform: scale(1.2);
     opacity: 0;
@@ -421,12 +436,20 @@
 }
 
 @keyframes progress {
-  0% { width: 0%; }
-  50% { width: 70%; }
-  100% { width: 100%; }
+  0% {
+    width: 0%;
+  }
+
+  50% {
+    width: 70%;
+  }
+
+  100% {
+    width: 100%;
+  }
 }
 
-// Success Animation (same as upload component)
+// Success Animation
 .success-animation {
   width: 80px;
   height: 80px;
@@ -461,13 +484,14 @@
     transform: scale(0);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
   }
 }
 
-// File Info (same as upload component)
+// File Info
 .file-info {
   display: flex;
   align-items: center;
@@ -535,7 +559,7 @@
   }
 }
 
-// Reupload Button (same as upload component)
+// Reupload Button
 .reupload-btn {
   background: $card-bg !important;
   border: 2px solid $accent-color !important;
@@ -557,7 +581,7 @@
   }
 }
 
-// JD Section (new component specific)
+// JD Section
 .jd-section {
   margin-top: $spacing-xl;
   display: flex;
@@ -565,8 +589,7 @@
   gap: $spacing-lg;
 
   .jd-input-field {
-    // width: 100%;
-    background: $hover-bg; // Using hover background instead of undefined variable
+    background: $hover-bg;
     border-radius: $radius-md;
     padding: $spacing-md;
     transition: all 0.3s ease;
@@ -580,7 +603,7 @@
     }
 
     mat-label {
-      color: $text-inverse;
+      color: $text-theme-inverse;
       font-weight: 500;
     }
 
@@ -591,7 +614,7 @@
       padding: $spacing-sm 0;
       resize: none;
       background: transparent;
-      color: $text-inverse;
+      color: $text-theme-inverse;
     }
 
     mat-hint {
@@ -632,18 +655,16 @@
   }
 }
 
-// Privacy Notice (same as upload component)
+// Privacy Notice
 .privacy-notice {
   display: flex;
   align-items: center;
   gap: $spacing-md;
   margin-top: $spacing-xl;
   padding: $spacing-lg;
-  background: linear-gradient(
-    var(--success-angle),
-    rgba(var(--success-rgb), 0.05) 0%,
-    rgba(var(--success-end), 0.05) 100%
-  );
+  background: linear-gradient(var(--success-angle),
+      rgba(var(--success-rgb), 0.05) 0%,
+      rgba(var(--success-end), 0.05) 100%);
   border-radius: $radius-md;
   border: 1px solid rgba(var(--success-rgb), 0.2);
   animation: fadeInUp 0.6s ease-out 0.4s backwards;
@@ -706,11 +727,5 @@
     min-height: auto;
     padding-top: $spacing-lg;
     padding-bottom: $spacing-lg;
-  }
-
-  .jd-section {
-    .analyze-btn {
-      // width: 100%;
-    }
   }
 }

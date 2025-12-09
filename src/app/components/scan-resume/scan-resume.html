@@ -1,8 +1,6 @@
 <div class="scan-section">
-  <!-- Animated Background -->
   <div class="background-gradient"></div>
 
-  <!-- Header -->
   <div class="scan-header">
     <div class="header-badge">
       <mat-icon>auto_awesome</mat-icon>
@@ -14,45 +12,32 @@
     </p>
   </div>
 
-  <!-- Scan Card -->
-  <mat-card class="scan-card" [class.drag-over]="isDragOver">
+  <mat-card class="scan-card" [class.drag-over]="isDragOver()">
     <mat-card-content>
       <div class="scan-content">
-        <!-- Upload & Input Area -->
-        <div
-          class="scan-area"
-          [class.disabled]="!isLoggedIn"
-          (click)="isLoggedIn && !hasFile ? fileInput.click() : openLogin($event)"
-          (drop)="onFileDropped($event)"
-          (dragover)="onDragOver($event)"
-          (dragleave)="onDragLeave($event)"
-          [class.has-file]="hasFile"
-        >
-          <input
-            type="file"
-            (change)="onFileSelected($event)"
-            accept=".pdf"
-            hidden
-            #fileInput
-          />
+        <div class="scan-area" [class.disabled]="!isLoggedIn()"
+          (click)="isLoggedIn() && !hasFile() ? fileInput.click() : openLogin($event)" (drop)="onFileDropped($event)"
+          (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" [class.has-file]="hasFile()">
+          <input #fileInput id="fileInput" type="file" (change)="onFileSelected($event)" accept=".pdf" hidden />
 
-          <!-- Initial State -->
-          <div class="scan-initial" *ngIf="!hasFile && !loading">
+          @if (!hasFile() && !loading()) {
+          <div class="scan-initial">
             <div class="upload-icon-wrapper">
               <div class="upload-icon-bg"></div>
-              <mat-icon *ngIf="isLoggedIn" class="upload-icon">cloud_upload</mat-icon>
-              <mat-icon *ngIf="!isLoggedIn" class="upload-icon">lock</mat-icon>
+              @if (isLoggedIn()) {
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+              } @else {
+              <mat-icon class="upload-icon">lock</mat-icon>
+              }
             </div>
-            <h3 class="scan-state-title" *ngIf="isLoggedIn">Upload Your Resume</h3>
-            <h3 class="scan-state-title" *ngIf="!isLoggedIn">Ready to Get Started?</h3>
-            <p class="scan-state-desc" *ngIf="isLoggedIn">
+
+            @if (isLoggedIn()) {
+            <h3 class="scan-state-title">Upload Your Resume</h3>
+            <p class="scan-state-desc">
               Drag & drop your PDF resume or <span class="highlight-text">click to browse</span>
             </p>
-            <p class="scan-state-desc" *ngIf="!isLoggedIn">
-              Sign in to unlock JD matching
-            </p>
 
-            <div class="file-requirements" *ngIf="isLoggedIn">
+            <div class="file-requirements">
               <div class="requirement-item">
                 <mat-icon>check_circle</mat-icon>
                 <span>PDF format</span>
@@ -66,104 +51,91 @@
                 <span>Instant results</span>
               </div>
             </div>
+            } @else {
+            <h3 class="scan-state-title">Ready to Get Started?</h3>
+            <p class="scan-state-desc">Sign in to unlock JD matching</p>
 
-            <button
-              *ngIf="!isLoggedIn"
-              mat-flat-button
-              class="signin-btn"
-              (click)="openLogin($event)">
+            <button mat-flat-button class="signin-btn" (click)="openLogin($event)">
               <mat-icon>login</mat-icon>
               <span>Sign In with Google</span>
             </button>
+            }
           </div>
+          }
 
-          <!-- Loading State -->
-          <div class="scan-loading" *ngIf="loading">
+          @if (loading()) {
+          <div class="scan-loading">
             <div class="loading-animation">
               <div class="spinner"></div>
               <div class="pulse-ring"></div>
             </div>
             <h3 class="scan-state-title">Analyzing Match</h3>
             <p class="scan-state-desc">We're comparing your resume to the job description...</p>
-            <!-- <div class="loading-progress">
-              <div class="progress-bar"></div>
-            </div> -->
           </div>
+          }
 
-          <!-- File Selected -->
-          <div class="file-selected" *ngIf="hasFile && !loading">
+          @if (hasFile() && !loading()) {
+          <div class="file-selected">
             <div class="success-animation">
               <mat-icon>check_circle</mat-icon>
             </div>
+
             <div class="file-info">
               <div class="file-icon">
                 <mat-icon>description</mat-icon>
               </div>
+
               <div class="file-details">
-                <h4>{{ fileName }}</h4>
-                <p>{{ fileSize }}</p>
+                <h4>{{ fileName() }}</h4>
+                <p>{{ fileSize() }}</p>
               </div>
-              <button
-                mat-icon-button
-                class="remove-btn"
-                (click)="resetFile(); $event.stopPropagation()"
-                matTooltip="Remove file"
-              >
+
+              <button mat-icon-button class="remove-btn" (click)="resetFile(); $event.stopPropagation()"
+                matTooltip="Remove file">
                 <mat-icon>close</mat-icon>
               </button>
             </div>
-            <button
-              mat-flat-button
-              color="primary"
-              class="reupload-btn"
-              (click)="fileInput.click(); $event.stopPropagation()"
-            >
+
+            <button mat-flat-button color="primary" class="reupload-btn"
+              (click)="fileInput.click(); $event.stopPropagation()">
               <mat-icon>swap_horiz</mat-icon>
               <span>Change Resume</span>
             </button>
           </div>
+          }
         </div>
 
-        <!-- Job Description Input (visible only when file is uploaded) -->
-        <div class="jd-section" *ngIf="hasFile && !loading">
+        @if (hasFile() && !loading()) {
+        <div class="jd-section">
           <mat-form-field class="jd-input-field" appearance="outline">
             <mat-label>Job Description</mat-label>
-            <textarea
-              matInput
-              [(ngModel)]="jobDescription"
-              cdkTextareaAutosize
-              cdkAutosizeMinRows="4"
-              cdkAutosizeMaxRows="8"
-              maxlength="2500"
-              placeholder="Paste the full job description here..."
-              required
-            ></textarea>
-            <mat-hint align="end">{{ wordCount }}/500 words</mat-hint>
-            <mat-error *ngIf="jdError">Job description must be 1-500 words</mat-error>
+            <textarea matInput [(ngModel)]="jobDescription" cdkTextareaAutosize cdkAutosizeMinRows="4"
+              cdkAutosizeMaxRows="8" maxlength="2500" placeholder="Paste the full job description here..."
+              required></textarea>
+            <mat-hint align="end">{{ wordCount() }}/500 words</mat-hint>
+            @if (jdError()) {
+            <mat-error>Job description must be 1-500 words</mat-error>
+            }
           </mat-form-field>
 
-          <button
-            mat-flat-button
-            class="analyze-btn"
-            [disabled]="!canAnalyze"
-            (click)="analyzeMatch()"
-          >
+          <button mat-flat-button class="analyze-btn" [disabled]="!canAnalyze()" (click)="analyzeMatch()">
             <mat-icon>document_scanner</mat-icon>
             <span>Analyze Match</span>
           </button>
         </div>
+        }
       </div>
     </mat-card-content>
   </mat-card>
 
-  <!-- Privacy Notice -->
   <div class="privacy-notice">
     <div class="privacy-icon">
       <mat-icon>verified_user</mat-icon>
     </div>
     <div class="privacy-content">
       <strong>Bank-Grade Security</strong>
-      <span>Your resume and job descriptions are encrypted end-to-end. We never share your data with third parties.</span>
+      <span>Your resume and job descriptions are encrypted end-to-end. We never share your data with third
+        parties.</span>
     </div>
   </div>
 </div>
