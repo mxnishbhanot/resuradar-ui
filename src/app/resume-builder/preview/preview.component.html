@@ -21,14 +21,14 @@
       </div>
     </div>
 
-    @if (!isLoading() && !showEmptyState()) {
+    <!-- @if (!isLoading() && !showEmptyState()) {
       <div class="zoom-controls">
         <button mat-icon-button (click)="zoomOut()" matTooltip="Zoom Out"><mat-icon>zoom_out</mat-icon></button>
         <span class="zoom-value">{{ zoomPercent() }}</span>
         <button mat-icon-button (click)="zoomIn()" matTooltip="Zoom In"><mat-icon>zoom_in</mat-icon></button>
         <button mat-icon-button (click)="resetZoom()" matTooltip="Reset Zoom"><mat-icon>refresh</mat-icon></button>
       </div>
-    }
+    } -->
 
     <button
       mat-flat-button color="primary"
@@ -60,15 +60,7 @@
 
     @else if (pdfUrl()) {
       <div class="preview-frame-wrapper">
-        <pdf-viewer
-          [src]="pdfUrl()!"
-          [zoom]="zoom()"
-          [original-size]="false"
-          [render-text]="false"
-          [show-all]="true"
-          (after-load-complete)="onPDFLoaded()"
-          style="display: block; width: 100%; height: 100%;"
-        ></pdf-viewer>
+        <iframe [src]="pdfUrl()" style="width:100%;height:100%;border:0;"></iframe>
       </div>
     }
   </div>

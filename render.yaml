@@ -1,10 +1,14 @@
 services:
   - type: web
     name: resuradar-frontend
-    env: static
-    buildCommand: npm install && npm run build-prod
-    staticPublishPath: dist/resume-analyzer-frontend/browser
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    env: node
+    buildCommand: |
+      npm install
+      npm run build-prod
+    startCommand: |
+      node dist/resume-analyzer-frontend/server/server.mjs
+    envVars:
+      - key: NODE_ENV
+        value: pre_alpha
+      - key: PORT
+        value: 10000 # Render assigns port and overrides automatically

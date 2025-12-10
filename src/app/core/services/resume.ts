@@ -1,32 +1,49 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { Observable, of } from 'rxjs';
+import { EnvironmentRuntimeService } from './environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class ResumeService {
 
   private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
+  private runtimeEnv = inject(EnvironmentRuntimeService);
 
-  /** Store latest analyses using Angular signals */
+  /** SSR-safe browser check */
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
+  /** Angular signals */
   latestAnalysis = signal<any>(null);
   latestMatchAnalysis = signal<any>(null);
 
-  /** 🔐 Build Authorization header */
+  /** 🔐 SSR-safe Authorization Header */
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('auth_token');
+    let token: string | null = null;
+
+    if (this.isBrowser()) {
+      try {
+        token = localStorage.getItem('auth_token');
+      } catch {
+        token = null;
+      }
+    }
+
     return token
       ? new HttpHeaders({ Authorization: `Bearer ${token}` })
       : new HttpHeaders();
   }
 
-  /** 📤 Upload resume */
+  /** 📤 Upload resume (Browser-only FormData OK) */
   uploadResume(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('resume', file);
 
     return this.http.post(
-      `${environment.apiUrl}/resumes/upload`,
+      `${this.runtimeEnv.getApiUrl()}/resumes/upload`,
       formData,
       { headers: this.getAuthHeaders() }
     );
@@ -35,13 +52,13 @@ export class ResumeService {
   /** 📊 Match resume with job description */
   matchResume(formData: FormData): Observable<any> {
     return this.http.post(
-      `${environment.apiUrl}/resumes/match`,
+      `${this.runtimeEnv.getApiUrl()}/resumes/match`,
       formData,
       { headers: this.getAuthHeaders() }
     );
   }
 
-  /** 💾 Signal-based caching */
+  /** 🔄 Cache (SSR-Safe: signals run in Node without issue) */
   setLatestAnalysis(data: any): void {
     this.latestAnalysis.set(data);
   }
@@ -50,7 +67,6 @@ export class ResumeService {
     this.latestMatchAnalysis.set(data);
   }
 
-  /** 🚀 Signal-based getters (template-friendly) */
   getLatestAnalysis() {
     return this.latestAnalysis();
   }
@@ -63,11 +79,13 @@ export class ResumeService {
     this.latestAnalysis.set(null);
   }
 
-  /** 📚 Resume history */
+  /** 📚 Resume history fetch */
   getResumeHistory(type: 'jd' | 'ats'): Observable<any> {
+    if (!this.isBrowser()) return of([]); // SSR-safe
     return this.http.get(
-      `${environment.apiUrl}/resumes/${type}`,
+      `${this.runtimeEnv.getApiUrl()}/resumes/${type}`,
       { headers: this.getAuthHeaders() }
     );
   }
+
 }

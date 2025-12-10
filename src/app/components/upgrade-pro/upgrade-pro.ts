@@ -1,4 +1,5 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -22,11 +23,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatProgressSpinnerModule,
     MatButtonModule,
     MatTooltipModule
-],
+  ],
   templateUrl: './upgrade-pro.html',
   styleUrls: ['./upgrade-pro.scss'],
 })
 export class UpgradePro implements OnInit {
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+
   isLoading = false;
   userName = '';
   userEmail = '';
@@ -40,7 +44,7 @@ export class UpgradePro implements OnInit {
     private router: Router,
     public dialogRef: MatDialogRef<UpgradePro>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.checkScreenSize();
@@ -50,17 +54,18 @@ export class UpgradePro implements OnInit {
 
   startCheckout(): void {
     this.isLoading = true;
+
     const orderId = `ORDER_${Date.now()}`;
     const amount = 1000; // ₹10 in paise
 
-    if (!(window as any).PhonePeCheckout) {
+    // 🚨 SSR-safe wrapper
+    if (!this.isBrowser || !(window as any).PhonePeCheckout) {
       this.toast.show(
         'warning',
         'System Warning',
         'Payment system not loaded. Please refresh and try again',
         5000
       );
-
       this.isLoading = false;
       return;
     }
@@ -70,24 +75,16 @@ export class UpgradePro implements OnInit {
         this.isLoading = false;
         this.close();
 
+        if (!this.isBrowser) return; // SSR safety
+
         const callback = (response: string) => {
           if (response === 'USER_CANCEL') {
-            this.toast.show(
-              'info',
-              'Payment Cancelled',
-              'Payment cancelled by user',
-            );
-
+            this.toast.show('info', 'Payment Cancelled', 'Payment cancelled by user');
           } else if (response === 'CONCLUDED') {
             this.verifyPayment(orderId);
           } else {
             console.error('Payment error:', response);
-            this.toast.show(
-              'error',
-              'Payment Failed',
-              'Payment failed. Please try again.',
-            );
-
+            this.toast.show('error', 'Payment Failed', 'Payment failed. Please try again.');
           }
         };
 
@@ -102,7 +99,7 @@ export class UpgradePro implements OnInit {
         this.toast.show(
           'error',
           'Payment Error',
-          'Failed to start payment. Please try again.',
+          'Failed to start payment. Please try again.'
         );
         this.isLoading = false;
       }
@@ -116,15 +113,17 @@ export class UpgradePro implements OnInit {
           this.toast.show(
             'success',
             'Payment Successful',
-            `Payment successful! Transaction ID: ${verifyRes.data.transactionId}`,
+            `Payment successful! Transaction ID: ${verifyRes.data.transactionId}`
           );
+
           this.userService.fetchCurrentUser().subscribe();
+
           this.router.navigate(['/upload', { txId: verifyRes.data.transactionId }]);
         } else if (verifyRes.data.status === 'PENDING') {
           this.toast.show(
             'warning',
             'Payment Processing',
-            'Payment is processing. Please wait...',
+            'Payment is processing. Please wait...'
           );
         } else {
           this.toast.show(
@@ -139,23 +138,25 @@ export class UpgradePro implements OnInit {
         this.toast.show(
           'error',
           'Verification Failed',
-          'Verification failed. Please contact support.',
+          'Verification failed. Please contact support.'
         );
       }
     });
   }
 
   close(): void {
-    this.isClosing = true; // Trigger the exit animation class
+    this.isClosing = true;
 
-    // Wait for animation to finish (300ms) before actually closing
     setTimeout(() => {
       this.dialogRef.close();
     }, 300);
   }
 
-  checkScreenSize() {
-    // Breakpoint at 768px (Standard Tablet/Mobile cutoff)
-    this.isMobile = window.innerWidth < 768;
+  checkScreenSize(): void {
+    if (this.isBrowser) {
+      this.isMobile = window.innerWidth < 768;
+    } else {
+      this.isMobile = false; // safe SSR default
+    }
   }
 }

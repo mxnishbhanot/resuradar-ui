@@ -1,0 +1,5 @@
+# robots.txt for ResuRadar
+User-agent: *
+Allow: /
+
+Sitemap: https://resuradar.in/sitemap.xml

@@ -1,5 +1,5 @@
-import { Component, OnInit, effect, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, effect, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -27,10 +27,16 @@ import { ThemeService } from '../../core/services/theme';
   styleUrls: ['./profile.scss'],
 })
 export class Profile {
-  // Theme state
-  isDarkTheme = signal<boolean>(localStorage.getItem('theme') === 'dark');
 
-  // User signal - starts with placeholder values
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+
+  // SSR-safe default theme
+  isDarkTheme = signal<boolean>(
+    this.isBrowser ? localStorage.getItem('theme') === 'dark' : false
+  );
+
+  // User state
   user = signal({
     name: 'Loading...',
     email: '',
@@ -57,7 +63,8 @@ export class Profile {
     public googleAuth: GoogleAuthService,
     private themeService: ThemeService
   ) {
-    // 🔄 Sync userService.user → profile.user signal
+
+    // Sync userService.user → local user signal
     effect(() => {
       const u = this.userService.user();
       if (u) {
@@ -72,13 +79,16 @@ export class Profile {
       }
     });
 
-    // 🔄 Fetch backend user on load (no subscription needed)
+    // Load backend user
     this.userService.fetchCurrentUser().subscribe();
   }
 
   toggleTheme() {
     this.themeService.toggle();
-    this.isDarkTheme.set(localStorage.getItem('theme') === 'dark');
+
+    if (this.isBrowser) {
+      this.isDarkTheme.set(localStorage.getItem('theme') === 'dark');
+    }
   }
 
   navigate() {

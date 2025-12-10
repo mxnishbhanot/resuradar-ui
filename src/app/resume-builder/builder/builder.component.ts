@@ -1,7 +1,13 @@
-
-import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  signal,
+  PLATFORM_ID
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID, Inject } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,7 +38,7 @@ interface BuilderTab {
     MatTooltipModule
   ],
   templateUrl: './builder.component.html',
-  styleUrl: './builder.component.scss',
+  styleUrls: ['./builder.component.scss'],
 })
 export class ResumeBuilderComponent implements OnInit {
 
@@ -40,6 +46,11 @@ export class ResumeBuilderComponent implements OnInit {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private platformId = inject(PLATFORM_ID);
+
+  // SSR helper
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   // Signals
   resumeId = signal<string | null>(null);
@@ -103,7 +114,7 @@ export class ResumeBuilderComponent implements OnInit {
   };
 
   constructor() {
-    // Sync query params
+    // Sync query params (safe on server)
     this.route.queryParamMap.subscribe(params => {
       this.resumeId.set(params.get('resumeId'));
     });
@@ -146,9 +157,12 @@ export class ResumeBuilderComponent implements OnInit {
   }
 
   scrollToTop() {
-    if (isPlatformBrowser(this.platformId)) {
+    if (!this.isBrowser()) return;
+    try {
       const el = document.querySelector('.content-wrapper');
       if (el) (el as HTMLElement).scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      /* noop */
     }
   }
 
@@ -193,18 +207,22 @@ export class ResumeBuilderComponent implements OnInit {
   }
 
   openPreview(): void {
-    if (!isPlatformBrowser(this.platformId)) return; // only client
+    if (!this.isBrowser()) return; // only client
 
-    // Lazy import preview component and open dialog with it
     import('../preview/preview.component').then(m => {
       const PreviewComponent = m.PreviewComponent;
 
-      const isMobile = window.innerWidth <= 768;
+      let isMobile = false;
+      try {
+        isMobile = window.innerWidth <= 768;
+      } catch {
+        isMobile = false;
+      }
 
       const config: MatDialogConfig = {
         width: isMobile ? '100vw' : '100%',
         height: isMobile ? '100vh' : '90vh',
-        maxWidth: isMobile ? '100vw' : 'none',
+        maxWidth: isMobile ? '100vw' : '680px',
         maxHeight: isMobile ? '100vh' : '90vh',
         panelClass: isMobile ? 'preview-modal-mobile' : 'preview-modal-desktop',
         data: { resumeId: this.resumeBuilder.snapshot._id },

@@ -1,9 +1,11 @@
-import { Component, Inject, effect, signal, inject } from '@angular/core';
+import { Component, Inject, signal, inject, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { fromEvent } from 'rxjs';
+
+import { fromEvent, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-quota-exhausted-modal',
@@ -12,24 +14,37 @@ import { fromEvent } from 'rxjs';
   templateUrl: './quota-exhausted-modal.html',
   styleUrls: ['./quota-exhausted-modal.scss']
 })
-export class QuotaExhaustedModal {
+export class QuotaExhaustedModal implements OnInit, OnDestroy {
 
-  // SIGNAL STATES
-  isMobile = signal(window.innerWidth < 768);
+  private platformId = inject(PLATFORM_ID);
+  private dialogRef = inject(MatDialogRef<QuotaExhaustedModal>);
+
+  /** SSR-safe: initialize with static value when not in browser */
+  isMobile = signal(false);
   isClosing = signal(false);
 
-  private dialogRef = inject(MatDialogRef<QuotaExhaustedModal>);
+  private resizeSub?: Subscription;
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: { message: string }) {}
 
-  // Auto-update mobile state on resize
-  resize$ = fromEvent(window, 'resize');
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit() {
-    effect(() => {
-      this.resize$.subscribe(() => {
+    if (this.isBrowser()) {
+      // Initial value
+      this.isMobile.set(window.innerWidth < 768);
+
+      // Listen safely to resize
+      this.resizeSub = fromEvent(window, 'resize').subscribe(() => {
         this.isMobile.set(window.innerWidth < 768);
       });
-    });
+    }
+  }
+
+  ngOnDestroy() {
+    this.resizeSub?.unsubscribe();
   }
 
   upgrade() {

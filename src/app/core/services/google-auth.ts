@@ -1,99 +1,201 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { finalize, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { SkeletonService } from './skeleton';
-import { environment } from '../../../environments/environment';
+import { EnvironmentRuntimeService } from './environment.service';
 
-declare const google: any;
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
 
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private skeleton = inject(SkeletonService);
+  private platformId = inject(PLATFORM_ID);
+  private runtimeEnv = inject(EnvironmentRuntimeService);
 
-  /** 🔥 Angular Signals replace BehaviorSubject */
+  /** Browser detection */
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
+  /** Signals */
   user = signal<any | null>(null);
 
-  /** Derived signals */
-  isLoggedIn = computed(() => !!localStorage.getItem('auth_token'));
+  isLoggedIn = computed(() =>
+    this.isBrowser() ? !!localStorage.getItem('auth_token') : false
+  );
+
   isUserLoaded = computed(() => !!this.user());
 
   private client: any = null;
+  private initPromise: Promise<void> | null = null;
 
   constructor() {
-    this.loadUserFromStorage();
+    // Only read from localStorage in browser
+    if (this.isBrowser()) {
+      this.loadUserFromStorage();
+    }
   }
 
   // ----------------------------------------------------------
-  // 1️⃣ Initialize Google OAuth + One Tap
+  // 1️⃣ Initialize Google OAuth + One Tap (returns a Promise)
   // ----------------------------------------------------------
-  initialize(clientId: string): void {
-    if (this.client) return; // Prevent re-init
+  initialize(clientId: string): Promise<void> {
+    if (!this.isBrowser()) {
+      // SSR: resolve immediately (no-op)
+      return Promise.resolve();
+    }
 
-    const alreadyLoggedIn = !!localStorage.getItem('auth_token');
-    if (alreadyLoggedIn) return;
+    // If already initialized, return resolved promise
+    if (this.client && window.google?.accounts) {
+      return Promise.resolve();
+    }
 
-    const startGsi = () => {
-      google.accounts.id.initialize({
-        client_id: clientId,
-        auto_select: true,
-        callback: (response: any) => this.handleAutoSignIn(response),
-        cancel_on_tap_outside: true,
-      });
+    // If an initialization is already in progress, return same promise
+    if (this.initPromise) return this.initPromise;
 
-      const lastPromptTime = localStorage.getItem('gsi_last_prompt');
-      const shouldPrompt =
-        !lastPromptTime ||
-        Date.now() - Number(lastPromptTime) > 6 * 60 * 60 * 1000;
+    // If user already logged in, skip One Tap init
+    try {
+      const alreadyLoggedIn = !!localStorage.getItem('auth_token');
+      if (alreadyLoggedIn) {
+        return Promise.resolve();
+      }
+    } catch {
+      // ignore storage errors
+    }
 
-      if (shouldPrompt) {
-        google.accounts.id.prompt();
-        localStorage.setItem('gsi_last_prompt', Date.now().toString());
+    this.initPromise = new Promise<void>((resolve, reject) => {
+      const startGsi = () => {
+        try {
+          if (!window.google?.accounts) {
+            return reject(new Error('google.accounts not available after script load'));
+          }
+
+          // One Tap initialization
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            auto_select: true,
+            callback: (response: any) => this.handleAutoSignIn(response),
+            cancel_on_tap_outside: true,
+          });
+
+          // Prompt logic (rate limit)
+          try {
+            const lastPromptTime = localStorage.getItem('gsi_last_prompt');
+            const shouldPrompt =
+              !lastPromptTime ||
+              Date.now() - Number(lastPromptTime) > 6 * 60 * 60 * 1000;
+
+            if (shouldPrompt) {
+              window.google.accounts.id.prompt();
+              localStorage.setItem('gsi_last_prompt', Date.now().toString());
+            }
+          } catch {
+            // ignore localStorage errors
+          }
+
+          // Init manual OAuth client
+          this.client = window.google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'email profile openid',
+            callback: (response: any) => this.handleManualSignIn(response),
+          });
+
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      // If script already present
+      if (window.google) {
+        if (window.google.accounts) {
+          startGsi();
+        } else {
+          // Wait briefly for google to be ready
+          const t = setInterval(() => {
+            if (window.google?.accounts) {
+              clearInterval(t);
+              startGsi();
+            }
+          }, 50);
+
+          setTimeout(() => {
+            clearInterval(t);
+            if (!window.google?.accounts) {
+              reject(new Error('google.accounts not available after timeout'));
+            }
+          }, 5000);
+        }
+        return;
       }
 
-      // Init manual OAuth client
-      this.client = google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
-        scope: 'email profile openid',
-        callback: (response: any) => this.handleManualSignIn(response),
-      });
-    };
+      // Load GSI script in browser
+      try {
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
 
-    if (!(window as any).google) {
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = startGsi;
-      document.head.appendChild(script);
-    } else {
-      startGsi();
-    }
+        script.onload = () => startGsi();
+        script.onerror = (ev) => reject(new Error('Failed to load GSI script'));
+
+        document.head.appendChild(script);
+      } catch (err) {
+        reject(err);
+      }
+    })
+      .finally(() => {
+        // clear initPromise so subsequent calls can retry if needed
+        this.initPromise = null;
+      });
+
+    return this.initPromise;
   }
 
   // ----------------------------------------------------------
   // 2️⃣ Manual Sign-In Flow
   // ----------------------------------------------------------
-  signIn() {
-    if (!this.client) {
-      console.error('Google client not initialized — initializing now...');
-      this.initialize(
+  async signIn(): Promise<void> {
+    if (!this.isBrowser()) return; // SSR: no-op
+
+    // Ensure initialization; wait up to initialize to finish
+    try {
+      await this.initialize(
         '159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com'
       );
+    } catch (err) {
+      console.error('[GoogleAuth] initialize failed', err);
+      // initialization failed — avoid calling client
       return;
     }
-    this.client.requestAccessToken();
+
+    if (!this.client) {
+      console.error('Google client not initialized — unable to sign in');
+      return;
+    }
+
+    // Request access token (manual OAuth)
+    try {
+      this.client.requestAccessToken();
+    } catch (err) {
+      console.error('requestAccessToken failed', err);
+    }
   }
 
-  // Manual sign-in callback
   private handleManualSignIn(response: any) {
     this.skeleton.setLoading(true);
 
     this.http
       .post<{ token: string; user: any }>(
-        `${environment.apiUrl}/auth/google`,
+        `${this.runtimeEnv.getApiUrl()}/auth/google`,
         { token: response.access_token }
       )
       .pipe(
@@ -101,8 +203,10 @@ export class GoogleAuthService {
         finalize(() => this.skeleton.setLoading(false))
       )
       .subscribe({
-        next: () => console.log('Manual sign-in success'),
-        error: (err) => console.error('Manual sign-in failed', err),
+        next: () => {},
+        error: (err) => {
+          console.error('Manual sign-in failed', err);
+        }
       });
   }
 
@@ -110,17 +214,21 @@ export class GoogleAuthService {
   // 3️⃣ One Tap Login Flow
   // ----------------------------------------------------------
   private handleAutoSignIn(response: any): void {
+    if (!this.isBrowser()) return; // SSR safe
+
     if (!response?.credential) return;
 
     this.http
       .post<{ token: string; user: any }>(
-        `${environment.apiUrl}/auth/google`,
+        `${this.runtimeEnv.getApiUrl()}/auth/google`,
         { idToken: response.credential }
       )
       .pipe(tap((res) => this.storeAuthData(res)))
       .subscribe({
-        next: () => console.log('One Tap Login Success'),
-        error: (err) => console.error('One Tap Login Failed:', err),
+        next: () => {},
+        error: (err) => {
+          console.error('One Tap Login Failed:', err);
+        }
       });
   }
 
@@ -128,35 +236,62 @@ export class GoogleAuthService {
   // 4️⃣ User + Token Helpers
   // ----------------------------------------------------------
   private storeAuthData(res: { token: string; user: any }) {
-    localStorage.setItem('auth_token', res.token);
-    localStorage.setItem('user', JSON.stringify(res.user));
+    if (this.isBrowser()) {
+      try {
+        localStorage.setItem('auth_token', res.token);
+        localStorage.setItem('user', JSON.stringify(res.user));
+      } catch {
+        // ignore storage errors
+      }
+    }
     this.user.set(res.user);
   }
 
   setUser(user: any) {
+    if (this.isBrowser()) {
+      try {
+        localStorage.setItem('user', JSON.stringify(user));
+      } catch {
+        /* noop */
+      }
+    }
     this.user.set(user);
-    localStorage.setItem('user', JSON.stringify(user));
   }
 
   loadUserFromStorage() {
-    const stored = localStorage.getItem('user');
-    if (stored) this.user.set(JSON.parse(stored));
+    if (!this.isBrowser()) return;
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) this.user.set(JSON.parse(stored));
+    } catch {
+      /* noop */
+    }
   }
 
   // ----------------------------------------------------------
   // 5️⃣ Logout
   // ----------------------------------------------------------
   logout() {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('activeTab');
+    if (this.isBrowser()) {
+      try {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('activeTab');
+
+        if (window.google?.accounts?.id) {
+          window.google.accounts.id.disableAutoSelect();
+        }
+      } catch {
+        /* noop */
+      }
+    }
 
     this.user.set(null);
 
-    if (google?.accounts?.id) {
-      google.accounts.id.disableAutoSelect();
+    try {
+      this.router.navigate(['/']);
+    } catch {
+      /* noop */
     }
-
-    this.router.navigate(['/']);
   }
 }

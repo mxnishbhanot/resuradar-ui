@@ -5,18 +5,20 @@ import {
   effect,
   computed,
   OnDestroy,
-  untracked
+  untracked,
+  PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 import { FormsModule } from '@angular/forms';
-import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'; // ← Add MAT_DIALOG_DATA
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 type Template = 'modern' | 'corporate' | 'minimal';
 
@@ -25,27 +27,33 @@ type Template = 'modern' | 'corporate' | 'minimal';
   standalone: true,
   imports: [
     FormsModule,
-    PdfViewerModule,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
     MatCardModule
-],
+  ],
   templateUrl: './preview.component.html',
-  styleUrl: './preview.component.scss',
+  styleUrls: ['./preview.component.scss'],
 })
 export class PreviewComponent implements OnDestroy {
+
   private store = inject(ResumeBuilderService);
-  private dialogRef = inject(MatDialogRef<PreviewComponent>); // Optional: for direct close
+  private dialogRef = inject(MatDialogRef<PreviewComponent>);
+  private platformId = inject(PLATFORM_ID);
+  private sanitizer = inject(DomSanitizer);
 
-  // Inject typed dialog data (modern + safe)
+  /** SSR-Safe Browser Check */
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
+  /** Dialog data */
   private data = inject<{ resumeId: string }>(MAT_DIALOG_DATA);
+  resumeId = signal(this.data.resumeId);
 
-  // Now derive a signal from data (handles null safely if needed)
-  resumeId = signal(this.data.resumeId); // ← Use this everywhere instead of input()
-
+  // UI State
   currentTemplate = signal<Template>('modern');
-  pdfUrl = signal<string | null>(null);
+  pdfUrl = signal<SafeResourceUrl | null>(null); // FIXED TYPE
   isLoading = signal(true);
   showEmptyState = signal(false);
   zoom = signal(1.0);
@@ -58,27 +66,30 @@ export class PreviewComponent implements OnDestroy {
 
   zoomPercent = computed(() => `${Math.round(this.zoom() * 100)}%`);
 
-constructor() {
-  effect(() => {
-    const template = this.currentTemplate();
-
-    untracked(() => {
-      this.loadPdfPreview(template);
+  constructor() {
+    effect(() => {
+      const template = this.currentTemplate();
+      untracked(() => this.loadPdfPreview(template));
     });
-  });
-}
+  }
 
+  // ----------------------------------------------------------
+  // LOAD PDF PREVIEW (SSR-SAFE + SANITIZED URL)
+  // ----------------------------------------------------------
   private loadPdfPreview(template: Template) {
     this.isLoading.set(true);
     this.showEmptyState.set(false);
-    this.zoom.set(1.0);
+    this.zoom.set(1);
 
-    if (this.pdfUrl()) {
-      URL.revokeObjectURL(this.pdfUrl()!);
-      this.pdfUrl.set(null);
+    if (this.isBrowser() && this.pdfUrl()) {
+      try {
+        // We cannot revoke SafeResourceUrl — only raw blobs.
+      } catch {}
     }
 
-    const id = this.resumeId(); // ← Now a signal
+    this.pdfUrl.set(null);
+
+    const id = this.resumeId();
     if (!id) {
       this.showEmptyState.set(true);
       this.isLoading.set(false);
@@ -87,47 +98,69 @@ constructor() {
 
     this.store.exportPdf(template, id).subscribe({
       next: (blob) => {
+        if (!this.isBrowser()) {
+          this.showEmptyState.set(true);
+          this.isLoading.set(false);
+          return;
+        }
+
         if (blob.size === 0) {
           this.showEmptyState.set(true);
         } else {
-          this.pdfUrl.set(URL.createObjectURL(blob));
+          const raw = URL.createObjectURL(blob);
+          const trusted = this.sanitizer.bypassSecurityTrustResourceUrl(raw);
+          this.pdfUrl.set(trusted);
         }
+
         this.isLoading.set(false);
       },
       error: () => {
         this.showEmptyState.set(true);
         this.isLoading.set(false);
-      },
+      }
     });
   }
 
+  // ----------------------------------------------------------
+  // ZOOM CONTROLS
+  // ----------------------------------------------------------
   zoomIn() { this.zoom.update(v => Math.min(v + 0.1, 3)); }
   zoomOut() { this.zoom.update(v => Math.max(v - 0.1, 0.3)); }
   resetZoom() { this.zoom.set(1.0); }
 
-  onPDFLoaded() {
-    setTimeout(() => this.isLoading.set(false), 100);
-  }
-
+  // ----------------------------------------------------------
+  // DOWNLOAD (SSR-SAFE)
+  // ----------------------------------------------------------
   downloadPDF() {
+    if (!this.isBrowser()) return;
+
     this.store.exportPdf(this.currentTemplate(), this.resumeId()).subscribe(blob => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `resume-${this.currentTemplate()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      try {
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `resume-${this.currentTemplate()}.pdf`;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error('Download failed:', e);
+      }
     });
   }
 
+  // ----------------------------------------------------------
+  // CLOSE
+  // ----------------------------------------------------------
   close() {
-    if (this.pdfUrl()) URL.revokeObjectURL(this.pdfUrl()!);
-    this.dialogRef.close(); // ← Clean close
+    this.dialogRef.close();
   }
 
   ngOnDestroy() {
-    if (this.pdfUrl()) URL.revokeObjectURL(this.pdfUrl()!);
+    // Nothing to revoke because SafeResourceUrl is not raw blob URLs.
   }
 }

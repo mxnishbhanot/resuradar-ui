@@ -1,82 +1,116 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "newProjectRoot": "projects",
   "projects": {
     "resume-analyzer-frontend": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "projectType": "application",
+
       "architect": {
         "build": {
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/"
               },
               {
                 "glob": "_redirects",
                 "input": "src",
-                "output": ""
+                "output": "/"
               }
             ],
-            "styles": ["src/styles.scss", "src/custom-theme.scss"]
+
+            "styles": [
+              "src/styles.scss",
+              "src/custom-theme.scss"
+            ]
           },
+
           "configurations": {
+            "development": {
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false,
+              "ssr": {
+                "entry": "src/server.ts"
+              }
+            },
+
             "production": {
-              "prerender": {
-                "routesFile": "routes.txt",
-                "discoverRoutes": true
+              "optimization": true,
+
+              "extractLicenses": true,
+              "sourceMap": false,
+
+              "outputHashing": "all",
+
+              "ssr": {
+                "entry": "src/server.ts"
               },
+
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "500kb",
                   "maximumError": "1mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kB",
-                  "maximumError": "40kB"
+                  "maximumWarning": "20kb",
+                  "maximumError": "40kb"
                 }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
+              ]
             }
           },
+
           "defaultConfiguration": "production"
         },
+
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4300
+          },
           "configurations": {
-            "production": {
-              "buildTarget": "resume-analyzer-frontend:build:production"
-            },
             "development": {
               "buildTarget": "resume-analyzer-frontend:build:development"
+            },
+            "production": {
+              "buildTarget": "resume-analyzer-frontend:build:production"
             }
           },
           "defaultConfiguration": "development"
         },
+
+        "serve-ssr": {
+          "builder": "@angular/build:ssr-dev-server",
+          "configurations": {
+            "development": {
+              "buildTarget": "resume-analyzer-frontend:build:development"
+            },
+            "production": {
+              "buildTarget": "resume-analyzer-frontend:build:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
         },
+
         "test": {
           "builder": "@angular/build:karma",
           "options": {
@@ -86,7 +120,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": ["src/styles.scss"]

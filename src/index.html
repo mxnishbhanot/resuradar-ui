@@ -2,20 +2,98 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>ResuRadar</title>
-  <base href="/">
-  <meta  name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:;">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<script src="https://mercury.phonepe.com/web/bundle/checkout.js"></script>
+  <meta charset="utf-8" />
+  <title>ResuRadar — AI Resume Analyzer</title>
+  <base href="/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Primary SEO -->
+  <meta name="description" content="ResuRadar — AI-powered resume analyzer. Get instant feedback, ATS optimization suggestions, and recruiter-ready improvements." />
+  <link rel="canonical" href="https://resuradar.in/" />
+
+  <!-- OpenGraph / Twitter -->
+  <meta property="og:site_name" content="ResuRadar" />
+  <meta property="og:title" content="ResuRadar — AI Resume Analyzer" />
+  <meta property="og:description" content="Get AI feedback, ATS-optimized resumes and instant recommendations to land interviews." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://resuradar.in/" />
+  <!-- replace with your logo -->
+  <meta property="og:image" content="https://resuradar.in/assets/og-image.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ResuRadar — AI Resume Analyzer" />
+  <meta name="twitter:description" content="AI feedback, ATS optimizations & recruiter-ready resume improvements." />
+  <meta name="twitter:image" content="https://resuradar.in/assets/og-image.png" />
+
+  <!-- Theme + manifest -->
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+
+  <!-- ================================
+       CONTENT SECURITY POLICY
+       NOTE: Strict CSP is best delivered via server HTTP headers.
+       This inline meta is useful for dev/local but consider moving to server headers.
+       (To be stricter remove 'unsafe-inline' and supply nonces/hashes for inline scripts)
+       ================================ -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' https:;
+    script-src 'self' 'unsafe-inline'
+      https://accounts.google.com
+      https://apis.google.com
+      https://mercury.phonepe.com;
+    script-src-elem 'self' 'unsafe-inline'
+      https://accounts.google.com
+      https://apis.google.com
+      https://mercury.phonepe.com;
+    style-src 'self' 'unsafe-inline'
+      https://fonts.googleapis.com;
+    img-src 'self' data: blob: https:;
+    font-src 'self' https://fonts.gstatic.com data:;
+    connect-src 'self'
+      https://accounts.google.com
+      https://oauth2.googleapis.com
+      https://www.googleapis.com
+      https://resuradar-api.onrender.com
+      http://localhost:5000
+      https://mercury.phonepe.com;
+    frame-src 'self' https://accounts.google.com https://mercury.phonepe.com blob:;
+    object-src 'none';
+    worker-src 'self' blob:;
+  " />
+
+  <!-- Cross-Origin-Opener-Policy for Google popup -->
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups" />
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+  <!-- Performance: preload / preconnect -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://accounts.google.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" as="style">
+
+  <!-- Fonts (deferred style load by browsers) -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- External scripts (defer/async). Important: For a strict CSP you should serve these via server headers
+       and use nonces or replace 'unsafe-inline' with script hashes. -->
+  <script src="https://mercury.phonepe.com/web/bundle/checkout.js" defer></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Small inlined critical CSS can be injected by your build for true FCP improvements.
+       Example: you can inline minimal critical styles here (only a few hundred bytes).  -->
+  <!-- <style>html,body{height:100%;margin:0;font-family:Roboto,system-ui,...}</style> -->
 </head>
 
 <body class="dark-theme">
+  <noscript>
+    <div style="padding:1rem;background:#fee; color:#600">
+      JavaScript is required for ResuRadar. Please enable JavaScript in your browser.
+    </div>
+  </noscript>
+
   <app-root></app-root>
 </body>
 
