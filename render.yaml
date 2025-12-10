@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     buildCommand: |
-      npm install
+      npm install --legacy-peer-deps
       npm run build-prod
     startCommand: |
       node dist/resume-analyzer-frontend/server/server.mjs
