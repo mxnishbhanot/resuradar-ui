@@ -55,7 +55,7 @@
             <h3 class="scan-state-title">Ready to Get Started?</h3>
             <p class="scan-state-desc">Sign in to unlock JD matching</p>
 
-            <button mat-flat-button class="signin-btn" (click)="openLogin($event)">
+            <button aria-label="Default" mat-flat-button class="signin-btn" (click)="openLogin($event)">
               <mat-icon>login</mat-icon>
               <span>Sign In with Google</span>
             </button>
@@ -90,13 +90,13 @@
                 <p>{{ fileSize() }}</p>
               </div>
 
-              <button mat-icon-button class="remove-btn" (click)="resetFile(); $event.stopPropagation()"
+              <button aria-label="Default" mat-icon-button class="remove-btn" (click)="resetFile(); $event.stopPropagation()"
                 matTooltip="Remove file">
                 <mat-icon>close</mat-icon>
               </button>
             </div>
 
-            <button mat-flat-button color="primary" class="reupload-btn"
+            <button aria-label="Default" mat-flat-button color="primary" class="reupload-btn"
               (click)="fileInput.click(); $event.stopPropagation()">
               <mat-icon>swap_horiz</mat-icon>
               <span>Change Resume</span>
@@ -118,7 +118,7 @@
             }
           </mat-form-field>
 
-          <button mat-flat-button class="analyze-btn" [disabled]="!canAnalyze()" (click)="analyzeMatch()">
+          <button aria-label="Default" mat-flat-button class="analyze-btn" [disabled]="!canAnalyze()" (click)="analyzeMatch()">
             <mat-icon>document_scanner</mat-icon>
             <span>Analyze Match</span>
           </button>

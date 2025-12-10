@@ -10,7 +10,7 @@
         <p class="page-subtitle">Track, analyze, and optimize your career documents.</p>
       </div>
 
-      <button class="btn-primary-gradient" (click)="createNew()">
+      <button class="btn-primary-gradient" (click)="createNew()" aria-label="Create New">
         <mat-icon>add</mat-icon>
         <span>Create New</span>
       </button>
@@ -37,26 +37,26 @@
       <section class="controls-section fade-in-up">
         <nav class="filter-pills">
 
-          <button class="pill" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
+          <button aria-label="Default" class="pill" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
             <span>All</span>
             <span class="pill-badge">{{ totalCount() }}</span>
           </button>
 
           <div class="divider"></div>
 
-          <button class="pill" [class.active]="activeFilter() === 'builder'" (click)="setFilter('builder')">
+          <button aria-label="Default" class="pill" [class.active]="activeFilter() === 'builder'" (click)="setFilter('builder')">
             <mat-icon>edit_document</mat-icon>
             <span>Builder</span>
             <span class="pill-badge">{{ builderResumes().length }}</span>
           </button>
 
-          <button class="pill" [class.active]="activeFilter() === 'ats'" (click)="setFilter('ats')">
+          <button aria-label="Default" class="pill" [class.active]="activeFilter() === 'ats'" (click)="setFilter('ats')">
             <mat-icon>analytics</mat-icon>
             <span>ATS</span>
             <span class="pill-badge">{{ atsResumes().length }}</span>
           </button>
 
-          <button class="pill" [class.active]="activeFilter() === 'jd'" (click)="setFilter('jd')">
+          <button aria-label="Default" class="pill" [class.active]="activeFilter() === 'jd'" (click)="setFilter('jd')">
             <mat-icon>work</mat-icon>
             <span>Matches</span>
             <span class="pill-badge">{{ jdResumes().length }}</span>
@@ -170,17 +170,17 @@
       @if (totalPages() > 1) {
       <div class="pagination-container fade-in-up">
 
-        <button class="page-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+        <button aria-label="Default" class="page-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
           <mat-icon>chevron_left</mat-icon>
         </button>
 
         @for (page of pageNumbers(); track page) {
-        <button class="page-btn" [class.active]="page === currentPage()" (click)="goToPage(page)">
+        <button aria-label="Default" class="page-btn" [class.active]="page === currentPage()" (click)="goToPage(page)">
           {{ page }}
         </button>
         }
 
-        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+        <button aria-label="Default" class="page-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
           <mat-icon>chevron_right</mat-icon>
         </button>
 
@@ -200,7 +200,7 @@
         <p>{{ getEmptyStateDescription() }}</p>
 
         <div class="btn-content">
-          <button class="btn-primary-gradient" (click)="getEmptyStateAction()">
+          <button aria-label="Default" class="btn-primary-gradient" (click)="getEmptyStateAction()">
             Start Now
           </button>
         </div>

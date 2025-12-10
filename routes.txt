@@ -1,0 +1,7 @@
+/
+/upload
+/scan
+/about-us
+/features
+/pricing
+/contact

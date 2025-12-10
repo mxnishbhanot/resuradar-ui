@@ -21,6 +21,7 @@
     </div>
 
     <button
+    aria-label="Default"
       mat-icon-button
       class="theme-toggle-btn"
       matTooltip="Switch theme"
@@ -75,7 +76,7 @@
   </div>
 
   <div class="sign-out-section">
-    <button mat-flat-button class="sign-out-btn" (click)="logout()">
+    <button mat-flat-button class="sign-out-btn" (click)="logout()" aria-label="Default">
       <mat-icon>logout</mat-icon>
       <span>Sign Out</span>
     </button>

@@ -11,7 +11,7 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,7 +25,6 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { UserService } from '../../core/services/user';
 import { SkeletonService } from '../../core/services/skeleton';
-import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { SkeletonLoader } from '../../shared/components/skeleton-loader/skeleton-loader';
 
 import { filter, take } from 'rxjs/operators';
@@ -45,6 +44,7 @@ import { Subject } from 'rxjs';
     MatRippleModule,
     RouterModule,
     SkeletonLoader,
+    NgOptimizedImage
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
@@ -64,7 +64,7 @@ export class Home implements OnInit, OnDestroy {
   private destroyed$ = new Subject<void>();
 
   // UI Signals
-  isLoading = this.skeletonService.loading; // re-using your service
+  isLoading = this.skeletonService.loading;
   mobileNavOpen = signal(false);
   profileMenuOpen = signal(false);
   isMobileView = signal(false);
@@ -88,64 +88,50 @@ export class Home implements OnInit, OnDestroy {
   isLoggedIn = computed(() => !!this.googleAuth.user());
 
   constructor() {
-    // router tracking (safe)
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((ev: any) => {
         this.currentUrl.set(ev.url);
         if (isPlatformBrowser(this.platformId)) {
-          // only scroll in browser and when sensible
           try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
         }
       });
 
-    // Sync GoogleAuth -> UserService once when user appears
     effect(() => {
       const authUser = this.googleAuth.user();
       if (!authUser) {
-        // no logged in user: clear server-side user copy
         this.userService.clearUser();
-        // make sure skeleton isn't stuck waiting for a user
         if (this.skeletonService.loading()) {
-          // short delay so UX doesn't feel abrupt
           setTimeout(() => this.skeletonService.setLoading(false), 250);
         }
         return;
       }
 
-      // if authUser present, fetch current user (one-time)
       this.userService.fetchCurrentUser().pipe(take(1)).subscribe({
         next: () => {
-          // stop skeleton when user data arrives
           if (this.skeletonService.loading()) {
             setTimeout(() => this.skeletonService.setLoading(false), 300);
           }
         },
         error: () => {
-          // failed to fetch — log out auth to keep app consistent
           this.googleAuth.logout();
           if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
         }
       });
     });
 
-    // Ensure skeleton eventually stops even if something goes wrong
-    // (fallback safety in case of network/3rd-party failures)
     setTimeout(() => {
       if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
-    }, 10_000); // 10s safety net
+    }, 10_000);
   }
 
   ngOnInit() {
     this.checkScreenSize();
 
-    // load cached user (non-blocking)
     if (isPlatformBrowser(this.platformId)) {
       try { this.googleAuth.loadUserFromStorage(); } catch (e) { /* noop */ }
     }
 
-    // Initialize Google Auth in a non-blocking, resilient way.
-    // Works whether initialize() returns a Promise or not.
     try {
       const maybePromise = this.googleAuth.initialize?.(
         '159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com'
@@ -155,30 +141,24 @@ export class Home implements OnInit, OnDestroy {
         (maybePromise as Promise<any>)
           .then(() => { /* ok */ })
           .catch(() => {
-            // don't block UI — ensure skeleton is turned off if auth fails
             if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
           });
-      } else {
-        // synchronous initialize completed or not present — nothing to wait for
       }
     } catch (err) {
-      // initialization threw synchronously — don't block UI
       if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
     }
   }
 
   ngOnDestroy(): void {
-    // cleanup DOM classes safely
     if (isPlatformBrowser(this.platformId)) {
       try { this.renderer.removeClass(document.body, 'mobile-nav-open'); } catch { /* noop */ }
     }
-    // teardown observables
     this.destroyed$.next();
     this.destroyed$.complete();
   }
 
   // ---------------------------------------
-  // UI Events (all guarded with isPlatformBrowser)
+  // UI Events
   // ---------------------------------------
 
   @HostListener('window:resize')
@@ -234,12 +214,10 @@ export class Home implements OnInit, OnDestroy {
   }
 
   navigate(path: string) {
-    // keep navigation simple & safe
     try { this.router.navigate([`/${path}`]); } catch { /* noop */ }
   }
 
   loginWithGoogle() {
-    // non-blocking sign-in
     try {
       this.googleAuth.signIn();
     } catch {
@@ -247,7 +225,11 @@ export class Home implements OnInit, OnDestroy {
     }
   }
 
-  openUpgradeModal() {
+  // OPTIMIZED: Dynamic import for the Upgrade Modal
+  async openUpgradeModal() {
+    // Lazy load the component JS chunk only when clicked
+    const { UpgradePro } = await import('../../components/upgrade-pro/upgrade-pro');
+
     const cfg = new MatDialogConfig();
     cfg.panelClass = 'responsive-dialog-wrapper';
     cfg.maxWidth = '100vw';
@@ -270,8 +252,6 @@ export class Home implements OnInit, OnDestroy {
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
   }
 
-  // NOTE: keep UI visible — don't hide entire app on mobile build route.
-  // If you want to hide the sidebar on small screens for /build, handle that in the template.
   shouldRender() {
     return true;
   }

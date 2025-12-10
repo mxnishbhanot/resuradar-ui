@@ -67,7 +67,7 @@
                 <h3 class="upload-state-title">Ready to Get Started?</h3>
                 <p class="upload-state-desc">Sign in to unlock AI-powered resume analysis</p>
 
-                <button mat-flat-button class="signin-btn" (click)="openLogin($event)">
+                <button aria-label="Sign In with Google" mat-flat-button class="signin-btn" (click)="openLogin($event)">
                   <mat-icon>login</mat-icon>
                   <span>Sign In with Google</span>
                 </button>
@@ -104,6 +104,7 @@
 
                 <button
                   mat-icon-button
+                  aria-label="Remove file"
                   class="remove-btn"
                   (click)="resetFile(); $event.stopPropagation()"
                   matTooltip="Remove file"
@@ -117,6 +118,7 @@
                 color="primary"
                 class="reupload-btn"
                 (click)="fileInput.click(); $event.stopPropagation()"
+                aria-label="Choose Different File"
               >
                 <mat-icon>swap_horiz</mat-icon>
                 <span>Choose Different File</span>

@@ -5,7 +5,7 @@
     <div class="desktop-card" [class.scale-out]="isClosing" (click)="$event.stopPropagation()">
       <div class="glow-orb"></div>
 
-      <button mat-icon-button class="close-btn" (click)="close()">
+      <button mat-icon-button class="close-btn" (click)="close()" aria-label="close">
         <mat-icon>close</mat-icon>
       </button>
 
@@ -52,7 +52,7 @@
             </li>
           </ul>
 
-          <button class="cta-btn pulse-animation" (click)="startCheckout()" [disabled]="isLoading">
+          <button aria-label="Upgrade Now" class="cta-btn pulse-animation" (click)="startCheckout()" [disabled]="isLoading">
             {{ isLoading ? 'Processing...' : 'Upgrade Now' }}
             <mat-icon>arrow_forward</mat-icon>
           </button>
@@ -69,7 +69,7 @@
       <div class="decorative-header">
         <div class="header-content">
           <div class="badge-pill mobile">Pro Plan</div>
-          <button mat-icon-button class="mobile-close" (click)="close()">
+          <button aria-label="close" mat-icon-button class="mobile-close" (click)="close()">
             <mat-icon>close</mat-icon>
           </button>
         </div>
@@ -124,7 +124,7 @@
       </div>
 
       <div class="mobile-footer">
-        <button class="cta-btn" (click)="startCheckout()" [disabled]="isLoading">
+        <button aria-label="Upgrade Now" class="cta-btn" (click)="startCheckout()" [disabled]="isLoading">
           <span>Upgrade Now</span>
           <span class="sep">•</span>
           <span>$10 Lifetime</span>
