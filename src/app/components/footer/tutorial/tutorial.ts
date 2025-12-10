@@ -1,11 +1,11 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { SafeUrlPipe } from '../../../shared/utils/safe-url-pipe';
 import { MatCard } from '@angular/material/card';
 
 @Component({
   selector: 'app-tutorial',
-  imports: [CommonModule, SafeUrlPipe, MatCard],
+  imports: [SafeUrlPipe, MatCard],
   templateUrl: './tutorial.html',
   styleUrl: './tutorial.scss',
 })

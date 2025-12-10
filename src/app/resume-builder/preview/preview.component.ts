@@ -7,7 +7,7 @@ import {
   OnDestroy,
   untracked
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,14 +24,13 @@ type Template = 'modern' | 'corporate' | 'minimal';
   selector: 'rr-preview',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     PdfViewerModule,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    MatCardModule,
-  ],
+    MatCardModule
+],
   templateUrl: './preview.component.html',
   styleUrl: './preview.component.scss',
 })

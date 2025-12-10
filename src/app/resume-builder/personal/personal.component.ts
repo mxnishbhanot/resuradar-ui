@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   FormBuilder,
   FormGroup,
@@ -20,7 +20,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'rr-personal',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -28,7 +27,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
     MatIconModule,
     MatCardModule,
     MatProgressSpinnerModule
-  ],
+],
   templateUrl: './personal.component.html',
   styleUrls: ['./personal.component.scss']
 })

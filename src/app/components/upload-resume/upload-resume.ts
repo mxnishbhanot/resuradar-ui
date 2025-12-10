@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,12 +21,11 @@ import { UpgradePro } from '../upgrade-pro/upgrade-pro';
   selector: 'app-upload-resume',
   standalone: true,
   imports: [
-    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatTooltipModule,
-  ],
+    MatTooltipModule
+],
   templateUrl: './upload-resume.html',
   styleUrls: ['./upload-resume.scss']
 })

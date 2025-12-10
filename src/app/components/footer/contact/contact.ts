@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,13 +14,12 @@ import { ToastService } from '../../../core/services/toast';
   selector: 'app-contact',
   standalone: true,
   imports: [
-    CommonModule,
     MatCardModule,
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
     CdkTextareaAutosize
-  ],
+],
   templateUrl: './contact.html',
   styleUrls: ['./contact.scss']
 })

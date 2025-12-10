@@ -1,5 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   FormBuilder,
   FormGroup,
@@ -21,7 +21,6 @@ import { ResumeBuilderService } from '../../core/services/resume-builder.service
   selector: 'rr-summary',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     TextFieldModule,
     MatFormFieldModule,
@@ -31,7 +30,7 @@ import { ResumeBuilderService } from '../../core/services/resume-builder.service
     MatCardModule,
     MatTooltipModule,
     CdkTextareaAutosize
-  ],
+],
   templateUrl: './summary.component.html',
   styleUrl: './summary.component.scss',
 })

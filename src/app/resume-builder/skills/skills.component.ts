@@ -1,5 +1,5 @@
 import { Component, inject, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -34,7 +34,6 @@ export interface SkillCategory {
   selector: 'rr-skills',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -43,7 +42,7 @@ export interface SkillCategory {
     MatCardModule,
     MatChipsModule,
     MatTooltipModule
-  ],
+],
   templateUrl: './skills.component.html',
   styleUrl: './skills.component.scss',
 })

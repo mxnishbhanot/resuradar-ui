@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -26,15 +26,14 @@ import { UpgradePro } from '../upgrade-pro/upgrade-pro';
   selector: 'app-scan-resume',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatCardModule,
     MatIconModule,
     MatInputModule,
     MatTooltipModule,
-    TextFieldModule,
-  ],
+    TextFieldModule
+],
   templateUrl: './scan-resume.html',
   styleUrls: ['./scan-resume.scss'],
 })

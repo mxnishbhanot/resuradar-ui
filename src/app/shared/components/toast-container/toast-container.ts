@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ToastService, Toast } from '../../../core/services/toast';
@@ -8,10 +8,9 @@ import { ToastService, Toast } from '../../../core/services/toast';
   selector: 'app-toast-container',
   standalone: true,
   imports: [
-    CommonModule,
     MatIconModule,
-    MatButtonModule,
-  ],
+    MatButtonModule
+],
   templateUrl: './toast-container.html',
   styleUrl: './toast-container.scss',
   // Optional: animate with Angular animations (or use CSS)

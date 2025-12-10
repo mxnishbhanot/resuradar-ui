@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
+
 import { PaymentService } from '../../core/services/payment';
 import { Router } from '@angular/router';
 import { UserService } from '../../core/services/user';
@@ -16,14 +16,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   selector: 'app-upgrade-pro',
   standalone: true,
   imports: [
-    CommonModule,
     MatIconModule,
     MatCardModule,
     MatDividerModule,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatTooltipModule
-  ],
+],
   templateUrl: './upgrade-pro.html',
   styleUrls: ['./upgrade-pro.scss'],
 })

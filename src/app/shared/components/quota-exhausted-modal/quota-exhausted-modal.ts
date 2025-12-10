@@ -1,5 +1,5 @@
 import { Component, Inject, effect, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -8,7 +8,7 @@ import { fromEvent } from 'rxjs';
 @Component({
   selector: 'app-quota-exhausted-modal',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatIconModule],
   templateUrl: './quota-exhausted-modal.html',
   styleUrls: ['./quota-exhausted-modal.scss']
 })

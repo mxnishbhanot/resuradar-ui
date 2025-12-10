@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,12 +13,11 @@ import { UserService } from '../../../core/services/user';
   selector: 'app-features',
   standalone: true,
   imports: [
-    CommonModule,
     MatCardModule,
     MatIconModule,
     MatButtonModule,
     RouterModule
-  ],
+],
   templateUrl: './features.html',
   styleUrl: './features.scss'
 })

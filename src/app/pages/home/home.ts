@@ -11,7 +11,7 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 
-import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
+import { isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,7 +34,6 @@ import { Subject } from 'rxjs';
   selector: 'app-home',
   standalone: true,
   imports: [
-    CommonModule,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
@@ -45,7 +44,7 @@ import { Subject } from 'rxjs';
     RouterModule,
     SkeletonLoader,
     NgOptimizedImage
-  ],
+],
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })

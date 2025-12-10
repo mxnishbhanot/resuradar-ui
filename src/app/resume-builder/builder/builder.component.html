@@ -21,29 +21,29 @@
     </div>
 
     <nav class="nav-menu">
-      <button *ngFor="let tab of tabs; let i = index"
-        class="nav-item-premium"
-        [class.active]="currentTab() === i"
-        [class.completed]="isTabCompleted(i)"
-        (click)="navigateToTab(i)"
-        (mouseenter)="prefetchTab(i)">
-
-        <div class="nav-bg-layer"></div>
-
-        <div class="nav-content">
-
-          <div class="icon-stage">
-            <mat-icon class="base-icon">{{ tab.icon }}</mat-icon>
-
-            <mat-icon *ngIf="isTabCompleted(i)" class="check-icon">check_circle</mat-icon>
+      @for (tab of tabs; track tab; let i = $index) {
+        <button
+          class="nav-item-premium"
+          [class.active]="currentTab() === i"
+          [class.completed]="isTabCompleted(i)"
+          (click)="navigateToTab(i)"
+          (mouseenter)="prefetchTab(i)">
+          <div class="nav-bg-layer"></div>
+          <div class="nav-content">
+            <div class="icon-stage">
+              <mat-icon class="base-icon">{{ tab.icon }}</mat-icon>
+              @if (isTabCompleted(i)) {
+                <mat-icon class="check-icon">check_circle</mat-icon>
+              }
+            </div>
+            <span class="nav-label">{{ tab.label }}</span>
+            <mat-icon class="hover-arrow">chevron_right</mat-icon>
+            @if (currentTab() === i) {
+              <div class="active-bar"></div>
+            }
           </div>
-
-          <span class="nav-label">{{ tab.label }}</span>
-          <mat-icon class="hover-arrow">chevron_right</mat-icon>
-
-          <div *ngIf="currentTab() === i" class="active-bar"></div>
-        </div>
-      </button>
+        </button>
+      }
     </nav>
   </aside>
 
@@ -54,9 +54,9 @@
       <div class="form-container">
 
         <!-- dynamic step loader -->
-        <ng-container *ngIf="currentStepComponent() as Step">
+        @if (currentStepComponent(); as Step) {
           <ng-container *ngComponentOutlet="Step"></ng-container>
-        </ng-container>
+        }
 
         <!-- fallback skeleton while component loads -->
         <ng-template #skeleton>
@@ -88,17 +88,21 @@
           </span>
         </div>
 
-        <button *ngIf="currentTab() < tabs.length - 1" mat-button class="deck-btn-primary" (click)="nextStep()">
-          Next <mat-icon>arrow_forward</mat-icon>
-        </button>
+        @if (currentTab() < tabs.length - 1) {
+          <button mat-button class="deck-btn-primary" (click)="nextStep()">
+            Next <mat-icon>arrow_forward</mat-icon>
+          </button>
+        }
 
-        <button *ngIf="currentTab() === tabs.length - 1"
-          [disabled]="completionPercentage() != 100"
-          mat-button
-          class="deck-btn-primary finish"
-          (click)="markCompleted()">
-          Finish <mat-icon>stars</mat-icon>
-        </button>
+        @if (currentTab() === tabs.length - 1) {
+          <button
+            [disabled]="completionPercentage() != 100"
+            mat-button
+            class="deck-btn-primary finish"
+            (click)="markCompleted()">
+            Finish <mat-icon>stars</mat-icon>
+          </button>
+        }
 
       </div>
 
@@ -134,17 +138,21 @@
         </button>
 
         <!-- NEXT / FINISH -->
-        <button *ngIf="currentTab() < tabs.length - 1" mat-flat-button class="btn-premium btn-primary" (click)="nextStep()">
-          Next Step <mat-icon>arrow_forward</mat-icon>
-        </button>
+        @if (currentTab() < tabs.length - 1) {
+          <button mat-flat-button class="btn-premium btn-primary" (click)="nextStep()">
+            Next Step <mat-icon>arrow_forward</mat-icon>
+          </button>
+        }
 
-        <button *ngIf="currentTab() === tabs.length - 1"
-          [disabled]="completionPercentage() != 100"
-          mat-flat-button
-          class="btn-premium btn-finish"
-          (click)="markCompleted()">
-          Finish <mat-icon>stars</mat-icon>
-        </button>
+        @if (currentTab() === tabs.length - 1) {
+          <button
+            [disabled]="completionPercentage() != 100"
+            mat-flat-button
+            class="btn-premium btn-finish"
+            (click)="markCompleted()">
+            Finish <mat-icon>stars</mat-icon>
+          </button>
+        }
 
       </div>
 

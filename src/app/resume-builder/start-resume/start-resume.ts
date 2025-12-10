@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -16,12 +16,11 @@ import { environment } from '../../../environments/environment';
   selector: 'rr-start-resume',
   standalone: true,
   imports: [
-    CommonModule,
     MatButtonModule,
     MatCardModule,
     MatIconModule,
     FormsModule
-  ],
+],
   templateUrl: './start-resume.html',
   styleUrls: ['./start-resume.scss']
 })
