@@ -2,6 +2,7 @@ services:
   - type: web
     name: resuradar-frontend
     env: node
+    plan: free
     buildCommand: |
       npm install
       npm run build-prod
@@ -9,6 +10,6 @@ services:
       node dist/resume-analyzer-frontend/server/server.mjs
     envVars:
       - key: NODE_ENV
-        value: pre_alpha
+        value: production
       - key: PORT
         value: 10000 # Render assigns port and overrides automatically
