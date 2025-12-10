@@ -20,7 +20,7 @@
         <div class="toolbar-left">
           <div class="logo" (click)="navigate('')">
             <div class="logo-icon-wrapper">
-              <img class="logo-icon" src="resuradar.png" alt="ResuRadar" />
+              <img class="logo-icon" src="resuradar.png" alt="ResuRadar" loading="lazy" />
               <div class="logo-glow"></div>
             </div>
             <span class="logo-text">Resu<span class="logo-highlight">Radar</span></span>
@@ -85,7 +85,7 @@
               <button mat-button class="profile-trigger" (click)="toggleProfileMenu()">
                 <div class="avatar-wrapper">
                   @if (avatar()) {
-                    <img [src]="avatar()" alt="Profile" class="avatar-image" />
+                    <img [src]="avatar()" alt="Profile" class="avatar-image" loading="lazy" />
                   } @else {
                     <div class="avatar-icon">
                       <mat-icon>person</mat-icon>
@@ -118,7 +118,7 @@
       <div class="menu-header" (click)="$event.stopPropagation()">
         <div class="avatar-wrapper large">
           @if (avatar()) {
-            <img [src]="avatar()" class="avatar-image" />
+            <img [src]="avatar()" class="avatar-image" loading="lazy" />
           } @else {
             <div class="avatar-icon"><mat-icon>person</mat-icon></div>
           }
@@ -169,7 +169,7 @@
 
     <div class="mobile-nav-header">
       <div class="logo" (click)="navigate(''); toggleMobileNav()">
-        <div class="logo-icon-wrapper"><img class="logo-icon" src="resuradar.png" /></div>
+        <div class="logo-icon-wrapper"><img class="logo-icon" src="resuradar.png" loading="lazy" /></div>
         <span class="logo-text">Resu<span class="logo-highlight">Radar</span></span>
       </div>
       <button mat-icon-button (click)="toggleMobileNav()"><mat-icon>close</mat-icon></button>
@@ -181,7 +181,7 @@
         <div class="mobile-user-card" (click)="navigate('profile'); toggleMobileNav()">
           <div class="avatar-wrapper">
             @if (avatar()) {
-              <img [src]="avatar()" class="avatar-image"/>
+              <img [src]="avatar()" class="avatar-image" loading="lazy"/>
             } @else {
               <div class="avatar-icon"><mat-icon>person</mat-icon></div>
             }
@@ -307,7 +307,7 @@
 
           <div class="footer-brand">
             <div class="logo" (click)="navigate('')">
-              <div class="logo-icon-wrapper"><img class="logo-icon" src="resuradar.png" /></div>
+              <div class="logo-icon-wrapper"><img class="logo-icon" src="resuradar.png" loading="lazy" /></div>
               <span class="logo-text">Resu<span class="logo-highlight">Radar</span></span>
             </div>
 

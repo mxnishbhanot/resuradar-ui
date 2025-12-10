@@ -5,7 +5,7 @@
     <div class="header-content">
       <div class="avatar-section">
         @if (user().picture) {
-          <img [src]="user().picture" alt="Profile" class="avatar-large" />
+          <img loading="lazy" [src]="user().picture" alt="Profile" class="avatar-large" />
         } @else {
           <div class="avatar-placeholder">{{ userInitials() }}</div>
         }

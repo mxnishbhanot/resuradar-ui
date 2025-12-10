@@ -7,10 +7,11 @@ import {
   computed,
   inject,
   OnInit,
-  OnDestroy
+  OnDestroy,
+  PLATFORM_ID
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,8 +26,10 @@ import { GoogleAuthService } from '../../core/services/google-auth';
 import { UserService } from '../../core/services/user';
 import { SkeletonService } from '../../core/services/skeleton';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
-import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader';
-import { filter } from 'rxjs/operators';
+import { SkeletonLoader } from '../../shared/components/skeleton-loader/skeleton-loader';
+
+import { filter, take } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -41,36 +44,42 @@ import { filter } from 'rxjs/operators';
     MatTooltipModule,
     MatRippleModule,
     RouterModule,
-    SkeletonLoaderComponent,
+    SkeletonLoader,
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })
 export class Home implements OnInit, OnDestroy {
 
-  /** ✅ NEW: DI fields (safe for signals/effects) */
+  // injectables
   private router = inject(Router);
   private renderer = inject(Renderer2);
   private dialog = inject(MatDialog);
   public googleAuth = inject(GoogleAuthService);
   private userService = inject(UserService);
   private skeletonService = inject(SkeletonService);
+  private platformId = inject(PLATFORM_ID);
 
-  /** UI Signals */
-  isLoading = this.skeletonService.loading;
+  // teardown
+  private destroyed$ = new Subject<void>();
+
+  // UI Signals
+  isLoading = this.skeletonService.loading; // re-using your service
   mobileNavOpen = signal(false);
   profileMenuOpen = signal(false);
   isMobileView = signal(false);
   isIpadView = signal(false);
   showBackToTop = signal(false);
 
-  /** Tabs */
-  activeTab = signal(localStorage.getItem('activeTab') || 'upload');
+  // Tabs
+  activeTab = signal(
+    (isPlatformBrowser(this.platformId) && localStorage.getItem('activeTab')) || 'upload'
+  );
 
-  /** URL */
+  // URL
   currentUrl = signal('');
 
-  /** User State */
+  // User State
   user = this.userService.user;
   userName = computed(() => this.user()?.name ?? 'Guest User');
   userEmail = computed(() => this.user()?.email ?? '');
@@ -79,68 +88,118 @@ export class Home implements OnInit, OnDestroy {
   isLoggedIn = computed(() => !!this.googleAuth.user());
 
   constructor() {
-    /** Router tracking */
+    // router tracking (safe)
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((ev: any) => {
         this.currentUrl.set(ev.url);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (isPlatformBrowser(this.platformId)) {
+          // only scroll in browser and when sensible
+          try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
+        }
       });
 
-    /** Sync GoogleAuth → UserService */
+    // Sync GoogleAuth -> UserService once when user appears
     effect(() => {
       const authUser = this.googleAuth.user();
       if (!authUser) {
+        // no logged in user: clear server-side user copy
         this.userService.clearUser();
+        // make sure skeleton isn't stuck waiting for a user
+        if (this.skeletonService.loading()) {
+          // short delay so UX doesn't feel abrupt
+          setTimeout(() => this.skeletonService.setLoading(false), 250);
+        }
         return;
       }
 
-      this.userService.fetchCurrentUser().subscribe({
-        error: () => this.googleAuth.logout()
+      // if authUser present, fetch current user (one-time)
+      this.userService.fetchCurrentUser().pipe(take(1)).subscribe({
+        next: () => {
+          // stop skeleton when user data arrives
+          if (this.skeletonService.loading()) {
+            setTimeout(() => this.skeletonService.setLoading(false), 300);
+          }
+        },
+        error: () => {
+          // failed to fetch — log out auth to keep app consistent
+          this.googleAuth.logout();
+          if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
+        }
       });
     });
 
-    /** Stop skeleton after user loads */
-    effect(() => {
-      if (this.user()) {
-        setTimeout(() => this.skeletonService.setLoading(false), 800);
-      }
-    });
+    // Ensure skeleton eventually stops even if something goes wrong
+    // (fallback safety in case of network/3rd-party failures)
+    setTimeout(() => {
+      if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
+    }, 10_000); // 10s safety net
   }
 
   ngOnInit() {
     this.checkScreenSize();
 
-    // Load stored user
-    this.googleAuth.loadUserFromStorage();
+    // load cached user (non-blocking)
+    if (isPlatformBrowser(this.platformId)) {
+      try { this.googleAuth.loadUserFromStorage(); } catch (e) { /* noop */ }
+    }
 
-    // Initialize Google
-    setTimeout(() => {
-      this.googleAuth.initialize(
+    // Initialize Google Auth in a non-blocking, resilient way.
+    // Works whether initialize() returns a Promise or not.
+    try {
+      const maybePromise = this.googleAuth.initialize?.(
         '159597214381-oa813em96pornk6kmb6uaos2vnk2o02g.apps.googleusercontent.com'
       );
-    }, 500);
+
+      if (maybePromise !== undefined && typeof (maybePromise as any).then === 'function') {
+        (maybePromise as Promise<any>)
+          .then(() => { /* ok */ })
+          .catch(() => {
+            // don't block UI — ensure skeleton is turned off if auth fails
+            if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
+          });
+      } else {
+        // synchronous initialize completed or not present — nothing to wait for
+      }
+    } catch (err) {
+      // initialization threw synchronously — don't block UI
+      if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
+    }
   }
 
   ngOnDestroy(): void {
-    this.renderer.removeClass(document.body, 'mobile-nav-open');
+    // cleanup DOM classes safely
+    if (isPlatformBrowser(this.platformId)) {
+      try { this.renderer.removeClass(document.body, 'mobile-nav-open'); } catch { /* noop */ }
+    }
+    // teardown observables
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
-  // -------------------------------------------------------------------
-  // UI Events
-  // -------------------------------------------------------------------
+  // ---------------------------------------
+  // UI Events (all guarded with isPlatformBrowser)
+  // ---------------------------------------
 
   @HostListener('window:resize')
   onResize() {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.checkScreenSize();
   }
 
   @HostListener('window:scroll')
   onScroll() {
-    this.showBackToTop.set(window.scrollY > 300);
+    if (!isPlatformBrowser(this.platformId)) return;
+    try { this.showBackToTop.set(window.scrollY > 300); } catch { /* noop */ }
   }
 
   checkScreenSize() {
+    if (!isPlatformBrowser(this.platformId)) {
+      this.isMobileView.set(false);
+      this.isIpadView.set(false);
+      return;
+    }
+
     const w = window.innerWidth;
     this.isMobileView.set(w <= 768);
     this.isIpadView.set(w <= 820);
@@ -153,17 +212,19 @@ export class Home implements OnInit, OnDestroy {
     const next = !this.mobileNavOpen();
     this.mobileNavOpen.set(next);
 
+    if (!isPlatformBrowser(this.platformId)) return;
     if (next) {
-      this.renderer.addClass(document.body, 'mobile-nav-open');
+      try { this.renderer.addClass(document.body, 'mobile-nav-open'); } catch { /* noop */ }
       this.profileMenuOpen.set(false);
     } else {
-      this.renderer.removeClass(document.body, 'mobile-nav-open');
+      try { this.renderer.removeClass(document.body, 'mobile-nav-open'); } catch { /* noop */ }
     }
   }
 
   closeMobileNav() {
     this.mobileNavOpen.set(false);
-    this.renderer.removeClass(document.body, 'mobile-nav-open');
+    if (!isPlatformBrowser(this.platformId)) return;
+    try { this.renderer.removeClass(document.body, 'mobile-nav-open'); } catch { /* noop */ }
   }
 
   toggleProfileMenu() {
@@ -173,11 +234,17 @@ export class Home implements OnInit, OnDestroy {
   }
 
   navigate(path: string) {
-    this.router.navigate([`/${path}`]);
+    // keep navigation simple & safe
+    try { this.router.navigate([`/${path}`]); } catch { /* noop */ }
   }
 
   loginWithGoogle() {
-    this.googleAuth.signIn();
+    // non-blocking sign-in
+    try {
+      this.googleAuth.signIn();
+    } catch {
+      if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
+    }
   }
 
   openUpgradeModal() {
@@ -193,25 +260,28 @@ export class Home implements OnInit, OnDestroy {
 
   setActiveTab(tab: string) {
     this.activeTab.set(tab);
-    localStorage.setItem('activeTab', tab);
+    if (isPlatformBrowser(this.platformId)) {
+      try { localStorage.setItem('activeTab', tab); } catch { /* noop */ }
+    }
   }
 
   scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!isPlatformBrowser(this.platformId)) return;
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
   }
 
+  // NOTE: keep UI visible — don't hide entire app on mobile build route.
+  // If you want to hide the sidebar on small screens for /build, handle that in the template.
   shouldRender() {
-    const url = this.currentUrl();
-    return !(url.includes('/build') && window.innerWidth < 1024);
+    return true;
   }
 
   externalLink(url: 'site' | 'linkedin') {
+    if (!isPlatformBrowser(this.platformId)) return;
     const urls = {
       site: 'https://resuradar.in',
       linkedin: 'https://www.linkedin.com/in/manish-kumar-031124226/',
     };
-
-    window.open(urls[url], '_blank');
+    try { window.open(urls[url], '_blank'); } catch { /* noop */ }
   }
-
 }

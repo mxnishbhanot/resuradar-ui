@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './skeleton-loader.html',
   styleUrls: ['./skeleton-loader.scss']
 })
-export class SkeletonLoaderComponent {
+export class SkeletonLoader {
   // Signal Input
   isMobile = input<boolean>(false);
 }
