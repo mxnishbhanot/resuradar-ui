@@ -3,6 +3,7 @@ services:
     name: resuradar-frontend
     env: node
     plan: free
+    region: singapore
     buildCommand: |
       npm install --legacy-peer-deps
       npm run build-prod
