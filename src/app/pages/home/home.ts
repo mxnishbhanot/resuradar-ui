@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 
 import { isPlatformBrowser, NgOptimizedImage } from '@angular/common';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,8 +41,8 @@ import { Subject } from 'rxjs';
     MatDividerModule,
     MatTooltipModule,
     MatRippleModule,
-    RouterModule,
     SkeletonLoader,
+    RouterOutlet,
     NgOptimizedImage
   ],
   templateUrl: './home.html',

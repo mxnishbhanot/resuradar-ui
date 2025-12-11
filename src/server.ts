@@ -6,8 +6,13 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
+
+// --- ADD THESE LINES FOR DEBUGGING ---
+console.log('Current Server Dir:', import.meta.dirname);
+console.log('Target Browser Dir:', browserDistFolder);
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();

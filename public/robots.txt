@@ -1,5 +1,4 @@
-# robots.txt for ResuRadar
 User-agent: *
-Allow: /
+Disallow:
 
 Sitemap: https://resuradar.in/sitemap.xml
