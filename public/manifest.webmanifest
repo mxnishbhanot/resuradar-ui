@@ -1,0 +1,9 @@
+{
+  "name": "ResuRadar",
+  "short_name": "ResuRadar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1976d2",
+  "icons": []
+}
