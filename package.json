@@ -1,6 +1,7 @@
 {
   "name": "resume-analyzer-frontend",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "ng": "ng",
     "start": "serve -s dist/resume-analyzer-frontend/browser -l $PORT",
