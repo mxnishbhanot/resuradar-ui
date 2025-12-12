@@ -6,3 +6,4 @@
     img-src 'self' data: https://accounts.google.com https://mercury.phonepe.com;
     frame-src https://accounts.google.com https://mercury.phonepe.com;
     style-src 'self' 'unsafe-inline';
+*/
