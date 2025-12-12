@@ -36,10 +36,6 @@
           },
           "configurations": {
             "production": {
-              "prerender": {
-                "routesFile": "routes.txt",
-                "discoverRoutes": true
-              },
               "budgets": [
                 {
                   "type": "initial",
