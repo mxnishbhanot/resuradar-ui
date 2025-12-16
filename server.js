@@ -9,19 +9,19 @@ app.use((req, res, next) => {
     "Content-Security-Policy",
     "default-src 'self'; " +
 
-    // Scripts (JS + module workers fallback)
+    // Scripts
     "script-src 'self' 'unsafe-inline' blob: https://accounts.google.com https://mercury.phonepe.com https://cdn.jsdelivr.net; " +
 
-    // Explicit worker rule (important)
+    // Workers (pdf.js)
     "worker-src 'self' blob:; " +
 
-    // API / fetch / XHR
-    "connect-src 'self' http://localhost:5000 https://resuradar-api-production.up.railway.app https://accounts.google.com https://mercury.phonepe.com; " +
+    // Fetch / XHR / Streams (IMPORTANT)
+    "connect-src 'self' blob: http://localhost:5000 https://resuradar-api-production.up.railway.app https://accounts.google.com https://mercury.phonepe.com; " +
 
     // Images
     "img-src 'self' data: https://accounts.google.com https://mercury.phonepe.com https://lh3.googleusercontent.com; " +
 
-    // Frames (OAuth / PhonePe)
+    // Frames
     "frame-src https://accounts.google.com https://mercury.phonepe.com; " +
 
     // Styles
@@ -32,6 +32,7 @@ app.use((req, res, next) => {
   );
   next();
 });
+
 
 // Express uses CommonJS, so __dirname works now
 const folder = path.join(__dirname, "dist/resume-analyzer-frontend/browser");
