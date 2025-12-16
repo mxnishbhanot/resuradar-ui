@@ -10,7 +10,7 @@ app.use((req, res, next) => {
     "Content-Security-Policy",
     "default-src 'self'; " +
       "script-src 'self' 'unsafe-inline' https://accounts.google.com https://mercury.phonepe.com; " +
-      "connect-src 'self' http://localhost:5000 https://resuradar-api.railway.internal https://accounts.google.com https://mercury.phonepe.com; " +
+      "connect-src 'self' http://localhost:5000 resuradar-api-production.up.railway.app https://accounts.google.com https://mercury.phonepe.com; " +
       "img-src 'self' data: https://accounts.google.com https://mercury.phonepe.com; " +
       "frame-src https://accounts.google.com https://mercury.phonepe.com; " +
       "style-src 'self' 'unsafe-inline' https://accounts.google.com; " +
