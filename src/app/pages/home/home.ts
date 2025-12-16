@@ -85,7 +85,7 @@ export class Home implements OnInit, OnDestroy {
   userEmail = computed(() => this.user()?.email ?? '');
   avatar = computed(() => this.user()?.picture ?? '');
   isPremium = computed(() => !!this.user()?.isPremium);
-  isLoggedIn = computed(() => !!this.googleAuth.isLoggedIn());
+  isLoggedIn = computed(() => !!this.googleAuth.user());
 
   constructor() {
     this.router.events
@@ -99,26 +99,32 @@ export class Home implements OnInit, OnDestroy {
 
     effect(() => {
       const authUser = this.googleAuth.user();
+
       if (!authUser) {
         this.userService.clearUser();
+
         if (this.skeletonService.loading()) {
           setTimeout(() => this.skeletonService.setLoading(false), 250);
         }
         return;
       }
 
-      this.userService.fetchCurrentUser().pipe(take(1)).subscribe({
-        next: () => {
-          if (this.skeletonService.loading()) {
-            setTimeout(() => this.skeletonService.setLoading(false), 300);
+      // ✅ Fetch backend user ONCE per login
+      if (!this.userService.user()) {
+        this.userService.fetchCurrentUser().pipe(take(1)).subscribe({
+          next: () => {
+            if (this.skeletonService.loading()) {
+              setTimeout(() => this.skeletonService.setLoading(false), 300);
+            }
+          },
+          error: () => {
+            this.googleAuth.logout();
+            this.skeletonService.setLoading(false);
           }
-        },
-        error: () => {
-          this.googleAuth.logout();
-          if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
-        }
-      });
+        });
+      }
     });
+
 
     setTimeout(() => {
       if (this.skeletonService.loading()) this.skeletonService.setLoading(false);
