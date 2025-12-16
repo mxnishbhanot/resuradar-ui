@@ -12,21 +12,21 @@ function getApiUrl(): string {
     return 'http://localhost:5000/api';
   }
 
-  if (href.includes('render.com')) {
+  if (href.includes('railway')) {
     // Render deployment
-    return 'https://resuradar-api.onrender.com/api';
+    return 'https://resuradar-api.railway.internal/api';
   }
 
   if (href.includes('prod')) {
     // Production environment (based on URL containing "prod")
-    return 'https://resuradar-api.onrender.com/api';
+    return 'https://resuradar-api.railway.internal/api';
   }
 
   // Default fallback
-  return 'https://resuradar-api.onrender.com/api';
+  return 'https://resuradar-api.railway.internal/api';
 }
 
 function isProduction(): boolean {
   const href = window.location.href;
-  return href.includes('prod') || href.includes('render.com');
+  return href.includes('prod') || href.includes('railway');
 }
