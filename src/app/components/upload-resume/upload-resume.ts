@@ -64,6 +64,8 @@ export class UploadResume implements OnInit, OnDestroy {
       // fallback: check user object truthiness
       return !!(this.googleAuth as any).user;
     });
+    console.log(this.isLoggedIn , "this.isLoggedIn");
+
   }
 
   ngOnInit(): void {

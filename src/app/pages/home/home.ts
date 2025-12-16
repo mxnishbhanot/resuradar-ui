@@ -85,7 +85,7 @@ export class Home implements OnInit, OnDestroy {
   userEmail = computed(() => this.user()?.email ?? '');
   avatar = computed(() => this.user()?.picture ?? '');
   isPremium = computed(() => !!this.user()?.isPremium);
-  isLoggedIn = computed(() => !!this.googleAuth.user());
+  isLoggedIn = computed(() => !!this.googleAuth.isLoggedIn());
 
   constructor() {
     this.router.events
