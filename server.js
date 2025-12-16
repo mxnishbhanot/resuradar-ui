@@ -10,14 +10,15 @@ app.use((req, res, next) => {
     "Content-Security-Policy",
     "default-src 'self'; " +
       "script-src 'self' 'unsafe-inline' https://accounts.google.com https://mercury.phonepe.com; " +
-      "connect-src 'self' http://localhost:5000 resuradar-api-production.up.railway.app https://accounts.google.com https://mercury.phonepe.com; " +
-      "img-src 'self' data: https://accounts.google.com https://mercury.phonepe.com; " +
+      "connect-src 'self' http://localhost:5000 https://resuradar-api-production.up.railway.app https://accounts.google.com https://mercury.phonepe.com; " +
+      "img-src 'self' data: https://accounts.google.com https://mercury.phonepe.com https://lh3.googleusercontent.com; " +
       "frame-src https://accounts.google.com https://mercury.phonepe.com; " +
       "style-src 'self' 'unsafe-inline' https://accounts.google.com; " +
       "font-src 'self' https://fonts.gstatic.com data:;"
   );
   next();
 });
+
 
 // Express uses CommonJS, so __dirname works now
 const folder = path.join(__dirname, "dist/resume-analyzer-frontend/browser");
