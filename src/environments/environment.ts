@@ -14,16 +14,16 @@ function getApiUrl(): string {
 
   if (href.includes('railway')) {
     // Render deployment
-    return 'resuradar-api-production.up.railway.app/api';
+    return 'https://resuradar-api-production.up.railway.app/api';
   }
 
   if (href.includes('prod')) {
     // Production environment (based on URL containing "prod")
-    return 'resuradar-api-production.up.railway.app/api';
+    return 'https://resuradar-api-production.up.railway.app/api';
   }
 
   // Default fallback
-  return 'resuradar-api-production.up.railway.app/api';
+  return 'https://resuradar-api-production.up.railway.app/api';
 }
 
 function isProduction(): boolean {
