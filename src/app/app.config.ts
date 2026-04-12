@@ -1,24 +1,15 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { AuthInterceptor, EncryptionInterceptor } from './shared/utils/encryption.interceptor';
+import { AuthInterceptor } from './shared/utils/encryption.interceptor';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(
-      withFetch(),
-      withInterceptors([EncryptionInterceptor, AuthInterceptor])
-    ),
-
-    // Browser only — must be moved (see next step)
-    // provideBrowserGlobalErrorListeners(),
-
-    // SSR + Browser hydration (correct)
-    provideClientHydration(withEventReplay())
-  ]
+    provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
+    provideClientHydration(withEventReplay()),
+  ],
 };

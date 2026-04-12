@@ -59,7 +59,7 @@ export interface ResumeBuilderState {
   experiences: Experience[];
   projects: Project[];  // CHANGED: Use detailed Project[]
   skills: SkillCategory[];  // CHANGED: Use SkillCategory[] (separate from projects)
-  theme?: 'modern' | 'minimal';
+  theme?: 'modern' | 'minimal' | 'corporate' | 'executive' | 'creative';
   colorScheme?: 'light' | 'dark';
 }
 

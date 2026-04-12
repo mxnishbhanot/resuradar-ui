@@ -6,7 +6,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
-
 import { PaymentService } from '../../core/services/payment';
 import { Router } from '@angular/router';
 import { UserService } from '../../core/services/user';
@@ -34,7 +33,7 @@ export class UpgradePro implements OnInit {
   isLoading = false;
   userName = '';
   userEmail = '';
-  isMobile: boolean = false;
+  isMobile = false;
   isClosing = false;
 
   constructor(
@@ -56,26 +55,20 @@ export class UpgradePro implements OnInit {
     this.isLoading = true;
 
     const orderId = `ORDER_${Date.now()}`;
-    const amount = 1000; // ₹10 in paise
+    const planId = 'premium_monthly';
 
-    // 🚨 SSR-safe wrapper
     if (!this.isBrowser || !(window as any).PhonePeCheckout) {
-      this.toast.show(
-        'warning',
-        'System Warning',
-        'Payment system not loaded. Please refresh and try again',
-        5000
-      );
+      this.toast.show('warning', 'System Warning', 'Payment system not loaded. Please refresh and try again', 5000);
       this.isLoading = false;
       return;
     }
 
-    this.paymentService.initiatePayment({ orderId, amount }).subscribe({
+    this.paymentService.initiatePayment({ orderId, planId }).subscribe({
       next: (res) => {
         this.isLoading = false;
         this.close();
 
-        if (!this.isBrowser) return; // SSR safety
+        if (!this.isBrowser) return;
 
         const callback = (response: string) => {
           if (response === 'USER_CANCEL') {
@@ -83,7 +76,6 @@ export class UpgradePro implements OnInit {
           } else if (response === 'CONCLUDED') {
             this.verifyPayment(orderId);
           } else {
-            console.error('Payment error:', response);
             this.toast.show('error', 'Payment Failed', 'Payment failed. Please try again.');
           }
         };
@@ -94,13 +86,8 @@ export class UpgradePro implements OnInit {
           type: 'IFRAME'
         });
       },
-      error: (err) => {
-        console.error('Failed to initiate payment:', err);
-        this.toast.show(
-          'error',
-          'Payment Error',
-          'Failed to start payment. Please try again.'
-        );
+      error: () => {
+        this.toast.show('error', 'Payment Error', 'Failed to start payment. Please try again.');
         this.isLoading = false;
       }
     });
@@ -117,46 +104,25 @@ export class UpgradePro implements OnInit {
           );
 
           this.userService.fetchCurrentUser().subscribe();
-
           this.router.navigate(['/upload', { txId: verifyRes.data.transactionId }]);
         } else if (verifyRes.data.status === 'PENDING') {
-          this.toast.show(
-            'warning',
-            'Payment Processing',
-            'Payment is processing. Please wait...'
-          );
+          this.toast.show('warning', 'Payment Processing', 'Payment is processing. Please wait...');
         } else {
-          this.toast.show(
-            'error',
-            'Payment Failed',
-            `Payment failed: ${verifyRes.data.errorCode || 'Unknown error'}`
-          );
+          this.toast.show('error', 'Payment Failed', `Payment failed: ${verifyRes.data.errorCode || 'Unknown error'}`);
         }
       },
-      error: (err) => {
-        console.error('Verification failed:', err);
-        this.toast.show(
-          'error',
-          'Verification Failed',
-          'Verification failed. Please contact support.'
-        );
+      error: () => {
+        this.toast.show('error', 'Verification Failed', 'Verification failed. Please contact support.');
       }
     });
   }
 
   close(): void {
     this.isClosing = true;
-
-    setTimeout(() => {
-      this.dialogRef.close();
-    }, 300);
+    setTimeout(() => this.dialogRef.close(), 300);
   }
 
   checkScreenSize(): void {
-    if (this.isBrowser) {
-      this.isMobile = window.innerWidth < 768;
-    } else {
-      this.isMobile = false; // safe SSR default
-    }
+    this.isMobile = this.isBrowser ? window.innerWidth < 768 : false;
   }
 }

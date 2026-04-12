@@ -20,7 +20,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-type Template = 'modern' | 'corporate' | 'minimal';
+type Template = 'modern' | 'corporate' | 'minimal' | 'executive' | 'creative';
 
 @Component({
   selector: 'rr-preview',
@@ -62,6 +62,8 @@ export class PreviewComponent implements OnDestroy {
     { label: 'Corporate', value: 'corporate' },
     { label: 'Modern', value: 'modern' },
     { label: 'Minimalist', value: 'minimal' },
+    { label: 'Executive', value: 'executive' },
+    { label: 'Creative', value: 'creative' },
   ] as const);
 
   zoomPercent = computed(() => `${Math.round(this.zoom() * 100)}%`);
