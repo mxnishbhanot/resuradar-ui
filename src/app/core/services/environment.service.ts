@@ -13,7 +13,6 @@ export class EnvironmentRuntimeService {
   /** Get API URL depending on environment */
   getApiUrl(): string {
     if (!this.isBrowser()) {
-      // SSR fallback (safe + consistent)
       return 'https://resuradar-api.onrender.com/api';
     }
 
@@ -28,18 +27,12 @@ export class EnvironmentRuntimeService {
       return 'http://localhost:5000/api';
     }
 
-    if (href.includes('render.com') || href.includes('prod')) {
-      return 'https://resuradar-api.onrender.com/api';
-    }
-
     return 'https://resuradar-api.onrender.com/api';
   }
 
   /** Determine if production */
   isProduction(): boolean {
-    if (!this.isBrowser()) {
-      return false; // SSR fallback
-    }
+    if (!this.isBrowser()) return false;
 
     let href: string;
     try {
@@ -48,6 +41,6 @@ export class EnvironmentRuntimeService {
       return false;
     }
 
-    return href.includes('prod') || href.includes('render.com');
+    return !href.includes('localhost');
   }
 }

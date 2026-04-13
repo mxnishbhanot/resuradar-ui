@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build-prod",
+  "installCommand": "npm install --legacy-peer-deps",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api" }
+  ],
+  "functions": {
+    "api/index.mjs": {
+      "includeFiles": "dist/resume-analyzer-frontend/**"
+    }
+  }
+}
