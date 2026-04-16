@@ -205,28 +205,6 @@ export class ResumeBuilderService {
       );
   }
 
-  generateWithAI(type: string, context: any) {
-    const scopedContext = context?.activeSection ? context : { activeSection: type, data: context };
-    return this.http.post(`${this.runtimeEnv.getApiUrl()}/ai/generate`, { type, context: scopedContext });
-  }
-
-  generateSuggestions(type: string, context: any, count = 3) {
-    const scopedContext = context?.activeSection ? context : { activeSection: type, data: context };
-    return this.http.post(`${this.runtimeEnv.getApiUrl()}/ai/suggestions`, { type, context: scopedContext, count });
-  }
-
-  improveContent(content: string, type?: string) {
-    return this.http.post(`${this.runtimeEnv.getApiUrl()}/ai/improve`, {
-      content,
-      type,
-      activeSection: type || 'generic',
-    });
-  }
-
-  checkContent(content: string) {
-    return this.http.post(`${this.runtimeEnv.getApiUrl()}/ai/check`, { content });
-  }
-
   exportPdf(template: string, resumeId: string) {
     const params = new HttpParams()
       .set('resumeId', resumeId)
