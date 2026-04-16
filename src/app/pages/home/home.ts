@@ -11,7 +11,7 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser, NgOptimizedImage } from '@angular/common';
-import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { Router, NavigationEnd, RouterOutlet, RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -40,6 +40,7 @@ import { Subject } from 'rxjs';
     MatRippleModule,
     SkeletonLoader,
     RouterOutlet,
+    RouterLink,
     NgOptimizedImage
   ],
   templateUrl: './home.html',
@@ -252,7 +253,8 @@ export class Home implements OnInit, OnDestroy {
     if (!this.isBrowser()) return;
     const urls = {
       site: 'https://resuradar.in',
-      linkedin: 'https://www.linkedin.com/in/manish-kumar-031124226/',
+      // Company page — update slug if your official LinkedIn differs
+      linkedin: 'https://www.linkedin.com/company/resuradar/',
     };
     try { window.open(urls[url], '_blank'); } catch {}
   }
