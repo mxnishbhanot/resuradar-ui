@@ -98,6 +98,28 @@
               <mat-icon>{{ getTypeIcon(resume.type) }}</mat-icon>
               {{ getTypeLabel(resume.type) }}
             </div>
+            @if (resume.type === 'ats' || resume.type === 'jd') {
+            <button
+              type="button"
+              mat-icon-button
+              class="card-history-menu"
+              [matMenuTriggerFor]="historyMenu"
+              (click)="$event.stopPropagation()"
+              aria-label="Analysis actions"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #historyMenu="matMenu">
+              <button type="button" mat-menu-item (click)="openRenameHistory($event, resume)">
+                <mat-icon>edit</mat-icon>
+                <span>Rename</span>
+              </button>
+              <button type="button" mat-menu-item (click)="confirmDeleteHistory($event, resume)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+            }
           </div>
 
           <!-- Main Content -->

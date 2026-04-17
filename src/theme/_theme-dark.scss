@@ -63,5 +63,8 @@ body.dark-theme {
   --shadow-xl: 0 20px 40px rgba(0,0,0,0.65);
 
   --shadow-rgb: 0,0,0;
+
+  --footer-nav-hover-color: var(--text-primary);
+  --footer-nav-hover-bg: rgba(var(--primary-start), 0.14);
 }
 

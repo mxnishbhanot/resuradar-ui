@@ -75,4 +75,7 @@ body.light-theme {
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.18);
 
   --shadow-rgb: 0, 0, 0;
+
+  --footer-nav-hover-color: var(--accent-color);
+  --footer-nav-hover-bg: rgba(var(--accent-rgb), 0.06);
 }

@@ -167,6 +167,36 @@ export const mockMatchAnalysis = async (page: Page) => {
 };
 
 export const mockResumeDashboard = async (page: Page) => {
+  await page.route(
+    (url) => /\/api\/resumes\/[a-fA-F0-9]{24}$/.test(url.pathname),
+    async (route) => {
+      const method = route.request().method();
+      if (method === 'DELETE') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true, message: 'Resume deleted' }),
+        });
+        return;
+      }
+      if (method === 'PATCH') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: true,
+            data: {
+              _id: route.request().url().split('/').pop()?.split('?')[0],
+              displayName: 'Renamed',
+            },
+          }),
+        });
+        return;
+      }
+      await route.continue();
+    }
+  );
+
   await page.route('**/api/custom-resume/all', async (route) => {
     await route.fulfill({
       status: 200,

@@ -1,18 +1,24 @@
 import { Component, DestroyRef, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { forkJoin, merge, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, take } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { CustomResumesListRefetchService } from '../../core/services/custom-resumes-list-refetch.service';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ResumeService } from '../../core/services/resume';
+import { ToastService } from '../../core/services/toast';
+import { UserService } from '../../core/services/user';
 import { AtsResume, BuilderResume, JdResume, ResumeListResponse, ResumeType } from '../../shared/models/resume.model';
+import { DeleteHistoryConfirmDialogComponent } from '../../shared/components/delete-history-confirm-dialog/delete-history-confirm-dialog';
+import { DisplayNameDialogComponent } from '../../shared/components/display-name-dialog/display-name-dialog';
 
 /** Card title: headline, else full name, else fallback (exported for unit tests). */
 export function buildBuilderCardTitle(personal: BuilderResume['personal']): string {
@@ -61,6 +67,8 @@ interface UnifiedResume {
   matchScore?: number;
   jobTitle?: string;
   analysis?: any;
+  filename?: string;
+  displayName?: string | null;
 }
 
 type FilterType = 'all' | ResumeType;
@@ -74,6 +82,7 @@ type FilterType = 'all' | ResumeType;
     CommonModule,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
     MatTooltipModule,
     MatProgressSpinnerModule
   ]
@@ -86,6 +95,9 @@ export class CustomResumesComponent implements OnInit {
   private resumeBuilderService = inject(ResumeBuilderService);
   private resumeService = inject(ResumeService);
   private listRefetchBus = inject(CustomResumesListRefetchService);
+  private dialog = inject(MatDialog);
+  private toast = inject(ToastService);
+  private userService = inject(UserService);
 
   // Signals for all resume categories
   builderResumes = signal<UnifiedResume[]>([]);
@@ -164,30 +176,40 @@ export class CustomResumesComponent implements OnInit {
         );
 
         this.atsResumes.set(
-          atsList.map((r: any) => ({
-            id: r._id,
-            title: r.filename || 'ATS Scan',
-            type: 'ats',
-            isDraft: false,
-            updatedAt: r.updatedAt,
-            completionPercentage: r.score ?? 0,
-            atsScore: r.score ?? 0,
-            analysis: r.analysis
-          }))
+          atsList.map((r: any) => {
+            const dn = typeof r.displayName === 'string' ? r.displayName.trim() : '';
+            return {
+              id: r._id,
+              title: dn || r.filename || 'ATS Scan',
+              type: 'ats' as const,
+              isDraft: false,
+              updatedAt: r.updatedAt,
+              completionPercentage: r.score ?? 0,
+              atsScore: r.score ?? 0,
+              analysis: r.analysis,
+              filename: r.filename,
+              displayName: r.displayName ?? null
+            };
+          })
         );
 
         this.jdResumes.set(
-          jdList.map((r: any) => ({
-            id: r._id,
-            title: r.filename || 'Job Match',
-            type: 'jd',
-            isDraft: false,
-            updatedAt: r.updatedAt,
-            completionPercentage: r.score ?? 0,
-            matchScore: r.score ?? 0,
-            jobTitle: r.jobDescription?.title,
-            analysis: r.analysis
-          }))
+          jdList.map((r: any) => {
+            const dn = typeof r.displayName === 'string' ? r.displayName.trim() : '';
+            return {
+              id: r._id,
+              title: dn || r.filename || 'Job Match',
+              type: 'jd' as const,
+              isDraft: false,
+              updatedAt: r.updatedAt,
+              completionPercentage: r.score ?? 0,
+              matchScore: r.score ?? 0,
+              jobTitle: r.jobDescription?.title,
+              analysis: r.analysis,
+              filename: r.filename,
+              displayName: r.displayName ?? null
+            };
+          })
         );
 
         this.isLoading.set(false);
@@ -318,5 +340,47 @@ export class CustomResumesComponent implements OnInit {
 
   getEmptyStateAction(): void {
     this.createNew();
+  }
+
+  openRenameHistory(event: MouseEvent, resume: UnifiedResume): void {
+    event.stopPropagation();
+    if (resume.type !== 'ats' && resume.type !== 'jd') return;
+    const initial =
+      (resume.displayName && resume.displayName.trim()) || resume.filename || '';
+    const ref = this.dialog.open(DisplayNameDialogComponent, {
+      width: 'min(400px, 92vw)',
+      data: { initialName: initial }
+    });
+    ref.afterClosed().pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe((result: string | undefined) => {
+      if (result === undefined) return;
+      this.resumeService.patchResumeDisplayName(resume.id, result).subscribe({
+        next: () => {
+          this.toast.show('success', 'Updated', 'Display name saved.');
+          this.loadAllResumes();
+        },
+        error: () => this.toast.show('error', 'Error', 'Could not update the display name.')
+      });
+    });
+  }
+
+  confirmDeleteHistory(event: MouseEvent, resume: UnifiedResume): void {
+    event.stopPropagation();
+    if (resume.type !== 'ats' && resume.type !== 'jd') return;
+    const kindLabel = resume.type === 'ats' ? 'ATS scan' : 'job match';
+    const ref = this.dialog.open(DeleteHistoryConfirmDialogComponent, {
+      width: 'min(400px, 92vw)',
+      data: { kindLabel }
+    });
+    ref.afterClosed().pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe((confirmed: boolean | undefined) => {
+      if (!confirmed) return;
+      this.resumeService.deleteResumeHistory(resume.id).subscribe({
+        next: () => {
+          this.toast.show('success', 'Deleted', 'Analysis removed from your dashboard.');
+          this.loadAllResumes();
+          this.userService.fetchCurrentUser().subscribe();
+        },
+        error: () => this.toast.show('error', 'Error', 'Could not delete this analysis.')
+      });
+    });
   }
 }

@@ -52,4 +52,12 @@ export class ResumeService {
     if (!this.isBrowser()) return of([]);
     return this.http.get(`${this.runtimeEnv.getApiUrl()}/resumes/${type}`);
   }
+
+  deleteResumeHistory(id: string): Observable<any> {
+    return this.http.delete(`${this.runtimeEnv.getApiUrl()}/resumes/${id}`);
+  }
+
+  patchResumeDisplayName(id: string, displayName: string): Observable<any> {
+    return this.http.patch(`${this.runtimeEnv.getApiUrl()}/resumes/${id}`, { displayName });
+  }
 }

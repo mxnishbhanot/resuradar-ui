@@ -24,6 +24,7 @@ export interface BuilderResume {
 export interface AtsResume {
   _id: string;
   filename: string;
+  displayName?: string | null;
   score: number;
   analysis: any;
   updatedAt: string;
@@ -32,6 +33,7 @@ export interface AtsResume {
 export interface JdResume {
   _id: string;
   filename: string;
+  displayName?: string | null;
   score: number;
   jobDescription?: { title?: string };
   analysis: any;

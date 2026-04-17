@@ -1115,13 +1115,23 @@
       margin: $spacing-xs 0;
       padding: $spacing-xs 0;
       font-size: 0.9375rem;
-      transition: all 0.2s ease;
+      transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
       border-radius: $radius-sm;
 
       &:hover {
-        color: var(--accent-color);
-        transform: translateX(4px);
-        background: rgba(var(--accent-rgb), 0.04);
+        color: var(--footer-nav-hover-color);
+        background: var(--footer-nav-hover-bg);
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        &:hover {
+          transform: translateX(4px);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid rgba(var(--primary-start), 0.55);
+        outline-offset: 2px;
       }
 
       &:first-child {
@@ -1173,10 +1183,18 @@
         color: var(--text-muted);
         text-decoration: none;
         font-size: 0.9375rem;
-        transition: color 0.2s ease;
+        padding: $spacing-2xs $spacing-xs;
+        border-radius: $radius-sm;
+        transition: color 0.2s ease, background 0.2s ease;
 
         &:hover {
-          color: var(--accent-color);
+          color: var(--footer-nav-hover-color);
+          background: var(--footer-nav-hover-bg);
+        }
+
+        &:focus-visible {
+          outline: 2px solid rgba(var(--primary-start), 0.55);
+          outline-offset: 2px;
         }
       }
 

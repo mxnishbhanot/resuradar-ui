@@ -294,6 +294,14 @@
     padding: 20px 20px 0;
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+
+    .card-history-menu {
+      flex-shrink: 0;
+      margin: -6px -6px 0 0;
+      color: $text-muted;
+    }
 
     .type-tag {
       padding: 6px 12px;

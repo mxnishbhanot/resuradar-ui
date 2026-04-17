@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 
 import {
   CustomResumesComponent,
@@ -9,6 +10,8 @@ import {
 } from './custom-resumes';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ResumeService } from '../../core/services/resume';
+import { ToastService } from '../../core/services/toast';
+import { UserService } from '../../core/services/user';
 import { BuilderResume } from '../../shared/models/resume.model';
 
 describe('buildBuilderCardTitle', () => {
@@ -79,7 +82,31 @@ class MockResumeService {
   getResumeHistory() {
     return of({ data: [] });
   }
+
+  deleteResumeHistory() {
+    return of({ success: true });
+  }
+
+  patchResumeDisplayName() {
+    return of({ success: true });
+  }
 }
+
+class MockUserService {
+  fetchCurrentUser() {
+    return of(null);
+  }
+}
+
+class MockToastService {
+  show() {}
+}
+
+const matDialogStub = {
+  open: () => ({
+    afterClosed: () => of(undefined)
+  })
+};
 
 describe('CustomResumesComponent', () => {
   let component: CustomResumesComponent;
@@ -91,6 +118,9 @@ describe('CustomResumesComponent', () => {
       providers: [
         { provide: ResumeBuilderService, useClass: MockResumeBuilderService },
         { provide: ResumeService, useClass: MockResumeService },
+        { provide: UserService, useClass: MockUserService },
+        { provide: ToastService, useClass: MockToastService },
+        { provide: MatDialog, useValue: matDialogStub },
         provideRouter([])
       ]
     }).compileComponents();
