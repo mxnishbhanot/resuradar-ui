@@ -40,8 +40,9 @@ export class MatchResults implements OnInit {
   // User from updated UserService (signal)
   user = this.userService.user;
 
-  // Premium state
-  isProUser = computed(() => !!this.user()?.isPremium);
+  showPremiumInsights = computed(
+    () => !!this.user()?.isPremium || !!this.data()?.premium_feedback
+  );
 
   // Circle geometry
   private radius = 54;

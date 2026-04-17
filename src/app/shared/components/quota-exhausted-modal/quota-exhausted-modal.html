@@ -10,7 +10,7 @@
       </div>
 
       <h2 class="title">Limit Reached</h2>
-      <p class="message">{{ data.message || 'You’ve hit the limit for free analyses.' }}</p>
+      <p class="message">{{ data.message || 'You’ve used your free resume analyses. Upgrade to unlock unlimited insights and match your resume with job descriptions.' }}</p>
 
       <div class="actions">
         <button class="upgrade-btn" (click)="upgrade()">
@@ -34,15 +34,15 @@
           <mat-icon>workspace_premium</mat-icon>
         </div>
 
-        <h2 class="title">Upload Limit Reached</h2>
-        <p class="message">{{ data.message || 'Unlock unlimited access to continue.' }}</p>
+        <h2 class="title">Limit Reached</h2>
+        <p class="message">{{ data.message || 'You’ve used your free resume analyses. Upgrade to unlock unlimited insights and match your resume with job descriptions.' }}</p>
 
         <div class="mobile-actions">
           <button class="upgrade-btn full-width" (click)="upgrade()">
             <div class="btn-content">
               <span>Upgrade Now</span>
               <span class="sep">•</span>
-              <span>$10</span>
+              <span>₹499/mo</span>
             </div>
           </button>
 

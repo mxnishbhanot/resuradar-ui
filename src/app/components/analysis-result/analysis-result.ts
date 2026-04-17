@@ -46,8 +46,10 @@ export class AnalysisResult implements OnInit {
   // User from UserService (already a signal)
   user = this.userService.user;
 
-  // Premium reactive state
-  isProUser = computed(() => !!this.user()?.isPremium);
+  /** Premium sections: subscribed user, or server included premium_feedback (e.g. wow analysis). */
+  showPremiumInsights = computed(
+    () => !!this.user()?.isPremium || !!this.data()?.premium_feedback
+  );
 
   // Circle progress geometry
   private radius = 54;

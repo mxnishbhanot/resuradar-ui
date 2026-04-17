@@ -3,8 +3,10 @@ import { Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { UserService } from '../../../core/services/user';
+import { UpgradePro } from '../../upgrade-pro/upgrade-pro';
 
 interface PricingPlan {
   name: string;
@@ -26,59 +28,55 @@ interface PricingPlan {
 export class Pricing {
   private router = inject(Router);
   private userService = inject(UserService);
+  private dialog = inject(MatDialog);
 
-  /** The user signal from updated service */
-  user = this.userService.user; // <-- this is a signal<UserProfile | null>
+  user = this.userService.user;
 
-  /** Computed signal for Pro status */
   isPro = computed(() => this.user()?.isPremium === true);
 
   plans: PricingPlan[] = [
     {
       name: 'Free',
       type: 'free',
-      price: '$0',
-      cycle: 'forever',
+      price: '₹0',
+      cycle: 'No card required',
       highlight: false,
       comingSoon: false,
       features: [
-        '3 free resume analyses',
-        'ATS Score (0–10)',
-        'Executive Summary',
-        'AI Strengths & Improvements',
-        'PDF uploads only'
+        'Up to 5 resume analyses',
+        'Basic resume builder (select templates)',
+        '1 free job description match',
+        'Value-first onboarding',
+        'PDF uploads for analysis'
       ]
     },
     {
       name: 'Pro',
       type: 'pro',
-      price: '$10',
-      cycle: 'lifetime',
+      price: '₹499',
+      cycle: 'per month + GST',
       highlight: true,
       comingSoon: false,
       features: [
-        'Unlimited resume uploads',
-        'All Free features, plus:',
-        'Job Description Matching',
-        'Professional Level detection',
-        'Rewritten bullet examples',
-        'ATS keyword optimization',
-        'Portfolio enhancement tips',
-        'Priority support'
+        'Unlimited resume analyses & JD matching',
+        'All resume builder templates & premium PDF export',
+        'Full premium AI insights on every run',
+        'UPI mandate subscription via PhonePe',
+        'Cancel per PhonePe / dashboard rules'
       ]
-    },
-    {
-      name: 'Pro (Quarterly)',
-      type: 'pro',
-      price: '$7.99',
-      cycle: 'quarterly',
-      highlight: false,
-      comingSoon: true,
-      features: ['Everything in Pro']
     }
   ];
 
-  /** Called when clicking Free or Pro buttons */
+  private getFullScreenDialogConfig(): MatDialogConfig {
+    return {
+      panelClass: 'responsive-dialog-wrapper',
+      maxWidth: '100vw',
+      width: '100%',
+      height: '100%',
+      disableClose: true
+    };
+  }
+
   selectPlan(plan: PricingPlan) {
     if (plan.type === 'free') {
       this.router.navigate(['/upload']);
@@ -86,8 +84,7 @@ export class Pricing {
     }
 
     if (plan.type === 'pro' && !this.isPro()) {
-      alert('Redirecting to secure checkout...');
-      // TODO: integrate payment
+      this.dialog.open(UpgradePro, this.getFullScreenDialogConfig());
     }
   }
 }

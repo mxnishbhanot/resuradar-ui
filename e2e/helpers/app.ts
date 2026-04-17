@@ -49,8 +49,14 @@ export const mockApi = async (page: Page) => {
         email: 'test@example.com',
         picture: 'https://example.com/avatar.png',
         isPremium: false,
+        hasActivePremium: false,
         joinedDate: new Date().toISOString(),
         resumeCount: 2,
+        standardUsed: 0,
+        standardLimit: 5,
+        jdUsed: 0,
+        jdLimit: 1,
+        freeBuilderTemplates: ['modern', 'corporate', 'minimal'],
       }),
     });
   });

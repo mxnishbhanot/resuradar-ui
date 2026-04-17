@@ -8,10 +8,19 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  /** Effective premium access (active subscription or legacy lifetime). */
   isPremium: boolean;
+  hasActivePremium?: boolean;
   joinedDate?: any;
   resumeCount?: number;
   picture: string;
+  standardUsed?: number;
+  standardLimit?: number;
+  jdUsed?: number;
+  jdLimit?: number;
+  premiumUntil?: string | null;
+  subscriptionStatus?: string;
+  freeBuilderTemplates?: string[];
 }
 
 @Injectable({
@@ -28,7 +37,7 @@ export class UserService {
 
   user = signal<UserProfile | null>(null);
   isLoggedIn = computed(() => !!this.user());
-  isProUser = computed(() => !!this.user()?.isPremium);
+  isProUser = computed(() => this.user()?.isPremium === true);
 
   fetchCurrentUser(): Observable<UserProfile | null> {
     if (!this.isBrowser()) {
@@ -36,7 +45,7 @@ export class UserService {
     }
 
     return this.http.get<UserProfile>(`${this.runtimeEnv.getApiUrl()}/user/me`).pipe(
-      tap((user) => this.user.set(user || null)),
+      tap((u) => this.user.set(u || null)),
       catchError(() => {
         this.user.set(null);
         return of(null);
@@ -51,7 +60,7 @@ export class UserService {
   markUserAsPro() {
     const current = this.user();
     if (current) {
-      this.user.set({ ...current, isPremium: true });
+      this.user.set({ ...current, isPremium: true, hasActivePremium: true });
     }
   }
 

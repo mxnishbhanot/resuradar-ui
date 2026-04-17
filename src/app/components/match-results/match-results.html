@@ -115,7 +115,7 @@
     <div class="right-column">
 
       <!-- LOCKED VIEW -->
-      @if (!isProUser()) {
+      @if (!showPremiumInsights()) {
       <mat-card class="premium-lock-card">
         <div class="lock-content">
           <div class="lock-icon-container">
@@ -136,7 +136,7 @@
       }
 
       <!-- PREMIUM CONTENT -->
-      @if (isProUser()) {
+      @if (showPremiumInsights()) {
 
       <!-- Keyword Match -->
       <mat-card class="premium-card">
