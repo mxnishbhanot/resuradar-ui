@@ -246,9 +246,7 @@
             <div class="card-content">
               <mat-chip-listbox class="keywords-list">
                 @for (keyword of data()?.premium_feedback?.keywords; track keyword) {
-                  <mat-chip class="keyword-chip"
-                            color="primary"
-                            variant="outlined">
+                  <mat-chip class="keyword-chip" variant="outlined">
                     {{ keyword }}
                   </mat-chip>
                 }

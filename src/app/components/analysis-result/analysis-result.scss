@@ -621,17 +621,31 @@
       flex-wrap: wrap;
       gap: $spacing-sm;
 
-      .keyword-chip {
+      /* M3 chips put label color on inner nodes + CSS vars; primary palette breaks dark-theme contrast */
+      ::ng-deep mat-chip.keyword-chip.mat-mdc-standard-chip,
+      ::ng-deep mat-chip.keyword-chip.mat-mdc-chip {
+        --mdc-chip-label-text-color: #{$text-primary};
+        --mat-chip-label-text-color: #{$text-primary};
+        --mdc-chip-outline-color: #{$border-color};
+        --mdc-chip-elevated-container-color: #{$hover-bg};
+        --mdc-chip-container-color: #{$hover-bg};
+        --mdc-chip-with-avatar-avatar-color: #{$text-primary};
         background: $hover-bg !important;
         border: 1px solid $border-color !important;
         color: $text-primary !important;
         border-radius: $radius-full !important;
-        padding: $spacing-xs $spacing-md !important;
         font-size: 0.875rem !important;
         font-weight: 500 !important;
 
+        .mdc-evolution-chip__text-label,
+        .mat-mdc-chip-action-label,
+        .mdc-evolution-chip__action--primary {
+          color: $text-primary !important;
+        }
+
         &:hover {
           background: $accent-overlay-10 !important;
+          --mdc-chip-elevated-container-color: transparent;
         }
       }
     }
