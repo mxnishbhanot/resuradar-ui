@@ -89,6 +89,10 @@
   }
 
   .title-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
     .header-badge {
       display: inline-flex;
       align-items: center;
@@ -112,22 +116,25 @@
 
     .main-title {
       font-size: clamp(1.75rem, 4vw, 2.5rem);
-      font-weight: 800;
-      background: $primary-gradient;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 $spacing-sm 0;
-      line-height: 1.2;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0 0 $spacing-xs 0;
+      line-height: 1.25;
       letter-spacing: -0.02em;
     }
 
     .subtitle {
-      font-size: 1.125rem;
+      font-size: 1rem;
       color: $text-secondary;
-      max-width: 600px;
-      margin: 0 auto;
-      line-height: 1.5;
+      max-width: 36rem;
+      margin: 0;
+      line-height: 1.55;
+
+      @media (max-width: 768px) {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+      }
     }
   }
 
@@ -138,8 +145,38 @@
       flex-direction: column;
       align-items: center;
       gap: $spacing-sm;
-      max-width: 240px;
+      max-width: min(320px, 100%);
       margin: 0 auto;
+
+      &.score-excellent .score-circle .progress-bar {
+        stroke: $success-color;
+      }
+
+      &.score-good .score-circle .progress-bar {
+        stroke: $accent-color;
+      }
+
+      &.score-needs-work .score-circle .progress-bar {
+        stroke: $error-color;
+      }
+
+      &.score-excellent .score-label {
+        background: rgba(var(--success-rgb), 0.1);
+        color: $success-color;
+        border-color: $success-color;
+      }
+
+      &.score-good .score-label {
+        background: rgba(var(--accent-rgb), 0.1);
+        color: $accent-color;
+        border-color: $accent-color;
+      }
+
+      &.score-needs-work .score-label {
+        background: rgba(var(--error-rgb), 0.1);
+        color: $error-color;
+        border-color: $error-color;
+      }
 
       .score-circle {
         position: relative;
@@ -165,22 +202,11 @@
 
           .progress-bar {
             fill: none;
+            stroke: $accent-color;
             stroke-width: 8;
             stroke-linecap: round;
             transition: stroke-dashoffset 1s ease-out;
             transform-origin: center;
-
-            &.score-excellent {
-              stroke: $success-color;
-            }
-
-            &.score-good {
-              stroke: $accent-color;
-            }
-
-            &.score-needs-work {
-              stroke: $error-color;
-            }
           }
         }
 
@@ -188,21 +214,24 @@
           position: relative;
           z-index: 2;
           display: flex;
-          flex-direction: column;
-          align-items: center;
+          flex-direction: row;
+          align-items: baseline;
+          justify-content: center;
+          gap: 0.15em;
+          padding-top: 0.35em;
 
           .score-value {
             font-size: 2.5rem;
             font-weight: 800;
             color: $text-primary;
-            padding-top: 12px;
+            line-height: 1;
           }
 
           .score-out-of {
-            font-size: 1rem;
+            font-size: 1.125rem;
             font-weight: 600;
             color: $text-secondary;
-            padding-top: 12px;
+            line-height: 1;
           }
         }
       }
@@ -217,32 +246,153 @@
         background: $hover-bg;
         color: $text-primary;
         border: 1px solid $border-color;
-
-        &.score-excellent {
-          background: rgba(var(--success-rgb), 0.1);
-          color: $success-color;
-          border-color: $success-color;
-        }
-
-        &.score-good {
-          background: rgba(var(--accent-rgb), 0.1);
-          color: $accent-color;
-          border-color: $accent-color;
-        }
-
-        &.score-needs-work {
-          background: rgba(var(--error-rgb), 0.1);
-          color: $error-color;
-          border-color: $error-color;
-        }
       }
 
       .score-description {
         font-size: 0.875rem;
         color: $text-secondary;
         text-align: center;
-        max-width: 200px;
+        max-width: 280px;
+        line-height: 1.45;
+      }
+
+      .score-disclaimer {
+        font-size: 0.8125rem;
+        color: $text-secondary;
+        text-align: center;
+        margin: $spacing-xs 0 0;
+        line-height: 1.45;
+        max-width: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: $spacing-xs;
+
+        .score-disclaimer-icon {
+          width: 18px;
+          height: 18px;
+          font-size: 18px;
+          color: $text-secondary;
+          cursor: help;
+          flex-shrink: 0;
+        }
+      }
+
+      .score-help-toggle {
+        margin-top: $spacing-xs;
+        font-size: 0.8125rem;
         line-height: 1.4;
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+      }
+
+      .score-help-panel {
+        width: 100%;
+        text-align: left;
+        padding: $spacing-sm $spacing-md;
+        margin-top: $spacing-xs;
+        border-radius: $radius-md;
+        border: 1px solid $border-color;
+        background: $hover-bg;
+
+        p {
+          margin: 0 0 $spacing-sm;
+          font-size: 0.8125rem;
+          color: $text-secondary;
+          line-height: 1.45;
+        }
+
+        .score-help-links {
+          display: flex;
+          flex-direction: column;
+          gap: $spacing-xs;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+
+          a {
+            color: $accent-color;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+
+      .score-explanation {
+        width: 100%;
+        margin: $spacing-sm 0 0;
+        font-size: 0.875rem;
+        color: $text-primary;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      .score-factors {
+        list-style: none;
+        margin: $spacing-sm 0 0;
+        padding: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+      }
+
+      .score-factor {
+        display: flex;
+        gap: $spacing-sm;
+        align-items: flex-start;
+        text-align: left;
+        font-size: 0.8125rem;
+        line-height: 1.45;
+        color: $text-primary;
+
+        .impact-badge {
+          flex-shrink: 0;
+          font-size: 0.6875rem;
+          font-weight: 700;
+          text-transform: capitalize;
+          letter-spacing: 0.04em;
+          padding: 2px 8px;
+          border-radius: $radius-full;
+          border: 1px solid $border-color;
+          color: $text-secondary;
+        }
+
+        .impact-badge--high {
+          color: $error-color;
+          border-color: rgba(var(--error-rgb), 0.35);
+          background: rgba(var(--error-rgb), 0.08);
+        }
+
+        .impact-badge--medium {
+          color: $accent-color;
+          border-color: rgba(var(--accent-rgb), 0.35);
+          background: rgba(var(--accent-rgb), 0.08);
+        }
+
+        .impact-badge--low {
+          color: $success-color;
+          border-color: rgba(var(--success-rgb), 0.35);
+          background: rgba(var(--success-rgb), 0.08);
+        }
+
+        .factor-body {
+          flex: 1;
+          min-width: 0;
+
+          .factor-name {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+          }
+        }
       }
     }
   }
@@ -460,6 +610,9 @@
         font-size: 1.5rem;
         font-weight: 700;
         color: $success-color;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
     }
   }

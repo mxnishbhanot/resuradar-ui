@@ -43,6 +43,8 @@ export class AnalysisResult implements OnInit {
   // Reactive analysis data
   data = signal<any>(null);
 
+  showScoreHelp = signal(false);
+
   // User from UserService (already a signal)
   user = this.userService.user;
 
@@ -84,6 +86,34 @@ export class AnalysisResult implements OnInit {
     return 'Resume needs significant improvements to stand out to employers';
   });
 
+  scoreAriaLabel = computed(() => {
+    const s = this.data()?.score ?? 0;
+    return `Score ${s} out of 100`;
+  });
+
+  scoreExplanation = computed(() => {
+    const s = this.data()?.free_feedback?.score_explanation;
+    return typeof s === 'string' && s.trim() ? s.trim() : '';
+  });
+
+  scoreFactors = computed(() => {
+    const raw = this.data()?.free_feedback?.score_factors;
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .filter(
+        (f: { name?: string; note?: string; impact?: string }) =>
+          f && typeof f.name === 'string' && typeof f.note === 'string'
+      )
+      .map((f: { name: string; note: string; impact?: string }) => ({
+        name: f.name.trim(),
+        note: f.note.trim(),
+        impact: ['high', 'medium', 'low'].includes(String(f.impact).toLowerCase())
+          ? String(f.impact).toLowerCase()
+          : 'medium',
+      }))
+      .filter((f) => f.name && f.note);
+  });
+
   ngOnInit(): void {
     const result = this.resumeService.getLatestAnalysis();
 
@@ -102,6 +132,10 @@ export class AnalysisResult implements OnInit {
   getScoreClass() { return this.scoreClass(); }
   getScoreLabel() { return this.scoreLabel(); }
   getScoreDescription() { return this.scoreDescription(); }
+
+  toggleScoreHelp(): void {
+    this.showScoreHelp.update((v) => !v);
+  }
 
   openUpgradeModal() {
     const config: MatDialogConfig = {

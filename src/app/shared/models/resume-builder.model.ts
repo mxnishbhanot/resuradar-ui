@@ -39,8 +39,8 @@ export interface Project {  // CHANGED: Expanded to match component (separate fr
   title: string;
   role: string;
   link?: string;
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
   isCurrent: boolean;
   techStack: string[];
   bullets: string[];

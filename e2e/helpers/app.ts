@@ -95,6 +95,20 @@ export const mockUploadAnalysis = async (page: Page) => {
             strengths: ['Strong project impact', 'Clear experience section', 'Relevant skills'],
             improvements: ['Tighten summary', 'Add more metrics', 'Improve ATS keywords'],
             summary: 'Solid resume with a few opportunities to make achievements sharper.',
+            score_explanation:
+              'The resume is clear and relevant but would rank higher with more quantified outcomes and a tighter summary.',
+            score_factors: [
+              {
+                name: 'Impact metrics',
+                impact: 'medium',
+                note: 'Several bullets describe tasks without numbers that would strengthen credibility.',
+              },
+              {
+                name: 'Summary',
+                impact: 'low',
+                note: 'The summary is readable and aligned with target roles.',
+              },
+            ],
           },
           premium_feedback: {
             detailed_suggestions: ['Add measurable outcomes to recent roles'],

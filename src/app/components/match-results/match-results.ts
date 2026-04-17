@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 import { ResumeService } from '../../core/services/resume';
@@ -21,7 +22,8 @@ import { UpgradePro } from '../upgrade-pro/upgrade-pro';
     MatIconModule,
     MatButtonModule,
     MatDividerModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTooltipModule,
   ],
   templateUrl: './match-results.html',
   styleUrls: ['./match-results.scss']
@@ -36,6 +38,8 @@ export class MatchResults implements OnInit {
 
   // Reactive analysis result
   data = signal<any>(null);
+
+  showScoreHelp = signal(false);
 
   // User from updated UserService (signal)
   user = this.userService.user;
@@ -72,6 +76,11 @@ export class MatchResults implements OnInit {
     return 'Weak match requiring major changes';
   });
 
+  matchScoreAriaLabel = computed(() => {
+    const s = this.data()?.free_feedback?.match_score ?? 0;
+    return `Match score ${s} out of 100`;
+  });
+
   ngOnInit(): void {
     const result = this.resumeService.getLatestMatchAnalysis();
 
@@ -90,6 +99,10 @@ export class MatchResults implements OnInit {
   // UI helpers
   getScoreClass() { return this.scoreClass(); }
   getScoreDescription() { return this.scoreDescription(); }
+
+  toggleScoreHelp(): void {
+    this.showScoreHelp.update((v) => !v);
+  }
 
   openUpgradeModal(): void {
     const config: MatDialogConfig = {

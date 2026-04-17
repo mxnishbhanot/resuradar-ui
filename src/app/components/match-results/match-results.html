@@ -24,8 +24,8 @@
       <div class="score-section">
         <div class="score-display" [ngClass]="getScoreClass()">
 
-          <div class="score-circle">
-            <svg class="score-progress" viewBox="0 0 120 120">
+          <div class="score-circle" role="img" [attr.aria-label]="matchScoreAriaLabel()">
+            <svg class="score-progress" viewBox="0 0 120 120" aria-hidden="true">
               <circle class="progress-bg" cx="60" cy="60" r="54" />
               <circle class="progress-bar" cx="60" cy="60" r="54" [attr.stroke-dasharray]="circumference"
                 [attr.stroke-dashoffset]="strokeDashoffset()" />
@@ -39,6 +39,40 @@
 
           <div class="score-label">{{ data().free_feedback.match_level }}</div>
           <div class="score-description">{{ getScoreDescription() }}</div>
+
+          <p class="score-disclaimer">
+            Match alignment score from AI—not a hiring decision.
+            <mat-icon
+              class="score-disclaimer-icon"
+              matTooltip="This score estimates how well your resume fits the pasted job description. Read the summary and improvement areas below for specifics."
+              matTooltipShowDelay="200"
+              aria-label="More about this score"
+            >help_outline</mat-icon>
+          </p>
+
+          <button
+            type="button"
+            mat-stroked-button
+            class="score-help-toggle"
+            (click)="toggleScoreHelp()"
+            [attr.aria-expanded]="showScoreHelp()"
+          >
+            <mat-icon>menu_book</mat-icon>
+            {{ showScoreHelp() ? 'Hide' : 'How we score' }}
+          </button>
+
+          @if (showScoreHelp()) {
+            <div class="score-help-panel">
+              <p>
+                The model produces one overall match score from your resume and the job description.
+                For detail, see:
+              </p>
+              <ul class="score-help-links">
+                <li><a href="#match-summary">Match Summary</a></li>
+                <li><a href="#match-gaps">Improvement Areas</a></li>
+              </ul>
+            </div>
+          }
         </div>
       </div>
 
@@ -52,7 +86,7 @@
     <div class="left-column">
 
       <!-- SUMMARY -->
-      <mat-card class="summary-card">
+      <mat-card class="summary-card" id="match-summary">
         <div class="card-header">
           <div class="icon-container">
             <mat-icon class="header-icon">summarize</mat-icon>
@@ -89,7 +123,7 @@
       </mat-card>
 
       <!-- GAPS -->
-      <mat-card class="insight-card gap-card">
+      <mat-card class="insight-card gap-card" id="match-gaps">
         <div class="card-header">
           <div class="icon-container warning">
             <mat-icon>lightbulb</mat-icon>

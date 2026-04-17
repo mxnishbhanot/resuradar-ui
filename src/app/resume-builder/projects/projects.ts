@@ -64,7 +64,7 @@ export class ProjectsComponent {
     title: ['', Validators.required],
     role: [''],
     link: ['', Validators.pattern('^(https?:\\/\\/)?[\\w.-]+\\.[a-z\\.]{2,6}([\\/\\w .-]*)*\\/?$')],
-    startDate: ['', Validators.required],
+    startDate: [''],
     endDate: [''],
     isCurrent: [false],
     techStack: this.fb.array([]),
@@ -147,6 +147,43 @@ export class ProjectsComponent {
     this.techStackArray.removeAt(index);
   }
 
+  /** Card timeline block: ongoing or at least one date. */
+  showProjectTimelineSection(project: Project): boolean {
+    return project.isCurrent || !!project.startDate || !!project.endDate;
+  }
+
+  /** Primary date line; null when only the ongoing badge should show (ongoing, no dates). */
+  projectTimelineCalendarText(project: Project): string | null {
+    const hasStart = !!project.startDate;
+    const hasEnd = !!project.endDate;
+    const fmt = (v: string | Date | undefined) =>
+      v ? (this.datePipe.transform(v, 'MMMM, yyyy') ?? '') : '';
+
+    if (project.isCurrent) {
+      if (hasStart) {
+        return `${fmt(project.startDate)} – Present`;
+      }
+      return null;
+    }
+    if (hasStart && hasEnd) {
+      return `${fmt(project.startDate)} – ${fmt(project.endDate)}`;
+    }
+    if (hasStart) {
+      return fmt(project.startDate);
+    }
+    if (hasEnd) {
+      return `Until ${fmt(project.endDate)}`;
+    }
+    return null;
+  }
+
+  private normalizeStoredDate(value: unknown): string {
+    if (value == null || value === '') return '';
+    if (value instanceof Date) return value.toISOString();
+    if (typeof value === 'string') return value;
+    return '';
+  }
+
   // ---------- EDIT ----------
 
   editProject(index: number) {
@@ -186,8 +223,8 @@ export class ProjectsComponent {
       title: v.title,
       role: v.role || undefined,
       link: v.link || undefined,
-      startDate: v.startDate,
-      endDate: v.isCurrent ? '' : v.endDate,
+      startDate: this.normalizeStoredDate(v.startDate),
+      endDate: v.isCurrent ? '' : this.normalizeStoredDate(v.endDate),
       isCurrent: v.isCurrent,
       techStack: v.techStack.filter((t: string) => t.trim()),
       bullets: v.bullets.filter((b: string) => b.trim())
