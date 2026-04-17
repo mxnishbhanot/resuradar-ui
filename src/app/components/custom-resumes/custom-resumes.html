@@ -99,39 +99,30 @@
               {{ getTypeLabel(resume.type) }}
             </div>
             @if (resume.type === 'builder' || resume.type === 'ats' || resume.type === 'jd') {
-            <button
-              type="button"
-              mat-icon-button
-              class="card-resume-menu"
-              [matMenuTriggerFor]="resumeActionsMenu"
-              (click)="$event.stopPropagation()"
-              aria-label="Resume actions"
-            >
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #resumeActionsMenu="matMenu" panelClass="rr-resume-card-menu-panel">
+            <div class="card-resume-actions" (click)="$event.stopPropagation()">
               @if (resume.type === 'ats' || resume.type === 'jd') {
               <button
                 type="button"
-                mat-menu-item
-                class="rr-menu-item-rename"
+                mat-icon-button
+                class="card-resume-icon-btn card-resume-icon-btn--rename"
                 (click)="openRenameHistory($event, resume)"
+                matTooltip="Rename"
+                aria-label="Rename this analysis"
               >
                 <mat-icon>edit_note</mat-icon>
-                <span>Rename</span>
               </button>
-              <mat-divider />
               }
               <button
                 type="button"
-                mat-menu-item
-                class="rr-menu-item-delete"
+                mat-icon-button
+                class="card-resume-icon-btn card-resume-icon-btn--delete"
                 (click)="confirmDeleteResume($event, resume)"
+                matTooltip="Delete"
+                [attr.aria-label]="resume.type === 'builder' ? 'Delete resume' : 'Delete analysis'"
               >
                 <mat-icon>delete_outline</mat-icon>
-                <span>Delete</span>
               </button>
-            </mat-menu>
+            </div>
             }
           </div>
 

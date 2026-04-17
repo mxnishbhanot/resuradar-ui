@@ -12,9 +12,11 @@
 
 .rr-delete-dialog__header {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  gap: 0px;
   padding: 22px 22px 0;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .rr-delete-dialog__icon-wrap {
@@ -98,7 +100,11 @@
   font-family: inherit;
   cursor: pointer;
   border: none;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
 
   &:active {
     transform: scale(0.98);

@@ -3,8 +3,6 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
@@ -86,8 +84,6 @@ type FilterType = 'all' | ResumeType;
     CommonModule,
     MatButtonModule,
     MatIconModule,
-    MatMenuModule,
-    MatDividerModule,
     MatTooltipModule,
     MatProgressSpinnerModule
   ]
