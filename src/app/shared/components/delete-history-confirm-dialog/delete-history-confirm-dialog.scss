@@ -1,0 +1,132 @@
+:host {
+  display: block;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.rr-delete-dialog {
+  padding: 0;
+}
+
+.rr-delete-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 22px 0;
+}
+
+.rr-delete-dialog__icon-wrap {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--error-rgb), 0.12);
+  border: 1px solid rgba(var(--error-rgb), 0.25);
+
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    color: var(--error-color);
+  }
+
+  &--builder mat-icon {
+    color: var(--error-color);
+  }
+}
+
+.rr-delete-dialog__title {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.rr-delete-dialog__body {
+  padding: 12px 22px 8px !important;
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+
+  p {
+    margin: 0 0 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.rr-delete-dialog__resume-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.rr-delete-dialog__note {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(var(--border-color-rgb), 0.12);
+  border: 1px solid var(--border-color);
+}
+
+.rr-delete-dialog__actions {
+  padding: 16px 22px 22px !important;
+  margin: 0 !important;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-color);
+  background: rgba(var(--border-color-rgb), 0.06);
+}
+
+.rr-btn {
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+
+    &:hover {
+      background: rgba(var(--border-color-rgb), 0.12);
+      color: var(--text-primary);
+    }
+  }
+
+  &--danger {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--error-rgb), 0.95) 0%,
+      rgba(var(--error-rgb), 0.82) 100%
+    );
+    color: var(--text-inverse);
+    box-shadow: 0 4px 14px rgba(var(--error-rgb), 0.35);
+
+    &:hover {
+      box-shadow: 0 6px 18px rgba(var(--error-rgb), 0.45);
+      filter: brightness(1.05);
+    }
+  }
+}

@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
@@ -17,7 +18,10 @@ import { ResumeService } from '../../core/services/resume';
 import { ToastService } from '../../core/services/toast';
 import { UserService } from '../../core/services/user';
 import { AtsResume, BuilderResume, JdResume, ResumeListResponse, ResumeType } from '../../shared/models/resume.model';
-import { DeleteHistoryConfirmDialogComponent } from '../../shared/components/delete-history-confirm-dialog/delete-history-confirm-dialog';
+import {
+  DeleteHistoryConfirmDialogComponent,
+  DeleteResumeConfirmData,
+} from '../../shared/components/delete-history-confirm-dialog/delete-history-confirm-dialog';
 import { DisplayNameDialogComponent } from '../../shared/components/display-name-dialog/display-name-dialog';
 
 /** Card title: headline, else full name, else fallback (exported for unit tests). */
@@ -83,6 +87,7 @@ type FilterType = 'all' | ResumeType;
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    MatDividerModule,
     MatTooltipModule,
     MatProgressSpinnerModule
   ]
@@ -349,6 +354,7 @@ export class CustomResumesComponent implements OnInit {
       (resume.displayName && resume.displayName.trim()) || resume.filename || '';
     const ref = this.dialog.open(DisplayNameDialogComponent, {
       width: 'min(400px, 92vw)',
+      panelClass: 'rr-themed-dialog',
       data: { initialName: initial }
     });
     ref.afterClosed().pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe((result: string | undefined) => {
@@ -363,16 +369,32 @@ export class CustomResumesComponent implements OnInit {
     });
   }
 
-  confirmDeleteHistory(event: MouseEvent, resume: UnifiedResume): void {
+  confirmDeleteResume(event: MouseEvent, resume: UnifiedResume): void {
     event.stopPropagation();
-    if (resume.type !== 'ats' && resume.type !== 'jd') return;
-    const kindLabel = resume.type === 'ats' ? 'ATS scan' : 'job match';
+    const data: DeleteResumeConfirmData =
+      resume.type === 'builder'
+        ? { mode: 'builder', resumeTitle: resume.title || 'Untitled Resume' }
+        : { mode: 'analysis', kindLabel: resume.type === 'ats' ? 'ATS scan' : 'job match' };
+
     const ref = this.dialog.open(DeleteHistoryConfirmDialogComponent, {
-      width: 'min(400px, 92vw)',
-      data: { kindLabel }
+      width: 'min(440px, 92vw)',
+      panelClass: 'rr-themed-dialog',
+      autoFocus: 'first-tabbable',
+      data
     });
     ref.afterClosed().pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe((confirmed: boolean | undefined) => {
       if (!confirmed) return;
+      if (resume.type === 'builder') {
+        this.resumeBuilderService.deleteResume(resume.id).subscribe({
+          next: () => {
+            this.toast.show('success', 'Deleted', 'Resume removed from your dashboard.');
+            this.loadAllResumes();
+            this.userService.fetchCurrentUser().subscribe();
+          },
+          error: () => this.toast.show('error', 'Error', 'Could not delete this resume.')
+        });
+        return;
+      }
       this.resumeService.deleteResumeHistory(resume.id).subscribe({
         next: () => {
           this.toast.show('success', 'Deleted', 'Analysis removed from your dashboard.');

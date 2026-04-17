@@ -1,0 +1,73 @@
+/* ------------------------------------------------------------------
+   My Resumes & shared overlays — uses tokens from :root.light-theme /
+   body.dark-theme (same vars on body.dark-theme per _theme-dark.scss)
+------------------------------------------------------------------ */
+
+/* MatMenu panel opened from resume cards */
+.rr-resume-card-menu-panel.mat-mdc-menu-panel {
+  margin-top: 6px;
+  border-radius: 14px !important;
+  border: 1px solid var(--border-color);
+  background: var(--bg-glass) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-lg);
+  min-width: 212px;
+  overflow: hidden;
+  padding: 4px 0;
+}
+
+.rr-resume-card-menu-panel .mat-mdc-menu-content {
+  padding: 0;
+}
+
+.rr-resume-card-menu-panel .mat-mdc-menu-item {
+  min-height: 46px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+}
+
+.rr-resume-card-menu-panel .mat-mdc-menu-item .mat-icon {
+  margin-right: 12px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--text-secondary);
+}
+
+.rr-resume-card-menu-panel .rr-menu-item-rename .mat-icon {
+  color: var(--accent-color);
+}
+
+.rr-resume-card-menu-panel .rr-menu-item-rename:hover {
+  background: rgba(var(--accent-rgb), 0.08);
+}
+
+.rr-resume-card-menu-panel .rr-menu-item-delete .mat-icon,
+.rr-resume-card-menu-panel .rr-menu-item-delete .mdc-list-item__primary-text {
+  color: var(--error-color);
+}
+
+.rr-resume-card-menu-panel .rr-menu-item-delete:hover {
+  background: rgba(var(--error-rgb), 0.1);
+}
+
+.rr-resume-card-menu-panel .mat-divider {
+  border-top-color: var(--border-color);
+  margin: 4px 8px;
+}
+
+/* Dialog: panelClass is applied to the CDK overlay pane */
+.cdk-overlay-container .cdk-overlay-pane.rr-themed-dialog .mat-mdc-dialog-container {
+  border-radius: 20px !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border-color);
+}
+
+.cdk-overlay-container .cdk-overlay-pane.rr-themed-dialog .mat-mdc-dialog-surface {
+  background: transparent;
+  box-shadow: none;
+}

@@ -899,7 +899,7 @@
 /* Main Content / Footer / Misc */
 .main-content {
   display: grid;
-  align-content: center;
+  align-content: start;
   padding: $spacing-xl $spacing-lg;
   animation: fadeIn 0.6s ease-out;
 

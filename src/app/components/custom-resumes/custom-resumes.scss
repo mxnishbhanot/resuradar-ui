@@ -297,10 +297,16 @@
     align-items: flex-start;
     gap: 8px;
 
-    .card-history-menu {
+    .card-resume-menu {
       flex-shrink: 0;
       margin: -6px -6px 0 0;
       color: $text-muted;
+      transition: color 0.15s ease, background 0.15s ease;
+
+      &:hover {
+        color: $text-primary;
+        background: rgba(var(--border-color-rgb), 0.12);
+      }
     }
 
     .type-tag {

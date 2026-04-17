@@ -53,7 +53,7 @@ export const mockApi = async (page: Page) => {
         joinedDate: new Date().toISOString(),
         resumeCount: 2,
         standardUsed: 0,
-        standardLimit: 5,
+        standardLimit: 3,
         jdUsed: 0,
         jdLimit: 1,
         freeBuilderTemplates: ['modern', 'corporate', 'faang'],
@@ -190,6 +190,21 @@ export const mockResumeDashboard = async (page: Page) => {
               displayName: 'Renamed',
             },
           }),
+        });
+        return;
+      }
+      await route.continue();
+    }
+  );
+
+  await page.route(
+    (url) => /\/api\/custom-resume\/[a-fA-F0-9]{24}$/.test(url.pathname),
+    async (route) => {
+      if (route.request().method() === 'DELETE') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true, message: 'Deleted' }),
         });
         return;
       }

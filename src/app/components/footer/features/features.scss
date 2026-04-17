@@ -6,7 +6,7 @@
 
 .features-hero {
   position: relative;
-  padding: $spacing-3xl 0;
+  padding: $spacing-3xl 0 $spacing-xl 0;
   background: $card-bg;
   overflow: hidden;
 
@@ -173,7 +173,7 @@
 
 // Features Section
 .features-section {
-  padding: $spacing-3xl 0;
+  padding: $spacing-xl 0 $spacing-3xl 0;
   background: $bg-primary;
 
   .container {

@@ -43,7 +43,7 @@ export class Pricing {
       highlight: false,
       comingSoon: false,
       features: [
-        'Up to 5 resume analyses',
+        'Up to 3 resume analyses',
         'Basic resume builder (select templates)',
         '1 free job description match',
         'Value-first onboarding',

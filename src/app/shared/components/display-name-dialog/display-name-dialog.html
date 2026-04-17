@@ -1,0 +1,21 @@
+<div class="rr-name-dialog">
+  <div class="rr-name-dialog__header">
+    <div class="rr-name-dialog__icon-wrap" aria-hidden="true">
+      <mat-icon>edit_note</mat-icon>
+    </div>
+    <h2 mat-dialog-title class="rr-name-dialog__title">Display name</h2>
+  </div>
+
+  <mat-dialog-content class="rr-name-dialog__content">
+    <mat-form-field appearance="outline" class="rr-name-dialog__field" subscriptSizing="dynamic">
+      <mat-label>Name</mat-label>
+      <input matInput [formControl]="ctrl" maxlength="120" />
+    </mat-form-field>
+    <p class="rr-name-dialog__hint">Leave empty to show the original file name on the card.</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="rr-name-dialog__actions" align="end">
+    <button type="button" class="rr-btn rr-btn--ghost" (click)="dialogRef.close()">Cancel</button>
+    <button type="button" class="rr-btn rr-btn--primary" [disabled]="ctrl.invalid" (click)="submit()">Save</button>
+  </mat-dialog-actions>
+</div>

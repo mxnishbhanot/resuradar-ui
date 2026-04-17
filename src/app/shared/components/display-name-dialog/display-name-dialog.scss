@@ -1,0 +1,124 @@
+:host {
+  display: block;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: var(--bg-primary);
+}
+
+:host ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label,
+:host ::ng-deep .mat-mdc-form-field input {
+  color: var(--text-primary);
+}
+
+.rr-name-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px 22px 0;
+}
+
+.rr-name-dialog__icon-wrap {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    color: var(--accent-color);
+  }
+}
+
+.rr-name-dialog__title {
+  margin: 6px 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.rr-name-dialog__content {
+  padding: 14px 22px 6px !important;
+  margin: 0 !important;
+}
+
+.rr-name-dialog__field {
+  width: 100%;
+}
+
+.rr-name-dialog__hint {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  margin: 10px 0 0;
+}
+
+.rr-name-dialog__actions {
+  padding: 16px 22px 22px !important;
+  margin: 0 !important;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-color);
+  background: rgba(var(--border-color-rgb), 0.06);
+}
+
+.rr-btn {
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+
+    &:hover {
+      background: rgba(var(--border-color-rgb), 0.12);
+      color: var(--text-primary);
+    }
+  }
+
+  &--primary {
+    background: linear-gradient(
+      135deg,
+      rgb(var(--primary-start)) 0%,
+      rgb(var(--primary-end)) 100%
+    );
+    color: var(--text-inverse);
+    box-shadow: 0 4px 14px rgba(var(--primary-start), 0.35);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 18px rgba(var(--primary-start), 0.45);
+      filter: brightness(1.04);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+}

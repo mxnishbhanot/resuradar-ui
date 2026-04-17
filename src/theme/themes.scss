@@ -1,3 +1,4 @@
 @use './_theme-light';
 @use './_theme-dark';
 @use './_variables' as *; // pull SCSS adapter into scope for components
+@use './overlay-panels';

@@ -1,0 +1,33 @@
+<div class="rr-delete-dialog">
+  <div class="rr-delete-dialog__header">
+    <div
+      class="rr-delete-dialog__icon-wrap"
+      [class.rr-delete-dialog__icon-wrap--builder]="data.mode === 'builder'"
+      aria-hidden="true"
+    >
+      <mat-icon>{{ data.mode === 'builder' ? 'delete_forever' : 'delete_sweep' }}</mat-icon>
+    </div>
+    <div>
+      <h2 mat-dialog-title class="rr-delete-dialog__title">
+        {{ data.mode === 'builder' ? 'Delete this resume?' : 'Delete this analysis?' }}
+      </h2>
+    </div>
+  </div>
+
+  <mat-dialog-content class="rr-delete-dialog__body">
+    @if (data.mode === 'builder') {
+      <p>
+        <span class="rr-delete-dialog__resume-name">{{ data.resumeTitle }}</span> will be permanently
+        removed from the builder. This cannot be undone.
+      </p>
+    } @else {
+      <p>This removes the saved {{ data.kindLabel }} from your dashboard.</p>
+      <p class="rr-delete-dialog__note">Your free trial usage is not reset.</p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="rr-delete-dialog__actions" align="end">
+    <button type="button" class="rr-btn rr-btn--ghost" (click)="dialogRef.close(false)">Cancel</button>
+    <button type="button" class="rr-btn rr-btn--danger" (click)="dialogRef.close(true)">Delete</button>
+  </mat-dialog-actions>
+</div>

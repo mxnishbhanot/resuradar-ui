@@ -98,24 +98,37 @@
               <mat-icon>{{ getTypeIcon(resume.type) }}</mat-icon>
               {{ getTypeLabel(resume.type) }}
             </div>
-            @if (resume.type === 'ats' || resume.type === 'jd') {
+            @if (resume.type === 'builder' || resume.type === 'ats' || resume.type === 'jd') {
             <button
               type="button"
               mat-icon-button
-              class="card-history-menu"
-              [matMenuTriggerFor]="historyMenu"
+              class="card-resume-menu"
+              [matMenuTriggerFor]="resumeActionsMenu"
               (click)="$event.stopPropagation()"
-              aria-label="Analysis actions"
+              aria-label="Resume actions"
             >
               <mat-icon>more_vert</mat-icon>
             </button>
-            <mat-menu #historyMenu="matMenu">
-              <button type="button" mat-menu-item (click)="openRenameHistory($event, resume)">
-                <mat-icon>edit</mat-icon>
+            <mat-menu #resumeActionsMenu="matMenu" panelClass="rr-resume-card-menu-panel">
+              @if (resume.type === 'ats' || resume.type === 'jd') {
+              <button
+                type="button"
+                mat-menu-item
+                class="rr-menu-item-rename"
+                (click)="openRenameHistory($event, resume)"
+              >
+                <mat-icon>edit_note</mat-icon>
                 <span>Rename</span>
               </button>
-              <button type="button" mat-menu-item (click)="confirmDeleteHistory($event, resume)">
-                <mat-icon>delete</mat-icon>
+              <mat-divider />
+              }
+              <button
+                type="button"
+                mat-menu-item
+                class="rr-menu-item-delete"
+                (click)="confirmDeleteResume($event, resume)"
+              >
+                <mat-icon>delete_outline</mat-icon>
                 <span>Delete</span>
               </button>
             </mat-menu>

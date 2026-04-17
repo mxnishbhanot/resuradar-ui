@@ -76,6 +76,10 @@ class MockResumeBuilderService {
     };
     return of({ resumes: [resume] });
   }
+
+  deleteResume() {
+    return of({ success: true });
+  }
 }
 
 class MockResumeService {
