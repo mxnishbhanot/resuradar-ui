@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StartResume } from './start-resume';
+import { StartResumeComponent } from './start-resume';
 
-describe('StartResume', () => {
-  let component: StartResume;
-  let fixture: ComponentFixture<StartResume>;
+describe('StartResumeComponent', () => {
+  let component: StartResumeComponent;
+  let fixture: ComponentFixture<StartResumeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [StartResume]
+      imports: [StartResumeComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(StartResume);
+    fixture = TestBed.createComponent(StartResumeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

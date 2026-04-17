@@ -22,6 +22,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { UserService } from '../../core/services/user';
+import { CustomResumesListRefetchService } from '../../core/services/custom-resumes-list-refetch.service';
 import { SkeletonService } from '../../core/services/skeleton';
 import { SkeletonLoader } from '../../shared/components/skeleton-loader/skeleton-loader';
 import { filter, take } from 'rxjs/operators';
@@ -53,6 +54,8 @@ export class Home implements OnInit, OnDestroy {
   public googleAuth = inject(GoogleAuthService);
   private userService = inject(UserService);
   private skeletonService = inject(SkeletonService);
+  /** Eagerly construct so My Resumes can detect re-entry from other routes. */
+  private _customResumesListRefetch = inject(CustomResumesListRefetchService);
   private platformId = inject(PLATFORM_ID);
 
   private isBrowser(): boolean {

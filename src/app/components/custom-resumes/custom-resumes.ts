@@ -1,16 +1,54 @@
-import { Component, inject, OnInit, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, merge, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { CustomResumesListRefetchService } from '../../core/services/custom-resumes-list-refetch.service';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ResumeService } from '../../core/services/resume';
 import { AtsResume, BuilderResume, JdResume, ResumeListResponse, ResumeType } from '../../shared/models/resume.model';
+
+/** Card title: headline, else full name, else fallback (exported for unit tests). */
+export function buildBuilderCardTitle(personal: BuilderResume['personal']): string {
+  const headline = personal?.headline?.trim();
+  if (headline) return headline;
+  const first = personal?.firstName?.trim() ?? '';
+  const last = personal?.lastName?.trim() ?? '';
+  const full = [first, last].filter(Boolean).join(' ');
+  if (full) return full;
+  return 'Untitled Resume';
+}
+
+/** Locale-aware "last updated" label with same-day freshness (exported for unit tests). */
+export function formatResumeUpdatedAt(dateStr: string, now = new Date()): string {
+  if (!dateStr?.trim()) return '—';
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return '—';
+  const timeOpts: Intl.DateTimeFormatOptions = {
+    hour: 'numeric',
+    minute: '2-digit'
+  };
+  const sameDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+  if (sameDay) {
+    return `Today, ${d.toLocaleTimeString(undefined, timeOpts)}`;
+  }
+  const datePart = d.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+  const timePart = d.toLocaleTimeString(undefined, timeOpts);
+  return `${datePart}, ${timePart}`;
+}
 
 interface UnifiedResume {
   id: string;
@@ -43,8 +81,11 @@ type FilterType = 'all' | ResumeType;
 export class CustomResumesComponent implements OnInit {
 
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+  private platformId = inject(PLATFORM_ID);
   private resumeBuilderService = inject(ResumeBuilderService);
   private resumeService = inject(ResumeService);
+  private listRefetchBus = inject(CustomResumesListRefetchService);
 
   // Signals for all resume categories
   builderResumes = signal<UnifiedResume[]>([]);
@@ -57,11 +98,25 @@ export class CustomResumesComponent implements OnInit {
   currentPage = signal<number>(1);
   itemsPerPage = signal<number>(8);
 
-  // -------------------------------
-  // INIT
-  // -------------------------------
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      const onPageShow = (event: Event) => {
+        const pe = event as PageTransitionEvent;
+        if (pe.persisted) {
+          this.loadAllResumes();
+        }
+      };
+      window.addEventListener('pageshow', onPageShow);
+      this.destroyRef.onDestroy(() => {
+        window.removeEventListener('pageshow', onPageShow);
+      });
+    }
+  }
+
   ngOnInit(): void {
-    this.loadAllResumes();
+    merge(of(null), this.listRefetchBus.reenteredList)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadAllResumes());
   }
 
   // -------------------------------
@@ -100,7 +155,7 @@ export class CustomResumesComponent implements OnInit {
         this.builderResumes.set(
           builderList.map((r: BuilderResume) => ({
             id: r._id,
-            title: r.personal?.headline || 'Untitled Resume',
+            title: buildBuilderCardTitle(r.personal),
             type: 'builder',
             isDraft: r.isDraft,
             updatedAt: r.updatedAt,
@@ -246,11 +301,7 @@ export class CustomResumesComponent implements OnInit {
   }
 
   formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    return formatResumeUpdatedAt(dateStr);
   }
 
   getEmptyStateTitle(): string {

@@ -14,7 +14,11 @@ export interface BuilderResume {
   updatedAt: string;
   isDraft: boolean;
   completionPercentage: number;
-  personal?: { headline?: string };
+  personal?: {
+    headline?: string;
+    firstName?: string;
+    lastName?: string;
+  };
 }
 
 export interface AtsResume {
