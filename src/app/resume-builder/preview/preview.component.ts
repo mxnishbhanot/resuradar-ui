@@ -23,7 +23,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 
-type Template = 'modern' | 'corporate' | 'minimal' | 'faang' | 'luxury' | 'magazine' | 'executive' | 'creative';
+type Template = 'modern' | 'corporate' | 'faang' | 'luxury' | 'executive';
 
 @Component({
   selector: 'rr-preview',
@@ -63,12 +63,9 @@ export class PreviewComponent implements OnDestroy {
   private readonly allTemplates: ReadonlyArray<{ label: string; value: Template }> = [
     { label: 'Corporate', value: 'corporate' },
     { label: 'Modern', value: 'modern' },
-    { label: 'Minimalist', value: 'minimal' },
-    { label: 'FAANG', value: 'faang' },
-    { label: 'Luxury', value: 'luxury' },
-    { label: 'Magazine', value: 'magazine' },
     { label: 'Executive', value: 'executive' },
-    { label: 'Creative', value: 'creative' },
+    { label: 'Signature', value: 'luxury' },
+    { label: 'Technical', value: 'faang' },
   ];
 
   templates = computed(() => {
@@ -78,7 +75,7 @@ export class PreviewComponent implements OnDestroy {
     const free = new Set(
       this.userService.user()?.freeBuilderTemplates?.length
         ? this.userService.user()!.freeBuilderTemplates!
-        : ['modern', 'corporate', 'minimal']
+        : ['modern', 'corporate', 'faang']
     );
     return this.allTemplates.filter((t) => free.has(t.value));
   });
