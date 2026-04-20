@@ -5,7 +5,9 @@ import { catchError, of, throwError, Subject, merge } from 'rxjs';
 import { debounceTime, filter, switchMap, tap } from 'rxjs/operators';
 import {
   EMPTY_RESUME_STATE,
-  ResumeBuilderState
+  normalizeTemplateSettings,
+  ResumeBuilderState,
+  type BuilderTemplateId,
 } from '../../shared/models/resume-builder.model';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EnvironmentRuntimeService } from './environment.service';
@@ -90,13 +92,16 @@ export class ResumeBuilderService {
       .subscribe((res: any) => {
         if (!res?.resume) return;
 
+        const theme = (res.resume.theme as BuilderTemplateId) || 'modern';
         this.state.set({
           _id: res.resume._id,
           personal: res.resume.personal || {},
           educations: res.resume.educations || [],
           experiences: res.resume.experiences || [],
           skills: res.resume.skills || [],
-          projects: res.resume.projects || []
+          projects: res.resume.projects || [],
+          theme,
+          templateSettings: normalizeTemplateSettings(theme, res.resume.templateSettings),
         });
 
         if (this.isBrowser()) this.saveToLocal();
@@ -150,7 +155,8 @@ export class ResumeBuilderService {
   }
 
   private runAutoSaveHttp() {
-    const payload = { ...this.snapshot, _id: this.snapshot._id };
+    const s = this.snapshot;
+    const payload = { ...this.toResumePayload(s), _id: s._id };
 
     return this.http
       .put<{ resume: { _id: string } & Partial<ResumeBuilderState> }>(
@@ -216,7 +222,7 @@ export class ResumeBuilderService {
     const method = state._id ? 'PUT' : 'POST';
 
     return this.http.request(method, url, {
-      body: { ...state, isDraft }
+      body: { ...this.toResumePayload(state), isDraft }
     }).pipe(
       tap(() => {
         this.isDirty = false;
@@ -250,6 +256,38 @@ export class ResumeBuilderService {
       params,
       responseType: 'blob' as const
     });
+  }
+
+  /** HTML preview from current in-memory state (POST). */
+  renderPreviewHtml(template: BuilderTemplateId, state: ResumeBuilderState) {
+    const resume = this.toResumePayload(state);
+    return this.http.post(`${this.runtimeEnv.getApiUrl()}/custom-resume/render-preview`, {
+      template,
+      resume,
+    }, { responseType: 'text' as const });
+  }
+
+  /** Mongo-backed HTML preview (GET). */
+  getPreviewHtmlByResumeId(resumeId: string, template: BuilderTemplateId) {
+    const params = new HttpParams().set('template', template);
+    return this.http.get(
+      `${this.runtimeEnv.getApiUrl()}/custom-resume/${resumeId}/preview-html`,
+      { params, responseType: 'text' as const }
+    );
+  }
+
+  /** Body for autosave / preview: resume fields + templateSettings (no Angular-only noise). */
+  toResumePayload(state: ResumeBuilderState): Record<string, unknown> {
+    const theme = state.theme || 'modern';
+    return {
+      _id: state._id,
+      personal: state.personal,
+      educations: state.educations,
+      experiences: state.experiences,
+      skills: state.skills,
+      projects: state.projects,
+      templateSettings: normalizeTemplateSettings(theme, state.templateSettings),
+    };
   }
 
   saveToLocal() {

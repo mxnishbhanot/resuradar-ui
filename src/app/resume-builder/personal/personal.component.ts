@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 
 import {
   FormBuilder,
@@ -50,7 +50,8 @@ export class PersonalComponent {
     headline: [''],
     location: [''],
     linkedin: [''],
-    github: ['']
+    github: [''],
+    portfolioUrl: ['']
   });
 
   formValue = toSignal(

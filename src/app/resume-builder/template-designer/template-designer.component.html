@@ -1,0 +1,98 @@
+<div class="designer-root">
+  <header class="designer-toolbar">
+    <div class="toolbar-left">
+      <button mat-icon-button type="button" (click)="close()" matTooltip="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+      <span>Template studio</span>
+      <select
+        class="template-select"
+        [ngModel]="currentTemplate()"
+        (ngModelChange)="onTemplateChange($event)"
+      >
+        @for (t of templateOptions(); track t.value) {
+          <option [value]="t.value">{{ t.label }}</option>
+        }
+      </select>
+    </div>
+    <div class="toolbar-right">
+      <button mat-stroked-button type="button" (click)="autoAdjust()" [disabled]="isLoading()">
+        Auto-adjust fit
+      </button>
+      <button mat-flat-button color="primary" type="button" (click)="downloadPdf()" [disabled]="isLoading() || !resumeId()">
+        <mat-icon>download</mat-icon>
+        Download PDF
+      </button>
+    </div>
+  </header>
+
+  <div class="designer-body">
+    <aside class="controls-panel">
+      <div class="panel-title">Section order</div>
+      <ul
+        class="section-list"
+        cdkDropList
+        (cdkDropListDropped)="onSectionDrop($event)"
+      >
+        @for (key of sectionOrder(); track key) {
+          <li class="section-item" cdkDrag>
+            <mat-icon cdkDragHandle style="cursor: grab">drag_indicator</mat-icon>
+            {{ sectionLabel(key) }}
+          </li>
+        }
+      </ul>
+
+      <div class="panel-title">Density</div>
+      <div class="slider-row">
+        <label>Overall scale ({{ scalePct() }})</label>
+        <mat-slider min="0.65" max="1.25" step="0.01">
+          <input matSliderThumb [ngModel]="layoutScale()" (ngModelChange)="onScaleChange($event)" />
+        </mat-slider>
+      </div>
+      <div class="slider-row">
+        <label>Section spacing ({{ gapPct() }})</label>
+        <mat-slider min="0.7" max="1.5" step="0.02">
+          <input matSliderThumb [ngModel]="sectionGap()" (ngModelChange)="onGapChange($event)" />
+        </mat-slider>
+      </div>
+      <div class="slider-row">
+        <label>Line height ({{ lineHeightPct() }})</label>
+        <mat-slider min="0.95" max="1.35" step="0.01">
+          <input matSliderThumb [ngModel]="lineHeight()" (ngModelChange)="onLineHeightChange($event)" />
+        </mat-slider>
+      </div>
+
+      <p class="hint">
+        Dashed lines show approximate A4 page breaks (same margins as PDF export). Click a highlighted
+        region in the preview to jump to the matching builder tab.
+      </p>
+    </aside>
+
+    <div class="preview-panel">
+      @if (isLoading()) {
+        <div class="loading-overlay">
+          <mat-progress-spinner diameter="40" mode="indeterminate" />
+        </div>
+      }
+      <div class="preview-scroll">
+        <div class="preview-stage" #stage>
+          <div class="page-overlay" [style.height.px]="overlayHeightPx()">
+            @for (y of pageLineTopsPx(); track y) {
+              <div class="page-line" [style.top.px]="y"></div>
+            }
+          </div>
+          @if (iframeUrl(); as src) {
+            <iframe
+              #previewFrame
+              class="preview-iframe"
+              [src]="src"
+              title="Resume preview"
+              sandbox="allow-scripts allow-same-origin"
+              (load)="onIframeLoad()"
+            ></iframe>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -215,10 +215,10 @@ export class ResumeBuilderComponent implements OnInit {
   }
 
   openPreview(): void {
-    if (!this.isBrowser()) return; // only client
+    if (!this.isBrowser()) return;
 
-    import('../preview/preview.component').then(m => {
-      const PreviewComponent = m.PreviewComponent;
+    import('../template-designer/template-designer.component').then((m) => {
+      const TemplateDesignerComponent = m.TemplateDesignerComponent;
 
       let isMobile = false;
       try {
@@ -228,18 +228,22 @@ export class ResumeBuilderComponent implements OnInit {
       }
 
       const config: MatDialogConfig = {
-        width: isMobile ? '100vw' : '100%',
-        height: isMobile ? '100vh' : '90vh',
-        maxWidth: isMobile ? '100vw' : '680px',
-        maxHeight: isMobile ? '100vh' : '90vh',
+        width: isMobile ? '100vw' : '96vw',
+        height: isMobile ? '100vh' : '92vh',
+        maxWidth: isMobile ? '100vw' : '1200px',
+        maxHeight: isMobile ? '100vh' : '92vh',
         panelClass: isMobile ? 'preview-modal-mobile' : 'preview-modal-desktop',
         data: { resumeId: this.resumeBuilder.snapshot._id },
-        autoFocus: false
+        autoFocus: false,
       };
 
-      // open using the lazy component type
-      this.dialog.open(PreviewComponent, config);
-    }).catch(err => console.error('Failed to load preview component', err));
+      const ref = this.dialog.open(TemplateDesignerComponent, config);
+      ref.afterClosed().subscribe((r: { navigateTab?: number } | undefined) => {
+        if (r?.navigateTab != null) {
+          this.navigateToTab(r.navigateTab);
+        }
+      });
+    }).catch((err) => console.error('Failed to load template designer', err));
   }
 
   markCompleted() {

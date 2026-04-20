@@ -15,6 +15,7 @@ import { ResumeService } from '../../core/services/resume';
 import { GoogleAuthService } from '../../core/services/google-auth';
 import { ToastService } from '../../core/services/toast';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
+import { FreeTierUsageHint } from '../../shared/components/free-tier-usage-hint/free-tier-usage-hint';
 import { UpgradePro } from '../upgrade-pro/upgrade-pro';
 
 @Component({
@@ -24,7 +25,8 @@ import { UpgradePro } from '../upgrade-pro/upgrade-pro';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatTooltipModule
+    MatTooltipModule,
+    FreeTierUsageHint,
 ],
   templateUrl: './upload-resume.html',
   styleUrls: ['./upload-resume.scss']

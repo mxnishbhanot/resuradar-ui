@@ -87,5 +87,29 @@
       <mat-hint>City, State or Country</mat-hint>
     </mat-form-field>
 
+    <!-- Optional links -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>LinkedIn</mat-label>
+        <input matInput formControlName="linkedin" placeholder="https://www.linkedin.com/in/yourprofile" />
+        <mat-icon matPrefix>link</mat-icon>
+        <mat-hint>Optional</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Portfolio or website</mat-label>
+        <input matInput formControlName="portfolioUrl" placeholder="https://yourportfolio.com" />
+        <mat-icon matPrefix>language</mat-icon>
+        <mat-hint>Optional</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="form-field full-width">
+      <mat-label>GitHub</mat-label>
+      <input matInput formControlName="github" placeholder="https://github.com/yourusername" />
+      <mat-icon matPrefix>code</mat-icon>
+      <mat-hint>Optional</mat-hint>
+    </mat-form-field>
+
   </form>
 </div>
