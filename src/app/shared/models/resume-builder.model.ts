@@ -62,22 +62,13 @@ export type TemplateSectionKey =
   | 'projects'
   | 'skills';
 
-/** Default section order for single-column templates (matches legacy corporate flow). */
+/** Default section order for all builder templates (single-column flow). */
 export const DEFAULT_SECTION_ORDER: TemplateSectionKey[] = [
   'summary',
   'experience',
   'education',
   'projects',
   'skills',
-];
-
-/** Modern two-column template: rail (skills, education) then main reads same keys in order. */
-export const MODERN_DEFAULT_SECTION_ORDER: TemplateSectionKey[] = [
-  'skills',
-  'education',
-  'summary',
-  'experience',
-  'projects',
 ];
 
 export interface TemplateLayout {
@@ -92,8 +83,8 @@ export interface TemplateSettings {
   layout?: Partial<TemplateLayout>;
 }
 
-export function defaultSectionOrderForTemplate(t: BuilderTemplateId): TemplateSectionKey[] {
-  return t === 'modern' ? [...MODERN_DEFAULT_SECTION_ORDER] : [...DEFAULT_SECTION_ORDER];
+export function defaultSectionOrderForTemplate(_t: BuilderTemplateId): TemplateSectionKey[] {
+  return [...DEFAULT_SECTION_ORDER];
 }
 
 const SECTION_KEY_SET = new Set<TemplateSectionKey>([

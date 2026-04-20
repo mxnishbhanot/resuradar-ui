@@ -44,7 +44,7 @@ export class Pricing {
       comingSoon: false,
       features: [
         'Up to 3 resume analyses',
-        'Basic resume builder (select templates)',
+        'Resume builder: 3 templates (Modern, Corporate, Technical)',
         '1 free job description match',
         'Value-first onboarding',
         'PDF uploads for analysis'
@@ -59,7 +59,7 @@ export class Pricing {
       comingSoon: false,
       features: [
         'Unlimited resume analyses & JD matching',
-        'All resume builder templates & premium PDF export',
+        'All 5 resume templates + premium PDF export (2 extra vs Free)',
         'Full premium AI insights on every run',
         'UPI mandate subscription via PhonePe',
         'Cancel per PhonePe / dashboard rules'
