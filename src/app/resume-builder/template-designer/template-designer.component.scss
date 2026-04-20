@@ -40,6 +40,24 @@
   flex-wrap: wrap;
 }
 
+/* Strong contrast on dark toolbar (stroked default was too low-contrast). */
+:host ::ng-deep .toolbar-auto-adjust-btn.mat-mdc-unelevated-button {
+  --mdc-filled-button-container-color: #334155;
+  --mdc-filled-button-label-text-color: #f8fafc;
+  --mat-filled-button-state-layer-color: #f8fafc;
+  --mat-filled-button-ripple-color: rgba(248, 250, 252, 0.18);
+}
+
+:host ::ng-deep .toolbar-auto-adjust-btn.mat-mdc-unelevated-button:hover:not(:disabled) {
+  --mdc-filled-button-container-color: #475569;
+}
+
+:host ::ng-deep .toolbar-auto-adjust-btn.mat-mdc-unelevated-button:disabled {
+  --mdc-filled-button-container-color: #1e293b;
+  --mdc-filled-button-label-text-color: #64748b;
+  opacity: 1;
+}
+
 .template-select {
   padding: 6px 10px;
   border-radius: 8px;
@@ -209,4 +227,48 @@ mat-slider {
   color: #94a3b8;
   margin-top: 12px;
   line-height: 1.45;
+}
+
+.studio-format-hint {
+  margin: 8px 0 4px;
+
+  ::ng-deep .rr-format-hint {
+    color: #94a3b8;
+  }
+
+  ::ng-deep .rr-format-hint-label {
+    color: #cbd5e1;
+  }
+
+  ::ng-deep .rr-format-hint code {
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+}
+
+.template-select-block {
+  width: 100%;
+  max-width: 100%;
+}
+
+.checkbox-row mat-checkbox {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.color-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-input {
+  width: 44px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
 }

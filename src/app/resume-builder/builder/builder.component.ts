@@ -10,6 +10,10 @@ import {
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { MatButtonModule } from '@angular/material/button';
+import {
+  MatButtonToggleChange,
+  MatButtonToggleModule,
+} from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -33,6 +37,7 @@ interface BuilderTab {
   imports: [
     CommonModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatIconModule,
     MatDialogModule,
     MatProgressBarModule,
@@ -212,6 +217,13 @@ export class ResumeBuilderComponent implements OnInit {
     const loader = this.tabs[index]?.loader;
     if (!loader) return;
     loader().then(c => this.loaderCache.set(index, c)).catch(() => {});
+  }
+
+  onPdfPaperChange(ev: MatButtonToggleChange): void {
+    const v = ev.value;
+    if (v === 'light' || v === 'dark') {
+      this.resumeBuilder.update({ colorScheme: v });
+    }
   }
 
   openPreview(): void {

@@ -21,6 +21,7 @@ import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -32,9 +33,11 @@ import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { CONTENT_HEIGHT_MM, mmToPx } from '../../shared/constants/print-spec';
 import {
   type BuilderTemplateId,
+  type TemplateAppearance,
   type TemplateSectionKey,
   normalizeTemplateSettings,
 } from '../../shared/models/resume-builder.model';
+import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 
 const SECTION_LABELS: Record<TemplateSectionKey, string> = {
   summary: 'Summary',
@@ -66,7 +69,9 @@ function mapFieldToTab(field: string | null | undefined): number | null {
     MatIconModule,
     MatProgressSpinnerModule,
     MatSliderModule,
+    MatCheckboxModule,
     MatTooltipModule,
+    InlineResumeFormatHintComponent,
   ],
   templateUrl: './template-designer.component.html',
   styleUrls: ['./template-designer.component.scss'],
@@ -138,6 +143,20 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   scalePct = computed(() => `${Math.round(this.layoutScale() * 100)}%`);
   gapPct = computed(() => `${Math.round(this.sectionGap() * 100)}%`);
   lineHeightPct = computed(() => `${Math.round(this.lineHeight() * 100)}%`);
+
+  appearance = computed(() =>
+    normalizeTemplateSettings(this.currentTemplate(), this.store.state().templateSettings).appearance!
+  );
+
+  bodyColorPicker = computed(() => {
+    const a = this.appearance();
+    return a.bodyColor ?? (a.colorMode === 'dark' ? '#fafafa' : '#0a0a0a');
+  });
+
+  headingColorPicker = computed(() => {
+    const a = this.appearance();
+    return a.headingColor ?? (a.colorMode === 'dark' ? '#fafafa' : '#0a0a0a');
+  });
 
   pageLineTopsPx = computed(() => {
     const h = this.overlayHeightPx();
@@ -241,6 +260,44 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     const L = { ...cur?.layout, ...partial, layoutVersion: 1 as const };
     this.store.update({
       templateSettings: normalizeTemplateSettings(t, { ...cur, layout: L }),
+    });
+  }
+
+  onColorModeChange(mode: string): void {
+    this.patchAppearance({ colorMode: mode === 'dark' ? 'dark' : 'light' });
+  }
+
+  onHeadingWeightChange(w: number): void {
+    const wn = w === 600 || w === 700 || w === 800 ? w : 700;
+    this.patchAppearance({ headingWeight: wn as TemplateAppearance['headingWeight'] });
+  }
+
+  onUnderlineLinksChange(checked: boolean): void {
+    this.patchAppearance({ underlineLinks: checked });
+  }
+
+  onBodyColorPick(hex: string): void {
+    this.patchAppearance({ bodyColor: hex || null });
+  }
+
+  onHeadingColorPick(hex: string): void {
+    this.patchAppearance({ headingColor: hex || null });
+  }
+
+  resetBodyColor(): void {
+    this.patchAppearance({ bodyColor: null });
+  }
+
+  resetHeadingColor(): void {
+    this.patchAppearance({ headingColor: null });
+  }
+
+  private patchAppearance(partial: Partial<TemplateAppearance>): void {
+    const t = this.currentTemplate();
+    const cur = this.store.snapshot.templateSettings;
+    const merged = { ...(cur?.appearance || {}), ...partial };
+    this.store.update({
+      templateSettings: normalizeTemplateSettings(t, { ...cur, appearance: merged }),
     });
   }
 

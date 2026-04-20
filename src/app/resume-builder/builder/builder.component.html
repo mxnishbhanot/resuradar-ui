@@ -120,6 +120,19 @@
       <h3>Template studio</h3>
       <p>Reorder sections, tune spacing, see page breaks, and export PDF.</p>
 
+      <div class="pdf-paper-toggle">
+        <span class="pdf-paper-label">PDF paper</span>
+        <mat-button-toggle-group
+          class="pdf-paper-group"
+          [value]="resumeState().colorScheme ?? 'light'"
+          hideSingleSelectionIndicator
+          (change)="onPdfPaperChange($event)"
+        >
+          <mat-button-toggle value="light">Light</mat-button-toggle>
+          <mat-button-toggle value="dark">Dark</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
       <button mat-stroked-button class="btn-premium btn-ghost" (click)="openPreview()">
         <span>Open studio</span>
         <mat-icon>open_in_new</mat-icon>

@@ -32,6 +32,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ThemeService } from '../../core/services/theme';
+import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 
 export interface Experience {
   id: string;
@@ -59,6 +60,7 @@ export interface Experience {
     MatTooltipModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    InlineResumeFormatHintComponent,
   ],
   templateUrl: './experience.component.html',
   styleUrls: ['./experience.component.scss']

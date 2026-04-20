@@ -93,6 +93,7 @@ export class ResumeBuilderService {
         if (!res?.resume) return;
 
         const theme = (res.resume.theme as BuilderTemplateId) || 'modern';
+        const templateSettings = normalizeTemplateSettings(theme, res.resume.templateSettings);
         this.state.set({
           _id: res.resume._id,
           personal: res.resume.personal || {},
@@ -101,7 +102,8 @@ export class ResumeBuilderService {
           skills: res.resume.skills || [],
           projects: res.resume.projects || [],
           theme,
-          templateSettings: normalizeTemplateSettings(theme, res.resume.templateSettings),
+          templateSettings,
+          colorScheme: templateSettings.appearance!.colorMode,
         });
 
         if (this.isBrowser()) this.saveToLocal();
@@ -115,13 +117,45 @@ export class ResumeBuilderService {
   }
 
   update(partial: Partial<ResumeBuilderState>) {
-    this.state.update(prev => ({ ...prev, ...partial }));
+    this.state.update((prev) => {
+      const merged = { ...prev, ...partial };
+      const theme = merged.theme || 'modern';
+      let rawTemplateSettings = merged.templateSettings;
+      if (partial.colorScheme !== undefined && partial.templateSettings === undefined) {
+        rawTemplateSettings = {
+          ...merged.templateSettings,
+          appearance: {
+            ...(merged.templateSettings?.appearance || {}),
+            colorMode: partial.colorScheme,
+          },
+        };
+      }
+      const templateSettings = normalizeTemplateSettings(theme, rawTemplateSettings);
+      return {
+        ...merged,
+        templateSettings,
+        colorScheme: templateSettings.appearance!.colorMode,
+      };
+    });
     this.isDirty = true;
     if (this.isBrowser()) this.saveToLocal();
   }
 
-  replace(newState: ResumeBuilderState) {
-    this.state.set(newState);
+  /** Replace in-memory state (e.g. parsed upload). Normalizes template settings and colorScheme. */
+  replace(resume: Partial<ResumeBuilderState> & { _id?: string | null }) {
+    const theme = (resume.theme as BuilderTemplateId) || 'modern';
+    const templateSettings = normalizeTemplateSettings(theme, resume.templateSettings);
+    this.state.set({
+      _id: resume._id ?? null,
+      personal: resume.personal || {},
+      educations: resume.educations || [],
+      experiences: resume.experiences || [],
+      skills: resume.skills || [],
+      projects: resume.projects || [],
+      theme,
+      templateSettings,
+      colorScheme: templateSettings.appearance!.colorMode,
+    });
     this.isDirty = true;
     if (this.isBrowser()) this.saveToLocal();
   }
@@ -302,8 +336,16 @@ export class ResumeBuilderService {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
-      const parsed = JSON.parse(raw);
-      this.state.set({ ...EMPTY_RESUME_STATE, ...parsed });
+      const parsed = JSON.parse(raw) as Partial<ResumeBuilderState>;
+      const merged = { ...EMPTY_RESUME_STATE, ...parsed };
+      const theme = merged.theme || 'modern';
+      const templateSettings = normalizeTemplateSettings(theme, merged.templateSettings);
+      this.state.set({
+        ...merged,
+        theme,
+        templateSettings,
+        colorScheme: templateSettings.appearance!.colorMode,
+      });
     } catch {}
   }
 

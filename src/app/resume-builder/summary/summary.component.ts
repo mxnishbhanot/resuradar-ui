@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 
 @Component({
   selector: 'rr-summary',
@@ -29,8 +30,9 @@ import { ResumeBuilderService } from '../../core/services/resume-builder.service
     MatIconModule,
     MatCardModule,
     MatTooltipModule,
-    CdkTextareaAutosize
-],
+    CdkTextareaAutosize,
+    InlineResumeFormatHintComponent,
+  ],
   templateUrl: './summary.component.html',
   styleUrl: './summary.component.scss',
 })

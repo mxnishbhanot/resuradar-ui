@@ -16,7 +16,13 @@
       </select>
     </div>
     <div class="toolbar-right">
-      <button mat-stroked-button type="button" (click)="autoAdjust()" [disabled]="isLoading()">
+      <button
+        mat-flat-button
+        type="button"
+        class="toolbar-auto-adjust-btn"
+        (click)="autoAdjust()"
+        [disabled]="isLoading()"
+      >
         Auto-adjust fit
       </button>
       <button mat-flat-button color="primary" type="button" (click)="downloadPdf()" [disabled]="isLoading() || !resumeId()">
@@ -61,6 +67,70 @@
           <input matSliderThumb [ngModel]="lineHeight()" (ngModelChange)="onLineHeightChange($event)" />
         </mat-slider>
       </div>
+
+      <div class="panel-title">Look &amp; feel</div>
+      <div class="slider-row">
+        <label for="rr-paper-mode">Paper</label>
+        <select
+          id="rr-paper-mode"
+          class="template-select template-select-block"
+          [ngModel]="appearance().colorMode"
+          (ngModelChange)="onColorModeChange($event)"
+        >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <div class="slider-row">
+        <label for="rr-heading-w">Section heading weight</label>
+        <select
+          id="rr-heading-w"
+          class="template-select template-select-block"
+          [ngModel]="appearance().headingWeight"
+          (ngModelChange)="onHeadingWeightChange(+$event)"
+        >
+          <option [ngValue]="600">Semibold (600)</option>
+          <option [ngValue]="700">Bold (700)</option>
+          <option [ngValue]="800">Extra bold (800)</option>
+        </select>
+      </div>
+      <div class="slider-row checkbox-row">
+        <mat-checkbox
+          [checked]="appearance().underlineLinks"
+          (change)="onUnderlineLinksChange($event.checked)"
+        >
+          Underline links in PDF
+        </mat-checkbox>
+      </div>
+      <div class="slider-row">
+        <label>Body text color</label>
+        <div class="color-row">
+          <input
+            type="color"
+            class="color-input"
+            [ngModel]="bodyColorPicker()"
+            (ngModelChange)="onBodyColorPick($event)"
+          />
+          @if (appearance().bodyColor) {
+            <button type="button" mat-stroked-button (click)="resetBodyColor()">Use theme default</button>
+          }
+        </div>
+      </div>
+      <div class="slider-row">
+        <label>Heading color</label>
+        <div class="color-row">
+          <input
+            type="color"
+            class="color-input"
+            [ngModel]="headingColorPicker()"
+            (ngModelChange)="onHeadingColorPick($event)"
+          />
+          @if (appearance().headingColor) {
+            <button type="button" mat-stroked-button (click)="resetHeadingColor()">Use theme default</button>
+          }
+        </div>
+      </div>
+      <rr-inline-resume-format-hint class="studio-format-hint" />
 
       <p class="hint">
         Dashed lines show approximate A4 page breaks (same margins as PDF export). Click a highlighted

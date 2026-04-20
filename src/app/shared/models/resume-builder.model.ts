@@ -78,9 +78,53 @@ export interface TemplateLayout {
   lineHeight: number;
 }
 
+export interface TemplateAppearance {
+  appearanceVersion: 1;
+  colorMode: 'light' | 'dark';
+  headingWeight: 600 | 700 | 800;
+  underlineLinks: boolean;
+  /** Optional override for body text (hex #rgb or #rrggbb). */
+  bodyColor: string | null;
+  /** Optional override for headings / section titles. */
+  headingColor: string | null;
+}
+
+const HEX_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+
+function expandHex3(h: string): string {
+  if (h.length === 4) {
+    return `#${h[1]}${h[1]}${h[2]}${h[2]}${h[3]}${h[3]}`;
+  }
+  return h.toLowerCase();
+}
+
+function sanitizeHex(c: unknown): string | null {
+  if (typeof c !== 'string') return null;
+  const t = c.trim();
+  if (!HEX_RE.test(t)) return null;
+  return expandHex3(t);
+}
+
+export function normalizeAppearance(
+  raw?: Partial<TemplateAppearance> | null
+): TemplateAppearance {
+  const colorMode = raw?.colorMode === 'dark' ? 'dark' : 'light';
+  let headingWeight = Number(raw?.headingWeight);
+  if (![600, 700, 800].includes(headingWeight)) headingWeight = 700;
+  return {
+    appearanceVersion: 1,
+    colorMode,
+    headingWeight: headingWeight as TemplateAppearance['headingWeight'],
+    underlineLinks: raw?.underlineLinks === true,
+    bodyColor: sanitizeHex(raw?.bodyColor),
+    headingColor: sanitizeHex(raw?.headingColor),
+  };
+}
+
 export interface TemplateSettings {
   sectionOrder?: TemplateSectionKey[];
   layout?: Partial<TemplateLayout>;
+  appearance?: Partial<TemplateAppearance>;
 }
 
 export function defaultSectionOrderForTemplate(_t: BuilderTemplateId): TemplateSectionKey[] {
@@ -126,6 +170,7 @@ export function normalizeTemplateSettings(
       sectionGap: Math.min(1.5, Math.max(0.7, sectionGap)),
       lineHeight: Math.min(1.35, Math.max(0.95, lineHeight)),
     },
+    appearance: normalizeAppearance(raw?.appearance),
   };
 }
 

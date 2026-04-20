@@ -23,6 +23,7 @@ import {
 
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 
 export interface SkillCategory {
   id: string;
@@ -41,8 +42,9 @@ export interface SkillCategory {
     MatIconModule,
     MatCardModule,
     MatChipsModule,
-    MatTooltipModule
-],
+    MatTooltipModule,
+    InlineResumeFormatHintComponent,
+  ],
   templateUrl: './skills.component.html',
   styleUrl: './skills.component.scss',
 })

@@ -34,6 +34,7 @@ import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ThemeService } from '../../core/services/theme';
+import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 import { Project } from '../../shared/models/resume-builder.model';
 
 @Component({
@@ -56,7 +57,8 @@ import { Project } from '../../shared/models/resume-builder.model';
     MatChipsModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    CdkTextareaAutosize
+    CdkTextareaAutosize,
+    InlineResumeFormatHintComponent,
   ]
 })
 export class ProjectsComponent {
