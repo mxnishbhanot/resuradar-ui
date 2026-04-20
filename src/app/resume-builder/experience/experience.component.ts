@@ -2,7 +2,7 @@ import {
   afterNextRender,
   Component,
   computed,
-  effect,
+  DestroyRef,
   ElementRef,
   inject,
   Injector,
@@ -10,6 +10,8 @@ import {
   signal,
   ViewChildren,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -70,6 +72,7 @@ export class ExperienceComponent {
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
   private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
   protected readonly theme = inject(ThemeService);
 
   @ViewChildren('bulletTextarea', { read: ElementRef })
@@ -95,24 +98,25 @@ export class ExperienceComponent {
   });
 
   constructor() {
-    /** Effect: handle "isCurrent" toggle without subscribing */
-    effect(() => {
-      const isCurr = this.form.get('isCurrent')?.value;
-      const endCtrl = this.form.get('endDate');
+    const isCurrentCtrl = this.form.get('isCurrent');
+    const endCtrl = this.form.get('endDate');
+    if (!isCurrentCtrl || !endCtrl) return;
 
-      if (!endCtrl) return;
-
+    const syncEndDateForCurrent = (isCurr: boolean | null | undefined) => {
       if (isCurr) {
         endCtrl.disable({ emitEvent: false });
         endCtrl.clearValidators();
         endCtrl.setValue(null, { emitEvent: false });
       } else {
         endCtrl.enable({ emitEvent: false });
-        endCtrl.setValidators([Validators.required]);
+        endCtrl.clearValidators();
       }
-
       endCtrl.updateValueAndValidity({ emitEvent: false });
-    });
+    };
+
+    isCurrentCtrl.valueChanges
+      .pipe(startWith(isCurrentCtrl.value), takeUntilDestroyed(this.destroyRef))
+      .subscribe((isCurr) => syncEndDateForCurrent(isCurr as boolean));
   }
 
   /** Bullets getter */

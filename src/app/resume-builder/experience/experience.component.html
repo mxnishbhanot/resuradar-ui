@@ -50,8 +50,8 @@
             <div class="meta-item">
               <mat-icon class="meta-icon">calendar_today</mat-icon>
               <span>
-                {{ exp.startDate | date:'MMMM, yyyy' }} -
-                {{ exp.isCurrent ? 'Present' : (exp.endDate | date:'MMMM, yyyy') }}
+                {{ exp.startDate | date:'MMMM, yyyy' }} –
+                {{ exp.isCurrent ? 'Present' : (exp.endDate ? (exp.endDate | date:'MMMM, yyyy') : '—') }}
               </span>
             </div>
 
@@ -191,11 +191,7 @@
               [class.disabled-field]="form.get('isCurrent')?.value"
             >
               <mat-label>End Date</mat-label>
-              <input
-                matInput
-                [matDatepicker]="endPicker"
-                formControlName="endDate"
-                [disabled]="form.get('isCurrent')?.value" />
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
 
               <mat-datepicker-toggle matSuffix [for]="endPicker" />
               <mat-datepicker #endPicker [panelClass]="theme.datepickerPanelClass()" />
