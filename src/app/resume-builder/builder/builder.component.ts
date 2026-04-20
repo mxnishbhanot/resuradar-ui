@@ -228,11 +228,13 @@ export class ResumeBuilderComponent implements OnInit {
       }
 
       const config: MatDialogConfig = {
-        width: isMobile ? '100vw' : '96vw',
-        height: isMobile ? '100vh' : '92vh',
-        maxWidth: isMobile ? '100vw' : '1200px',
-        maxHeight: isMobile ? '100vh' : '92vh',
-        panelClass: isMobile ? 'preview-modal-mobile' : 'preview-modal-desktop',
+        width: isMobile ? '100vw' : 'min(1480px, 99vw)',
+        height: isMobile ? '100vh' : 'min(900px, 94vh)',
+        maxWidth: isMobile ? '100vw' : '99vw',
+        maxHeight: isMobile ? '100vh' : '94vh',
+        panelClass: isMobile
+          ? ['preview-modal-mobile', 'rr-template-studio-pane']
+          : ['preview-modal-desktop', 'rr-template-studio-pane'],
         data: { resumeId: this.resumeBuilder.snapshot._id },
         autoFocus: false,
       };
