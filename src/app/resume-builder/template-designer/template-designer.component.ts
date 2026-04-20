@@ -90,7 +90,8 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
 
   private previewResizeObserver: ResizeObserver | null = null;
-  private previewResizeRafId = 0;
+  /** Deferred flush so layout writes never run in the same turn as ResizeObserver delivery. */
+  private previewLayoutFlushTimer: ReturnType<typeof setTimeout> | null = null;
 
   previewFrame = viewChild<ElementRef<HTMLIFrameElement>>('previewFrame');
 
@@ -174,12 +175,12 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.previewLayoutFlushTimer != null) {
+      clearTimeout(this.previewLayoutFlushTimer);
+      this.previewLayoutFlushTimer = null;
+    }
     this.previewResizeObserver?.disconnect();
     this.previewResizeObserver = null;
-    if (this.previewResizeRafId) {
-      cancelAnimationFrame(this.previewResizeRafId);
-      this.previewResizeRafId = 0;
-    }
     this.revokeBlobs();
     if (this.refreshTimer) clearTimeout(this.refreshTimer);
     if (isPlatformBrowser(this.platformId)) {
@@ -374,31 +375,40 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
 
     this.previewResizeObserver?.disconnect();
     this.previewResizeObserver = null;
-    if (this.previewResizeRafId) {
-      cancelAnimationFrame(this.previewResizeRafId);
-      this.previewResizeRafId = 0;
+    if (this.previewLayoutFlushTimer != null) {
+      clearTimeout(this.previewLayoutFlushTimer);
+      this.previewLayoutFlushTimer = null;
     }
 
-    const applyPreviewLayout = () => {
-      const h = Math.max(body.scrollHeight, 1);
-      if (this.overlayHeightPx() !== h) {
-        this.overlayHeightPx.set(h);
+    const flushPreviewLayout = () => {
+      const ro = this.previewResizeObserver;
+      if (ro == null || !frame.isConnected) return;
+      ro.disconnect();
+      try {
+        const h = Math.max(body.scrollHeight, 1);
+        if (this.overlayHeightPx() !== h) {
+          this.overlayHeightPx.set(h);
+        }
+        frame.style.height = `${Math.max(h, 200)}px`;
+      } catch {
+        /* cross-origin or torn document */
+      } finally {
+        try {
+          ro?.observe(body);
+        } catch {
+          /* body detached */
+        }
       }
-      frame.style.height = `${Math.max(h, 200)}px`;
     };
 
     const scheduleLayout = () => {
-      if (this.previewResizeRafId) {
-        cancelAnimationFrame(this.previewResizeRafId);
+      if (this.previewLayoutFlushTimer != null) {
+        clearTimeout(this.previewLayoutFlushTimer);
       }
-      this.previewResizeRafId = requestAnimationFrame(() => {
-        this.previewResizeRafId = 0;
-        try {
-          applyPreviewLayout();
-        } catch {
-          /* cross-origin or torn document */
-        }
-      });
+      this.previewLayoutFlushTimer = setTimeout(() => {
+        this.previewLayoutFlushTimer = null;
+        flushPreviewLayout();
+      }, 0);
     };
 
     scheduleLayout();
