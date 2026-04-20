@@ -18,6 +18,7 @@ import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/d
 import { ActivatedRoute } from '@angular/router';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ResumeBuilderState } from '../../shared/models/resume-builder.model';
+import { ToastService } from '../../core/services/toast';
 
 /** UI Tab Type */
 interface BuilderTab {
@@ -46,6 +47,7 @@ export class ResumeBuilderComponent implements OnInit {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private platformId = inject(PLATFORM_ID);
+  private toast = inject(ToastService);
 
   // SSR helper
   private isBrowser(): boolean {
@@ -96,6 +98,12 @@ export class ResumeBuilderComponent implements OnInit {
     ];
 
     return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  });
+
+  /** Finish requires 100% progress and a server-backed resume id (after autosave). */
+  canFinish = computed(() => {
+    const s = this.resumeState();
+    return this.completionPercentage() === 100 && !!s._id;
   });
 
   isTabCompleted = (index: number): boolean => {
@@ -235,8 +243,17 @@ export class ResumeBuilderComponent implements OnInit {
   }
 
   markCompleted() {
-    this.resumeBuilder.completeResume().subscribe(res => {
-      if (res) this.openPreview();
+    this.resumeBuilder.completeResume().subscribe({
+      next: (res) => {
+        if (res) this.openPreview();
+      },
+      error: (err: { message?: string; error?: { message?: string } }) => {
+        const msg =
+          err?.message ||
+          err?.error?.message ||
+          'Failed to complete resume. Try again in a moment.';
+        this.toast.show('error', 'Could not finish resume', msg, 8000);
+      }
     });
   }
 }

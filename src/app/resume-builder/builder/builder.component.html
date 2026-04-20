@@ -96,7 +96,7 @@
 
         @if (currentTab() === tabs.length - 1) {
           <button
-            [disabled]="completionPercentage() != 100"
+            [disabled]="!canFinish()"
             mat-button
             class="deck-btn-primary finish"
             (click)="markCompleted()">
@@ -146,7 +146,7 @@
 
         @if (currentTab() === tabs.length - 1) {
           <button
-            [disabled]="completionPercentage() != 100"
+            [disabled]="!canFinish()"
             mat-flat-button
             class="btn-premium btn-finish"
             (click)="markCompleted()">

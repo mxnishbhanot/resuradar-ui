@@ -1,9 +1,14 @@
 import {
+  afterNextRender,
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
+  Injector,
+  QueryList,
   signal,
+  ViewChildren,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -26,6 +31,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { ThemeService } from '../../core/services/theme';
 
 export interface Experience {
   id: string;
@@ -61,6 +67,11 @@ export class ExperienceComponent {
 
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
+  private injector = inject(Injector);
+  protected readonly theme = inject(ThemeService);
+
+  @ViewChildren('bulletTextarea', { read: ElementRef })
+  bulletTextareas!: QueryList<ElementRef<HTMLTextAreaElement>>;
 
   /** UI Signals */
   showForm = signal(false);
@@ -124,6 +135,13 @@ export class ExperienceComponent {
   /** Bullets */
   addBullet() {
     this.bullets.push(this.fb.control(''));
+    afterNextRender(
+      () => {
+        const el = this.bulletTextareas?.last?.nativeElement;
+        el?.focus({ preventScroll: true });
+      },
+      { injector: this.injector },
+    );
   }
 
   removeBullet(i: number) {

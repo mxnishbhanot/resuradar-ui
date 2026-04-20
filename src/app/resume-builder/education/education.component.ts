@@ -1,10 +1,15 @@
 import {
+  afterNextRender,
   Component,
-  inject,
-  signal,
   computed,
   effect,
+  ElementRef,
+  inject,
+  Injector,
+  QueryList,
+  signal,
   untracked,
+  ViewChildren,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -25,6 +30,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { TextFieldModule } from '@angular/cdk/text-field';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { ThemeService } from '../../core/services/theme';
 
 export interface EducationEntry {
   id: string;
@@ -60,6 +66,11 @@ export interface EducationEntry {
 export class EducationComponent {
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
+  private injector = inject(Injector);
+  protected readonly theme = inject(ThemeService);
+
+  @ViewChildren('bulletTextarea', { read: ElementRef })
+  bulletTextareas!: QueryList<ElementRef<HTMLTextAreaElement>>;
 
   // UI State
   showForm = signal(false);
@@ -69,7 +80,7 @@ export class EducationComponent {
   form = this.fb.group({
     institution: ['', Validators.required],
     degree: ['', Validators.required],
-    major: ['', Validators.required],
+    major: [''],
     startDate: [null as Date | null, Validators.required],
     endDate: [null as Date | null],
     isCurrent: [false],
@@ -148,6 +159,13 @@ export class EducationComponent {
 
   addBullet() {
     this.bullets.push(this.fb.control(''));
+    afterNextRender(
+      () => {
+        const el = this.bulletTextareas?.last?.nativeElement;
+        el?.focus({ preventScroll: true });
+      },
+      { injector: this.injector },
+    );
   }
 
   removeBullet(index: number) {

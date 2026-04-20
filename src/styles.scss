@@ -642,9 +642,20 @@ div {
   .custom-dark-datepicker .mat-calendar-header .mat-mdc-icon-button {
     color: var(--text-inverse);
   }
-  .custom-dark-datepicker .mat-calendar-header .mdc-button__label,.mat-calendar-arrow, th {
+
+  .custom-dark-datepicker .mat-calendar-header .mdc-button__label,
+  .custom-dark-datepicker .mat-calendar-header .mat-calendar-arrow {
     color: var(--text-inverse);
     fill: var(--text-inverse);
+  }
+
+  /* S M T W T F S — lives under .mat-calendar-table-header, not .mat-calendar-header */
+  .custom-dark-datepicker .mat-calendar-table-header th {
+    color: var(--text-secondary);
+  }
+
+  .custom-dark-datepicker .mat-calendar-table-header th span[aria-hidden='true'] {
+    color: inherit;
   }
 
   /* --- Calendar Body (Year/Month views) --- */

@@ -44,7 +44,7 @@ export class PersonalComponent {
   /** Build the form */
   form: FormGroup = this.fb.group({
     firstName: ['', Validators.required],
-    lastName: ['', Validators.required],
+    lastName: [''],
     email: ['', [Validators.required, Validators.email]],
     phone: ['', Validators.pattern(/^\+?[1-9]\d{1,14}$/)],
     headline: [''],

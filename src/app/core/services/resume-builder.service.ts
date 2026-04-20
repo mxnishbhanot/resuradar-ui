@@ -1,13 +1,16 @@
 import { Injectable, inject, signal, effect, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { catchError, of, timer, tap, debounce } from 'rxjs';
+import { catchError, of, throwError, Subject, merge } from 'rxjs';
+import { debounceTime, filter, switchMap, tap } from 'rxjs/operators';
 import {
   EMPTY_RESUME_STATE,
   ResumeBuilderState
 } from '../../shared/models/resume-builder.model';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EnvironmentRuntimeService } from './environment.service';
+import { ToastService } from './toast';
+import { GoogleAuthService } from './google-auth';
 
 const STORAGE_KEY = 'rr_resume_builder_state_v1';
 
@@ -18,6 +21,8 @@ export class ResumeBuilderService {
   private route = inject(ActivatedRoute);
   private platformId = inject(PLATFORM_ID);
   private runtimeEnv = inject(EnvironmentRuntimeService);
+  private toast = inject(ToastService);
+  private googleAuth = inject(GoogleAuthService);
 
   private isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
@@ -27,12 +32,29 @@ export class ResumeBuilderService {
 
   private autoSaveEnabled = true;
   private isDirty = false;
+  private readonly autoSaveDebounced = new Subject<void>();
+  private readonly autoSaveImmediate = new Subject<void>();
 
   constructor() {
     if (this.isBrowser()) {
       this.loadFromLocal();
       this.listenToUrlResumeId();
-      this.setupAutoSave();
+
+      merge(
+        this.autoSaveImmediate,
+        this.autoSaveDebounced.pipe(debounceTime(2000))
+      )
+        .pipe(
+          filter(() => this.isDirty && this.autoSaveEnabled),
+          switchMap(() => this.runAutoSaveHttp())
+        )
+        .subscribe();
+
+      effect(() => {
+        this.state();
+        if (!this.isDirty || !this.autoSaveEnabled) return;
+        this.autoSaveDebounced.next();
+      });
     }
   }
 
@@ -103,7 +125,14 @@ export class ResumeBuilderService {
     if (!this.isBrowser()) return;
 
     this.clearLocal();
-    this.state.set(EMPTY_RESUME_STATE);
+    const email = this.googleAuth.user()?.email?.trim();
+    this.state.set({
+      ...EMPTY_RESUME_STATE,
+      personal: {
+        ...EMPTY_RESUME_STATE.personal,
+        ...(email ? { email } : {}),
+      },
+    });
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -111,56 +140,58 @@ export class ResumeBuilderService {
       queryParamsHandling: 'merge'
     }).then(() => {
       this.isDirty = true;
-      this.autoSaveToServer();
+      this.autoSaveImmediate.next();
     });
   }
 
-  private setupAutoSave() {
-    if (!this.isBrowser()) return;
-
-    effect(() => {
-      const current = this.state();
-      debounce(() => timer(2000))(of(current)).subscribe(() => {
-        if (this.isDirty && this.autoSaveEnabled) {
-          this.autoSaveToServer();
-        }
-      });
-    });
+  private autoSaveFailureMessage(err: unknown): string {
+    const e = err as { error?: { message?: string; error?: string } };
+    return e?.error?.message || e?.error?.error || 'Check your connection and try again.';
   }
 
-  private autoSaveToServer() {
+  private runAutoSaveHttp() {
     const payload = { ...this.snapshot, _id: this.snapshot._id };
 
-    this.http.put(`${this.runtimeEnv.getApiUrl()}/custom-resume/draft/autosave`, payload)
+    return this.http
+      .put<{ resume: { _id: string } & Partial<ResumeBuilderState> }>(
+        `${this.runtimeEnv.getApiUrl()}/custom-resume/draft/autosave`,
+        payload
+      )
       .pipe(
+        tap((res) => {
+          if (!res?.resume) return;
+
+          this.isDirty = false;
+          const newId = res.resume._id;
+
+          if (!this.snapshot._id || this.snapshot._id !== newId) {
+            this.state.update(prev => ({ ...prev, _id: newId }));
+            if (this.isBrowser()) this.saveToLocal();
+          }
+
+          if (this.isBrowser()) {
+            const currentId = this.route.snapshot.queryParamMap.get('resumeId');
+            if (currentId !== newId) {
+              this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: { resumeId: newId },
+                queryParamsHandling: 'merge'
+              });
+            }
+          }
+        }),
         catchError(err => {
           console.error('Auto-save failed:', err);
+          this.toast.show(
+            'error',
+            'Could not save draft',
+            this.autoSaveFailureMessage(err),
+            8000
+          );
           if (this.isBrowser()) this.saveToLocal();
           return of(null);
         })
-      )
-      .subscribe((res: any) => {
-        if (!res?.resume) return;
-
-        this.isDirty = false;
-        const newId = res.resume._id;
-
-        if (!this.snapshot._id || this.snapshot._id !== newId) {
-          this.state.update(prev => ({ ...prev, _id: newId }));
-          if (this.isBrowser()) this.saveToLocal();
-        }
-
-        if (this.isBrowser()) {
-          const currentId = this.route.snapshot.queryParamMap.get('resumeId');
-          if (currentId !== newId) {
-            this.router.navigate([], {
-              relativeTo: this.route,
-              queryParams: { resumeId: newId },
-              queryParamsHandling: 'merge'
-            });
-          }
-        }
-      });
+      );
   }
 
   getAllResumes() {
@@ -196,6 +227,11 @@ export class ResumeBuilderService {
 
   completeResume() {
     const state = this.snapshot;
+    if (!state._id) {
+      return throwError(
+        () => new Error('Resume has not been saved to the server yet. Wait for autosave or try again.')
+      );
+    }
     return this.http.post(`${this.runtimeEnv.getApiUrl()}/custom-resume/${state._id}/complete`, {})
       .pipe(
         tap(() => {

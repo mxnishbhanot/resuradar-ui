@@ -1,4 +1,14 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  Injector,
+  QueryList,
+  signal,
+  ViewChildren,
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import {
   FormBuilder,
@@ -23,6 +33,7 @@ import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
+import { ThemeService } from '../../core/services/theme';
 import { Project } from '../../shared/models/resume-builder.model';
 
 @Component({
@@ -52,6 +63,11 @@ export class ProjectsComponent {
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
   private datePipe = inject(DatePipe);
+  private injector = inject(Injector);
+  protected readonly theme = inject(ThemeService);
+
+  @ViewChildren('bulletTextarea', { read: ElementRef })
+  bulletTextareas!: QueryList<ElementRef<HTMLTextAreaElement>>;
 
   /** Signal-backed UI state */
   showForm = signal(false);
@@ -129,6 +145,13 @@ export class ProjectsComponent {
 
   addBullet(): void {
     this.bullets.push(this.fb.control(''));
+    afterNextRender(
+      () => {
+        const el = this.bulletTextareas?.last?.nativeElement;
+        el?.focus({ preventScroll: true });
+      },
+      { injector: this.injector },
+    );
   }
 
   removeBullet(index: number) {

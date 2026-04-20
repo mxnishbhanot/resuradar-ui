@@ -178,7 +178,7 @@
               <mat-label>Start Date</mat-label>
               <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
               <mat-datepicker-toggle matSuffix [for]="startPicker" />
-              <mat-datepicker #startPicker />
+              <mat-datepicker #startPicker [panelClass]="theme.datepickerPanelClass()" />
 
               @if (form.get('startDate')?.hasError('required')) {
                 <mat-error>Start Date is required</mat-error>
@@ -198,7 +198,7 @@
                 [disabled]="form.get('isCurrent')?.value" />
 
               <mat-datepicker-toggle matSuffix [for]="endPicker" />
-              <mat-datepicker #endPicker />
+              <mat-datepicker #endPicker [panelClass]="theme.datepickerPanelClass()" />
             </mat-form-field>
 
           </div>
@@ -231,7 +231,7 @@
 
                 <mat-form-field appearance="outline" class="bullet-field">
                   <mat-label>Achievement {{ $index + 1 }}</mat-label>
-                  <textarea matInput [formControlName]="$index" rows="3"></textarea>
+                  <textarea #bulletTextarea matInput [formControlName]="$index" rows="3"></textarea>
                 </mat-form-field>
 
                 <button mat-icon-button type="button" (click)="removeBullet($index)">

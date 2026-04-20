@@ -19,7 +19,13 @@
             <div class="card-badge"><mat-icon>menu_book</mat-icon></div>
             <div class="card-title-section">
               <h3 class="card-title">{{ entry.institution }}</h3>
-              <p class="card-degree">{{ entry.degree }} in {{ entry.major }}</p>
+              <p class="card-degree">
+                @if ((entry.major ?? '').trim()) {
+                  {{ entry.degree }} in {{ entry.major }}
+                } @else {
+                  {{ entry.degree }}
+                }
+              </p>
             </div>
             <div class="card-actions">
               <button mat-icon-button (click)="editEntry(i)" matTooltip="Edit">
@@ -128,10 +134,9 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Major/Field</mat-label>
+              <mat-label>Major / field (optional)</mat-label>
               <input matInput formControlName="major" />
               <mat-icon matPrefix>auto_stories</mat-icon>
-              <mat-error>Major is required</mat-error>
             </mat-form-field>
           </div>
         </div>
@@ -145,7 +150,7 @@
               <mat-label>Start Date</mat-label>
               <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
               <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-              <mat-datepicker #startPicker></mat-datepicker>
+              <mat-datepicker #startPicker [panelClass]="theme.datepickerPanelClass()"></mat-datepicker>
               <mat-error>Start date is required</mat-error>
             </mat-form-field>
 
@@ -153,7 +158,7 @@
               <mat-label>End Date</mat-label>
               <input matInput [matDatepicker]="endPicker" formControlName="endDate" [disabled]="!!form.value.isCurrent" />
               <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-              <mat-datepicker #endPicker></mat-datepicker>
+              <mat-datepicker #endPicker [panelClass]="theme.datepickerPanelClass()"></mat-datepicker>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -178,7 +183,7 @@
               <div class="bullet-row">
                 <div class="bullet-number-badge">{{ i + 1 }}</div>
                 <mat-form-field appearance="outline" class="bullet-field">
-                  <textarea matInput [formControlName]="i" rows="3"
+                  <textarea #bulletTextarea matInput [formControlName]="i" rows="3"
                             placeholder="e.g., Graduated with Honors"></textarea>
                 </mat-form-field>
                 <button mat-icon-button type="button" (click)="removeBullet(i)" matTooltip="Remove">

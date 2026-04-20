@@ -45,10 +45,7 @@
         <mat-label>Last Name</mat-label>
         <input matInput formControlName="lastName" placeholder="Doe" />
         <mat-icon matPrefix>person</mat-icon>
-
-        @if (form.get('lastName')?.hasError('required')) {
-          <mat-error>Last name is required</mat-error>
-        }
+        <mat-hint>Optional</mat-hint>
       </mat-form-field>
 
     </div>

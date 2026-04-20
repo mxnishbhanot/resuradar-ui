@@ -1,4 +1,4 @@
-import { Injectable, signal, effect, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, signal, effect, inject, PLATFORM_ID, computed } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
@@ -14,6 +14,11 @@ export class ThemeService {
 
   // SSR-safe default value
   theme = signal<'light' | 'dark'>('light');
+
+  /** Applied to `mat-datepicker` in dark mode so overlay calendar picks up `.custom-dark-datepicker` styles. */
+  readonly datepickerPanelClass = computed<string | string[]>(() =>
+    this.theme() === 'dark' ? 'custom-dark-datepicker' : ''
+  );
 
   constructor() {
     if (this.isBrowser()) {
