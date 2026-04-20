@@ -56,7 +56,7 @@ export const mockApi = async (page: Page) => {
         standardLimit: 3,
         jdUsed: 0,
         jdLimit: 1,
-        freeBuilderTemplates: ['modern', 'corporate', 'faang'],
+        freeBuilderTemplates: ['modern'],
       }),
     });
   });

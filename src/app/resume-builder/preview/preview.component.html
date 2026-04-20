@@ -5,20 +5,7 @@
       <button mat-icon-button class="close-btn" (click)="close()" matTooltip="Close">
         <mat-icon>close</mat-icon>
       </button>
-
-      <div class="template-selector">
-        <label for="templateSelect">Template:</label>
-        <select
-          id="templateSelect"
-          class="template-dropdown"
-          [ngModel]="currentTemplate()"
-          (ngModelChange)="currentTemplate.set($event)"
-        >
-          @for (t of templates(); track t.value) {
-            <option [value]="t.value">{{ t.label }}</option>
-          }
-        </select>
-      </div>
+      <span class="preview-title">PDF preview</span>
     </div>
 
     <!-- @if (!isLoading() && !showEmptyState()) {

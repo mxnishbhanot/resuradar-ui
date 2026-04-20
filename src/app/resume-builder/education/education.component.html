@@ -184,10 +184,13 @@
             @for (ctrl of bullets.controls; track ctrl; let i = $index) {
               <div class="bullet-row">
                 <div class="bullet-number-badge">{{ i + 1 }}</div>
-                <mat-form-field appearance="outline" class="bullet-field">
-                  <textarea #bulletTextarea matInput [formControlName]="i" rows="3"
-                            placeholder="e.g., Graduated with Honors"></textarea>
-                </mat-form-field>
+                <div class="bullet-field-stack">
+                  <mat-form-field appearance="outline" class="bullet-field">
+                    <textarea #bulletTextarea matInput [formControlName]="i" rows="3"
+                              placeholder="e.g., Graduated with Honors"></textarea>
+                  </mat-form-field>
+                  <rr-selection-color-apply [textFieldEl]="bulletTextarea" [control]="$any(ctrl)" />
+                </div>
                 <button mat-icon-button type="button" (click)="removeBullet(i)" matTooltip="Remove">
                   <mat-icon>close</mat-icon>
                 </button>

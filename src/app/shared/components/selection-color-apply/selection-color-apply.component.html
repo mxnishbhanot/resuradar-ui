@@ -1,0 +1,21 @@
+<div class="rr-sel-color">
+  <button
+    type="button"
+    mat-stroked-button
+    class="rr-sel-color-btn"
+    [matMenuTriggerFor]="colorMenu"
+    [disabled]="!canApply()"
+  >
+    <mat-icon>palette</mat-icon>
+    Selection color
+  </button>
+  <mat-menu #colorMenu="matMenu" class="rr-selection-color-menu">
+    <div class="rr-sel-color-panel" (click)="$event.stopPropagation()">
+      <color-chrome
+        [color]="chromeColor()"
+        [disableAlpha]="true"
+        (onChangeComplete)="onChromeComplete($event)"
+      />
+    </div>
+  </mat-menu>
+</div>

@@ -652,6 +652,12 @@
   }
 }
 
+.bullet-field-stack {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
 .bullet-number-badge {
   width: 32px;
   height: 32px;

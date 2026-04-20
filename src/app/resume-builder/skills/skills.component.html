@@ -133,13 +133,15 @@
 
         <mat-form-field appearance="outline" class="form-field full-width">
           <mat-label>Category Name</mat-label>
-          <input matInput formControlName="name" placeholder="e.g., Technical Skills, Languages" />
+          <input #catName matInput formControlName="name" placeholder="e.g., Technical Skills, Languages" />
           <mat-icon matPrefix>label</mat-icon>
 
           @if (form.get('name')?.hasError('required')) {
           <mat-error>Category name is required</mat-error>
           }
         </mat-form-field>
+
+        <rr-selection-color-apply [textFieldEl]="catName" [control]="nameFc" />
       </div>
 
       <!-- SKILLS LIST -->

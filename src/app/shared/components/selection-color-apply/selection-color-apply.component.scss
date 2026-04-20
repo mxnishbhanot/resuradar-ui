@@ -1,0 +1,15 @@
+.rr-sel-color {
+  margin-top: 6px;
+}
+
+.rr-sel-color-btn {
+  font-size: 0.8125rem;
+}
+
+::ng-deep .mat-mdc-menu-panel.rr-selection-color-menu {
+  max-width: 320px;
+}
+
+.rr-sel-color-panel {
+  padding: 8px 12px 12px;
+}

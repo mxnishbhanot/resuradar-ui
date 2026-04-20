@@ -290,17 +290,21 @@
           <div class="bullet-row">
             <div class="bullet-number-badge">{{ $index + 1 }}</div>
 
-            <mat-form-field appearance="outline" class="bullet-field">
-              <mat-label>Achievement {{ $index + 1 }}</mat-label>
+            <div class="bullet-field-stack">
+              <mat-form-field appearance="outline" class="bullet-field">
+                <mat-label>Achievement {{ $index + 1 }}</mat-label>
 
-              <textarea #bulletTextarea matInput [formControlName]="$index"
-                        rows="3"
-                        placeholder="Describe your role, solution, or results"
-                        cdkTextareaAutosize
-                        cdkAutosizeMinRows="2"
-                        cdkAutosizeMaxRows="5">
-              </textarea>
-            </mat-form-field>
+                <textarea #bulletTextarea matInput [formControlName]="$index"
+                          rows="3"
+                          placeholder="Describe your role, solution, or results"
+                          cdkTextareaAutosize
+                          cdkAutosizeMinRows="2"
+                          cdkAutosizeMaxRows="5">
+                </textarea>
+              </mat-form-field>
+
+              <rr-selection-color-apply [textFieldEl]="bulletTextarea" [control]="$any(bullet)" />
+            </div>
 
             <button mat-icon-button type="button" (click)="removeBullet($index)"
                     class="bullet-delete-btn" matTooltip="Remove">

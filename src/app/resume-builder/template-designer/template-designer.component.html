@@ -4,16 +4,10 @@
       <button mat-icon-button type="button" (click)="close()" matTooltip="Close">
         <mat-icon>close</mat-icon>
       </button>
-      <span>Template studio</span>
-      <select
-        class="template-select"
-        [ngModel]="currentTemplate()"
-        (ngModelChange)="onTemplateChange($event)"
-      >
-        @for (t of templateOptions(); track t.value) {
-          <option [value]="t.value">{{ t.label }}</option>
-        }
-      </select>
+      <div class="toolbar-title">
+        <span class="toolbar-title-main">Template studio</span>
+        <span class="toolbar-title-sub">Standard layout</span>
+      </div>
     </div>
     <div class="toolbar-right">
       <button
@@ -105,12 +99,22 @@
       <div class="slider-row">
         <label>Body text color</label>
         <div class="color-row">
-          <input
-            type="color"
-            class="color-input"
-            [ngModel]="bodyColorPicker()"
-            (ngModelChange)="onBodyColorPick($event)"
-          />
+          <button
+            type="button"
+            class="color-swatch"
+            [style.background]="bodyColorPicker()"
+            [matMenuTriggerFor]="bodyColorMenu"
+            matTooltip="Choose body text color"
+          ></button>
+          <mat-menu #bodyColorMenu="matMenu" class="rr-studio-color-menu">
+            <div class="color-menu-surface" (click)="$event.stopPropagation()">
+              <color-chrome
+                [color]="bodyColorPicker()"
+                [disableAlpha]="true"
+                (onChangeComplete)="onBodyChromeComplete($event)"
+              />
+            </div>
+          </mat-menu>
           @if (appearance().bodyColor) {
             <button type="button" mat-stroked-button (click)="resetBodyColor()">Use theme default</button>
           }
@@ -119,12 +123,22 @@
       <div class="slider-row">
         <label>Heading color</label>
         <div class="color-row">
-          <input
-            type="color"
-            class="color-input"
-            [ngModel]="headingColorPicker()"
-            (ngModelChange)="onHeadingColorPick($event)"
-          />
+          <button
+            type="button"
+            class="color-swatch"
+            [style.background]="headingColorPicker()"
+            [matMenuTriggerFor]="headingColorMenu"
+            matTooltip="Choose heading color"
+          ></button>
+          <mat-menu #headingColorMenu="matMenu" class="rr-studio-color-menu">
+            <div class="color-menu-surface" (click)="$event.stopPropagation()">
+              <color-chrome
+                [color]="headingColorPicker()"
+                [disableAlpha]="true"
+                (onChangeComplete)="onHeadingChromeComplete($event)"
+              />
+            </div>
+          </mat-menu>
           @if (appearance().headingColor) {
             <button type="button" mat-stroked-button (click)="resetHeadingColor()">Use theme default</button>
           }

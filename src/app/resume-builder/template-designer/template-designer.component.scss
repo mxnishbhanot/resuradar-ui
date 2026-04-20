@@ -40,6 +40,28 @@
   flex-wrap: wrap;
 }
 
+.toolbar-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.toolbar-title-main {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+.toolbar-title-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 /* Strong contrast on dark toolbar (stroked default was too low-contrast). */
 :host ::ng-deep .toolbar-auto-adjust-btn.mat-mdc-unelevated-button {
   --mdc-filled-button-container-color: #334155;
@@ -82,10 +104,11 @@
 }
 
 .controls-panel {
-  padding: 14px;
+  padding: 18px 16px 20px;
   border-right: 1px solid #334155;
   overflow: auto;
-  background: #1e293b;
+  background: linear-gradient(180deg, #1e293b 0%, #172033 100%);
+  box-shadow: inset -1px 0 0 rgba(15, 23, 42, 0.35);
 }
 
 @media (max-width: 900px) {
@@ -101,7 +124,11 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #94a3b8;
-  margin-bottom: 10px;
+  margin: 20px 0 10px;
+}
+
+.panel-title:first-child {
+  margin-top: 0;
 }
 
 .section-list {
@@ -218,7 +245,8 @@ mat-slider {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(2px);
   z-index: 3;
 }
 
@@ -263,12 +291,30 @@ mat-slider {
   gap: 10px;
 }
 
-.color-input {
-  width: 44px;
+.color-swatch {
+  width: 40px;
   height: 32px;
   padding: 0;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  background: transparent;
+  border: 2px solid #475569;
+  border-radius: 8px;
   cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.15s ease, transform 0.12s ease;
+}
+
+.color-swatch:hover {
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.color-menu-surface {
+  padding: 8px 10px 12px;
+}
+
+:host ::ng-deep .mat-mdc-menu-panel.rr-studio-color-menu {
+  max-width: 320px;
+}
+
+:host ::ng-deep .mat-mdc-menu-panel.rr-studio-color-menu .mat-mdc-menu-content {
+  padding: 0;
 }

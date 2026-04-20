@@ -23,10 +23,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { ColorChromeModule } from 'ngx-color/chrome';
+import type { ColorEvent } from 'ngx-color';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
-import { UserService } from '../../core/services/user';
 import { ToastService } from '../../core/services/toast';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
@@ -38,6 +40,7 @@ import {
   normalizeTemplateSettings,
 } from '../../shared/models/resume-builder.model';
 import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
+import { STANDARD_RESUME_COLORS } from '../../shared/constants/print-spec';
 
 const SECTION_LABELS: Record<TemplateSectionKey, string> = {
   summary: 'Summary',
@@ -71,6 +74,8 @@ function mapFieldToTab(field: string | null | undefined): number | null {
     MatSliderModule,
     MatCheckboxModule,
     MatTooltipModule,
+    MatMenuModule,
+    ColorChromeModule,
     InlineResumeFormatHintComponent,
   ],
   templateUrl: './template-designer.component.html',
@@ -83,14 +88,14 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private dialog = inject(MatDialog);
   private toast = inject(ToastService);
-  private userService = inject(UserService);
   private platformId = inject(PLATFORM_ID);
   private destroyRef = inject(DestroyRef);
 
   previewFrame = viewChild<ElementRef<HTMLIFrameElement>>('previewFrame');
 
   resumeId = signal(this.data.resumeId);
-  currentTemplate = signal<BuilderTemplateId>('modern');
+  /** Single standard layout — kept for API compatibility with `renderPreviewHtml` / `exportPdf`. */
+  private readonly tpl: BuilderTemplateId = 'modern';
   isLoading = signal(false);
   iframeUrl = signal<SafeResourceUrl | null>(null);
   overlayHeightPx = signal(0);
@@ -99,44 +104,24 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   private refreshTimer: ReturnType<typeof setTimeout> | null = null;
   private onWinMessage = (ev: MessageEvent) => this.handlePreviewMessage(ev);
 
-  private readonly allTemplates: ReadonlyArray<{ label: string; value: BuilderTemplateId }> = [
-    { label: 'Corporate', value: 'corporate' },
-    { label: 'Modern', value: 'modern' },
-    { label: 'Executive', value: 'executive' },
-    { label: 'Signature', value: 'luxury' },
-    { label: 'Technical', value: 'faang' },
-  ];
-
-  templateOptions = computed(() => {
-    if (this.userService.isProUser()) {
-      return [...this.allTemplates];
-    }
-    const free = new Set(
-      this.userService.user()?.freeBuilderTemplates?.length
-        ? this.userService.user()!.freeBuilderTemplates!
-        : ['modern', 'corporate', 'faang']
-    );
-    return this.allTemplates.filter((t) => free.has(t.value));
-  });
-
   sectionOrder = computed(() => {
-    const t = this.currentTemplate();
+    const t = this.tpl;
     return normalizeTemplateSettings(t, this.store.state().templateSettings).sectionOrder!;
   });
 
   layoutScale = computed(
     () =>
-      normalizeTemplateSettings(this.currentTemplate(), this.store.state().templateSettings).layout!
+      normalizeTemplateSettings(this.tpl, this.store.state().templateSettings).layout!
         .globalScale!
   );
   sectionGap = computed(
     () =>
-      normalizeTemplateSettings(this.currentTemplate(), this.store.state().templateSettings).layout!
+      normalizeTemplateSettings(this.tpl, this.store.state().templateSettings).layout!
         .sectionGap!
   );
   lineHeight = computed(
     () =>
-      normalizeTemplateSettings(this.currentTemplate(), this.store.state().templateSettings).layout!
+      normalizeTemplateSettings(this.tpl, this.store.state().templateSettings).layout!
         .lineHeight!
   );
 
@@ -145,17 +130,19 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   lineHeightPct = computed(() => `${Math.round(this.lineHeight() * 100)}%`);
 
   appearance = computed(() =>
-    normalizeTemplateSettings(this.currentTemplate(), this.store.state().templateSettings).appearance!
+    normalizeTemplateSettings(this.tpl, this.store.state().templateSettings).appearance!
   );
 
   bodyColorPicker = computed(() => {
     const a = this.appearance();
-    return a.bodyColor ?? (a.colorMode === 'dark' ? '#fafafa' : '#0a0a0a');
+    const t = a.colorMode === 'dark' ? STANDARD_RESUME_COLORS.dark : STANDARD_RESUME_COLORS.light;
+    return a.bodyColor ?? t.ink;
   });
 
   headingColorPicker = computed(() => {
     const a = this.appearance();
-    return a.headingColor ?? (a.colorMode === 'dark' ? '#fafafa' : '#0a0a0a');
+    const t = a.colorMode === 'dark' ? STANDARD_RESUME_COLORS.dark : STANDARD_RESUME_COLORS.light;
+    return a.headingColor ?? t.heading;
   });
 
   pageLineTopsPx = computed(() => {
@@ -170,28 +157,13 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   });
 
   constructor() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.userService.fetchCurrentUser().subscribe();
-    }
-
-    effect(() => {
-      const opts = this.templateOptions();
-      const cur = this.currentTemplate();
-      if (opts.length && !opts.some((o) => o.value === cur)) {
-        this.currentTemplate.set(opts[0].value);
-      }
-    });
-
     effect(() => {
       this.store.state();
-      this.currentTemplate();
       untracked(() => this.scheduleRefresh());
     });
   }
 
   ngOnInit(): void {
-    const th = this.store.snapshot.theme;
-    if (th) this.currentTemplate.set(th);
     if (isPlatformBrowser(this.platformId)) {
       window.addEventListener('message', this.onWinMessage);
     }
@@ -221,19 +193,10 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
-  onTemplateChange(t: BuilderTemplateId): void {
-    this.currentTemplate.set(t);
-    const prev = this.store.snapshot.templateSettings;
-    this.store.update({
-      theme: t,
-      templateSettings: normalizeTemplateSettings(t, prev),
-    });
-  }
-
   onSectionDrop(event: CdkDragDrop<TemplateSectionKey[]>): void {
     const order = [...this.sectionOrder()];
     moveItemInArray(order, event.previousIndex, event.currentIndex);
-    const t = this.currentTemplate();
+    const t = this.tpl;
     this.store.update({
       templateSettings: normalizeTemplateSettings(t, {
         ...this.store.snapshot.templateSettings,
@@ -255,7 +218,7 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   }
 
   private patchLayout(partial: { globalScale?: number; sectionGap?: number; lineHeight?: number }): void {
-    const t = this.currentTemplate();
+    const t = this.tpl;
     const cur = this.store.snapshot.templateSettings;
     const L = { ...cur?.layout, ...partial, layoutVersion: 1 as const };
     this.store.update({
@@ -284,6 +247,20 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     this.patchAppearance({ headingColor: hex || null });
   }
 
+  onBodyChromeComplete(ev: ColorEvent): void {
+    const raw = ev.color?.hex;
+    if (!raw) return;
+    const hex = raw.startsWith('#') ? raw : `#${raw}`;
+    this.onBodyColorPick(hex);
+  }
+
+  onHeadingChromeComplete(ev: ColorEvent): void {
+    const raw = ev.color?.hex;
+    if (!raw) return;
+    const hex = raw.startsWith('#') ? raw : `#${raw}`;
+    this.onHeadingColorPick(hex);
+  }
+
   resetBodyColor(): void {
     this.patchAppearance({ bodyColor: null });
   }
@@ -293,7 +270,7 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   }
 
   private patchAppearance(partial: Partial<TemplateAppearance>): void {
-    const t = this.currentTemplate();
+    const t = this.tpl;
     const cur = this.store.snapshot.templateSettings;
     const merged = { ...(cur?.appearance || {}), ...partial };
     this.store.update({
@@ -305,13 +282,13 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     const id = this.resumeId();
     if (!isPlatformBrowser(this.platformId) || !id) return;
 
-    this.store.exportPdf(this.currentTemplate(), id).subscribe({
+    this.store.exportPdf(this.tpl, id).subscribe({
       next: (blob) => {
         try {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `resume-${this.currentTemplate()}.pdf`;
+          a.download = `resume-${this.tpl}.pdf`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -355,7 +332,7 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
 
     this.isLoading.set(true);
     this.store
-      .renderPreviewHtml(this.currentTemplate(), this.store.snapshot)
+      .renderPreviewHtml(this.tpl, this.store.snapshot)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (html) => {
@@ -404,7 +381,7 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   private runRefresh(): void {
     this.isLoading.set(true);
     this.store
-      .renderPreviewHtml(this.currentTemplate(), this.store.snapshot)
+      .renderPreviewHtml(this.tpl, this.store.snapshot)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (html) => {
@@ -451,7 +428,7 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
       data: {
         message:
           message ||
-          'This template is available on Pro. Upgrade to unlock all templates and premium PDF exports.',
+          'PDF export is not available on your current plan. Upgrade to export your resume.',
       },
     });
     ref.afterClosed().subscribe((r) => {

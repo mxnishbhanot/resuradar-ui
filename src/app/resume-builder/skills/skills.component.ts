@@ -24,6 +24,7 @@ import {
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
+import { SelectionColorApplyComponent } from '../../shared/components/selection-color-apply/selection-color-apply.component';
 
 export interface SkillCategory {
   id: string;
@@ -44,6 +45,7 @@ export interface SkillCategory {
     MatChipsModule,
     MatTooltipModule,
     InlineResumeFormatHintComponent,
+    SelectionColorApplyComponent,
   ],
   templateUrl: './skills.component.html',
   styleUrl: './skills.component.scss',
@@ -52,6 +54,10 @@ export class SkillsComponent {
 
   private fb = inject(FormBuilder);
   private store = inject(ResumeBuilderService);
+
+  get nameFc(): FormControl<string> {
+    return this.form.get('name') as FormControl<string>;
+  }
 
   // ► SIGNAL STATE
   skillCategories = signal<SkillCategory[]>([]);

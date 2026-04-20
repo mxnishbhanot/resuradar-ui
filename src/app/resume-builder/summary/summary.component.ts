@@ -2,6 +2,7 @@ import { Component, effect, inject, signal } from '@angular/core';
 
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   Validators,
   ReactiveFormsModule
@@ -17,6 +18,8 @@ import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
+import { SelectionColorApplyComponent } from '../../shared/components/selection-color-apply/selection-color-apply.component';
+import { FormatResumeInlinePipe } from '../../shared/pipes/format-resume-inline.pipe';
 
 @Component({
   selector: 'rr-summary',
@@ -32,6 +35,8 @@ import { InlineResumeFormatHintComponent } from '../../shared/components/inline-
     MatTooltipModule,
     CdkTextareaAutosize,
     InlineResumeFormatHintComponent,
+    SelectionColorApplyComponent,
+    FormatResumeInlinePipe,
   ],
   templateUrl: './summary.component.html',
   styleUrl: './summary.component.scss',
@@ -70,6 +75,10 @@ export class SummaryComponent {
   cancelForm(): void {
     this.showForm.set(false);
     this.form.patchValue({ summary: this.summaryText() });
+  }
+
+  get summaryFc(): FormControl<string> {
+    return this.form.get('summary') as FormControl<string>;
   }
 
   saveSummary(): void {

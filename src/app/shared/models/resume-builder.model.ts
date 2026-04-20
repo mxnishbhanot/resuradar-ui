@@ -53,7 +53,12 @@ export interface SkillCategory {  // CHANGED: New interface for skills (categori
   skills: string[];
 }
 
-export type BuilderTemplateId = 'modern' | 'corporate' | 'executive' | 'faang' | 'luxury';
+/** Single standard PDF layout (legacy DB values are coerced to this on load). */
+export type BuilderTemplateId = 'modern';
+
+export function coerceBuilderTemplateId(_raw: unknown): BuilderTemplateId {
+  return 'modern';
+}
 
 export type TemplateSectionKey =
   | 'summary'

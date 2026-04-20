@@ -5,6 +5,7 @@ import { catchError, of, throwError, Subject, merge } from 'rxjs';
 import { debounceTime, filter, switchMap, tap } from 'rxjs/operators';
 import {
   EMPTY_RESUME_STATE,
+  coerceBuilderTemplateId,
   normalizeTemplateSettings,
   ResumeBuilderState,
   type BuilderTemplateId,
@@ -92,7 +93,7 @@ export class ResumeBuilderService {
       .subscribe((res: any) => {
         if (!res?.resume) return;
 
-        const theme = (res.resume.theme as BuilderTemplateId) || 'modern';
+        const theme = coerceBuilderTemplateId(res.resume.theme);
         const templateSettings = normalizeTemplateSettings(theme, res.resume.templateSettings);
         this.state.set({
           _id: res.resume._id,
@@ -118,8 +119,8 @@ export class ResumeBuilderService {
 
   update(partial: Partial<ResumeBuilderState>) {
     this.state.update((prev) => {
-      const merged = { ...prev, ...partial };
-      const theme = merged.theme || 'modern';
+      const merged = { ...prev, ...partial, theme: 'modern' as const };
+      const theme: BuilderTemplateId = 'modern';
       let rawTemplateSettings = merged.templateSettings;
       if (partial.colorScheme !== undefined && partial.templateSettings === undefined) {
         rawTemplateSettings = {
@@ -143,7 +144,7 @@ export class ResumeBuilderService {
 
   /** Replace in-memory state (e.g. parsed upload). Normalizes template settings and colorScheme. */
   replace(resume: Partial<ResumeBuilderState> & { _id?: string | null }) {
-    const theme = (resume.theme as BuilderTemplateId) || 'modern';
+    const theme = coerceBuilderTemplateId(resume.theme);
     const templateSettings = normalizeTemplateSettings(theme, resume.templateSettings);
     this.state.set({
       _id: resume._id ?? null,
@@ -312,7 +313,7 @@ export class ResumeBuilderService {
 
   /** Body for autosave / preview: resume fields + templateSettings (no Angular-only noise). */
   toResumePayload(state: ResumeBuilderState): Record<string, unknown> {
-    const theme = state.theme || 'modern';
+    const theme: BuilderTemplateId = coerceBuilderTemplateId(state.theme);
     return {
       _id: state._id,
       personal: state.personal,
@@ -338,7 +339,7 @@ export class ResumeBuilderService {
       if (!raw) return;
       const parsed = JSON.parse(raw) as Partial<ResumeBuilderState>;
       const merged = { ...EMPTY_RESUME_STATE, ...parsed };
-      const theme = merged.theme || 'modern';
+      const theme = coerceBuilderTemplateId(merged.theme);
       const templateSettings = normalizeTemplateSettings(theme, merged.templateSettings);
       this.state.set({
         ...merged,

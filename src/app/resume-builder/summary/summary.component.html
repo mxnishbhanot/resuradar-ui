@@ -32,7 +32,7 @@
       </div>
 
       <div class="summary-text-wrapper">
-        <p class="summary-text">{{ summaryText() }}</p>
+        <p class="summary-text" [innerHTML]="summaryText() | formatResumeInline"></p>
       </div>
     </div>
   }
@@ -92,6 +92,7 @@
             <mat-label>Summary Content</mat-label>
 
             <textarea
+              #summaryTa
               matInput
               formControlName="summary"
               rows="6"
@@ -111,6 +112,8 @@
               <mat-error>Summary cannot exceed 500 characters</mat-error>
             }
           </mat-form-field>
+
+          <rr-selection-color-apply [textFieldEl]="summaryTa" [control]="summaryFc" />
 
           <rr-inline-resume-format-hint class="summary-format-hint" />
         </div>
