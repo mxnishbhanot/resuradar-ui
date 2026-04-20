@@ -178,8 +178,6 @@
           <h4 class="form-section-title"><mat-icon>military_tech</mat-icon> Honors & Coursework</h4>
           <p class="bullets-hint"><mat-icon class="hint-icon">lightbulb</mat-icon> Dean's List, scholarships, relevant courses...</p>
 
-          <rr-inline-resume-format-hint class="bullets-format-hint" />
-
           <div formArrayName="bullets">
             @for (ctrl of bullets.controls; track ctrl; let i = $index) {
               <div class="bullet-row">

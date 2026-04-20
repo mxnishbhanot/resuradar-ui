@@ -31,7 +31,6 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ThemeService } from '../../core/services/theme';
-import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 import { SelectionColorApplyComponent } from '../../shared/components/selection-color-apply/selection-color-apply.component';
 
 export interface EducationEntry {
@@ -61,7 +60,6 @@ export interface EducationEntry {
     MatDatepickerModule,
     MatNativeDateModule,
     TextFieldModule,
-    InlineResumeFormatHintComponent,
     SelectionColorApplyComponent,
   ],
   templateUrl: './education.component.html',

@@ -144,8 +144,6 @@
           }
         </div>
       </div>
-      <rr-inline-resume-format-hint class="studio-format-hint" />
-
       <p class="hint">
         Dashed lines show approximate A4 page breaks (same margins as PDF export). Click a highlighted
         region in the preview to jump to the matching builder tab.
@@ -160,21 +158,26 @@
       }
       <div class="preview-scroll">
         <div class="preview-stage" #stage>
-          <div class="page-overlay" [style.height.px]="overlayHeightPx()">
-            @for (y of pageLineTopsPx(); track y) {
-              <div class="page-line" [style.top.px]="y"></div>
+          <div
+            class="preview-paper"
+            [style.--rr-studio-paper-width]="contentWidthMm + 'mm'"
+          >
+            <div class="page-overlay" [style.height.px]="overlayHeightPx()">
+              @for (y of pageLineTopsPx(); track y) {
+                <div class="page-line" [style.top.px]="y"></div>
+              }
+            </div>
+            @if (iframeUrl(); as src) {
+              <iframe
+                #previewFrame
+                class="preview-iframe"
+                [src]="src"
+                title="Resume preview"
+                sandbox="allow-scripts allow-same-origin"
+                (load)="onIframeLoad()"
+              ></iframe>
             }
           </div>
-          @if (iframeUrl(); as src) {
-            <iframe
-              #previewFrame
-              class="preview-iframe"
-              [src]="src"
-              title="Resume preview"
-              sandbox="allow-scripts allow-same-origin"
-              (load)="onIframeLoad()"
-            ></iframe>
-          }
         </div>
       </div>
     </div>

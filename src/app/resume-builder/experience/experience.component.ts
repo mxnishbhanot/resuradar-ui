@@ -32,7 +32,6 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ThemeService } from '../../core/services/theme';
-import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 import { SelectionColorApplyComponent } from '../../shared/components/selection-color-apply/selection-color-apply.component';
 
 export interface Experience {
@@ -61,7 +60,6 @@ export interface Experience {
     MatTooltipModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    InlineResumeFormatHintComponent,
     SelectionColorApplyComponent,
   ],
   templateUrl: './experience.component.html',

@@ -17,7 +17,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
-import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 import { SelectionColorApplyComponent } from '../../shared/components/selection-color-apply/selection-color-apply.component';
 import { FormatResumeInlinePipe } from '../../shared/pipes/format-resume-inline.pipe';
 
@@ -34,7 +33,6 @@ import { FormatResumeInlinePipe } from '../../shared/pipes/format-resume-inline.
     MatCardModule,
     MatTooltipModule,
     CdkTextareaAutosize,
-    InlineResumeFormatHintComponent,
     SelectionColorApplyComponent,
     FormatResumeInlinePipe,
   ],

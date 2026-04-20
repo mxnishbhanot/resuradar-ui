@@ -67,12 +67,12 @@ export type TemplateSectionKey =
   | 'projects'
   | 'skills';
 
-/** Default section order for all builder templates (single-column flow). */
+/** Default section order (matches standard resume PDF: jobs before projects, then education, skills). */
 export const DEFAULT_SECTION_ORDER: TemplateSectionKey[] = [
   'summary',
   'experience',
-  'education',
   'projects',
+  'education',
   'skills',
 ];
 

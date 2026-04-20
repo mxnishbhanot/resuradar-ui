@@ -32,14 +32,13 @@ import { ResumeBuilderService } from '../../core/services/resume-builder.service
 import { ToastService } from '../../core/services/toast';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
-import { CONTENT_HEIGHT_MM, mmToPx } from '../../shared/constants/print-spec';
+import { CONTENT_HEIGHT_MM, CONTENT_WIDTH_MM, mmToPx } from '../../shared/constants/print-spec';
 import {
   type BuilderTemplateId,
   type TemplateAppearance,
   type TemplateSectionKey,
   normalizeTemplateSettings,
 } from '../../shared/models/resume-builder.model';
-import { InlineResumeFormatHintComponent } from '../../shared/components/inline-resume-format-hint/inline-resume-format-hint.component';
 import { STANDARD_RESUME_COLORS } from '../../shared/constants/print-spec';
 
 const SECTION_LABELS: Record<TemplateSectionKey, string> = {
@@ -76,7 +75,6 @@ function mapFieldToTab(field: string | null | undefined): number | null {
     MatTooltipModule,
     MatMenuModule,
     ColorChromeModule,
-    InlineResumeFormatHintComponent,
   ],
   templateUrl: './template-designer.component.html',
   styleUrls: ['./template-designer.component.scss'],
@@ -91,7 +89,13 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private destroyRef = inject(DestroyRef);
 
+  private previewResizeObserver: ResizeObserver | null = null;
+  private previewResizeRafId = 0;
+
   previewFrame = viewChild<ElementRef<HTMLIFrameElement>>('previewFrame');
+
+  /** Matches PDF printable width (`print-spec` / Playwright margins). */
+  readonly contentWidthMm = CONTENT_WIDTH_MM;
 
   resumeId = signal(this.data.resumeId);
   /** Single standard layout — kept for API compatibility with `renderPreviewHtml` / `exportPdf`. */
@@ -170,6 +174,12 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.previewResizeObserver?.disconnect();
+    this.previewResizeObserver = null;
+    if (this.previewResizeRafId) {
+      cancelAnimationFrame(this.previewResizeRafId);
+      this.previewResizeRafId = 0;
+    }
     this.revokeBlobs();
     if (this.refreshTimer) clearTimeout(this.refreshTimer);
     if (isPlatformBrowser(this.platformId)) {
@@ -360,15 +370,43 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   onIframeLoad(): void {
     const frame = this.previewFrame()?.nativeElement;
     const body = frame?.contentDocument?.body;
-    if (!body) return;
-    const updateH = () => this.overlayHeightPx.set(body.scrollHeight);
-    updateH();
+    if (!frame || !body) return;
+
+    this.previewResizeObserver?.disconnect();
+    this.previewResizeObserver = null;
+    if (this.previewResizeRafId) {
+      cancelAnimationFrame(this.previewResizeRafId);
+      this.previewResizeRafId = 0;
+    }
+
+    const applyPreviewLayout = () => {
+      const h = Math.max(body.scrollHeight, 1);
+      if (this.overlayHeightPx() !== h) {
+        this.overlayHeightPx.set(h);
+      }
+      frame.style.height = `${Math.max(h, 200)}px`;
+    };
+
+    const scheduleLayout = () => {
+      if (this.previewResizeRafId) {
+        cancelAnimationFrame(this.previewResizeRafId);
+      }
+      this.previewResizeRafId = requestAnimationFrame(() => {
+        this.previewResizeRafId = 0;
+        try {
+          applyPreviewLayout();
+        } catch {
+          /* cross-origin or torn document */
+        }
+      });
+    };
+
+    scheduleLayout();
     try {
-      const ro = new ResizeObserver(updateH);
-      ro.observe(body);
-      this.destroyRef.onDestroy(() => ro.disconnect());
+      this.previewResizeObserver = new ResizeObserver(() => scheduleLayout());
+      this.previewResizeObserver.observe(body);
     } catch {
-      /* optional */
+      /* ResizeObserver unsupported */
     }
   }
 
