@@ -38,7 +38,9 @@
           </div>
 
           <div class="score-label">{{ data().free_feedback.match_level }}</div>
-          <div class="score-description">{{ getScoreDescription() }}</div>
+          @if (getScoreDescription()) {
+            <div class="score-description">{{ getScoreDescription() }}</div>
+          }
 
           <p class="score-disclaimer">
             Match alignment score from AI—not a hiring decision.
@@ -173,6 +175,10 @@
       @if (showPremiumInsights()) {
 
       <!-- Keyword Match -->
+      @if (
+        data().premium_feedback.keyword_analysis.total_keywords_in_jd > 0 ||
+        data().premium_feedback.keyword_analysis.missing_keywords.length > 0
+      ) {
       <mat-card class="premium-card">
         <div class="card-header">
           <div class="icon-container"><mat-icon class="header-icon">tag</mat-icon></div>
@@ -198,6 +204,7 @@
           }
         </div>
       </mat-card>
+      }
 
       <!-- Role Fit Breakdown -->
       <mat-card class="premium-card">
@@ -228,6 +235,7 @@
       </mat-card>
 
       <!-- Recommendations -->
+      @if (matchRecommendations().length) {
       <mat-card class="premium-card">
         <div class="card-header">
           <div class="icon-container"><mat-icon class="header-icon">lightbulb</mat-icon></div>
@@ -238,7 +246,7 @@
 
         <div class="card-content">
           <ul class="tips-list">
-            @for (rec of data().premium_feedback.recommendations; track rec) {
+            @for (rec of matchRecommendations(); track rec) {
             <li class="tip-item">
               <mat-icon class="tip-icon">arrow_right</mat-icon>
               <span>{{ rec }}</span>
@@ -247,8 +255,10 @@
           </ul>
         </div>
       </mat-card>
+      }
 
       <!-- Suggested Rewrites -->
+      @if (jobMatchRewrites().length) {
       <mat-card class="premium-card">
         <div class="card-header">
           <div class="icon-container"><mat-icon class="header-icon">auto_fix_high</mat-icon></div>
@@ -258,11 +268,16 @@
         <mat-divider></mat-divider>
 
         <div class="card-content">
+          <p class="rewrite-disclaimer">
+            Any numbers in “After” are placeholders unless the same figure is already on your resume.
+          </p>
           <div class="rewrites-list">
 
-            @for (rw of data().premium_feedback.suggested_rewrites; track rw.original) {
-            <div class="rewrite-item">
+            @for (rw of jobMatchRewrites(); track $index) {
+            <div class="rewrite-item rewrite-item--pair">
+              @if (rw.original) {
               <p class="original-text"><strong>Before:</strong> {{ rw.original }}</p>
+              }
               <p class="rewrite-text"><strong>After:</strong> {{ rw.suggestion }}</p>
             </div>
             }
@@ -270,6 +285,7 @@
           </div>
         </div>
       </mat-card>
+      }
 
       <!-- Success Banner -->
       <mat-card class="success-banner">

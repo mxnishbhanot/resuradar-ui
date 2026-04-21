@@ -726,6 +726,13 @@
 // Premium Cards
 .premium-card {
   .card-content {
+    .rewrite-disclaimer {
+      font-size: 0.875rem;
+      color: $text-secondary;
+      margin: 0 0 $spacing-md;
+      line-height: 1.45;
+    }
+
     .suggestions-list,
     .rewrites-list {
       .suggestion-item,
@@ -769,6 +776,24 @@
           font-size: 1rem;
           line-height: 1.5;
           flex: 1;
+        }
+
+        &.rewrite-item--pair {
+          flex-direction: column;
+          align-items: stretch;
+          gap: $spacing-sm;
+
+          .original-text {
+            margin: 0;
+            color: $text-secondary;
+            font-size: 0.9375rem;
+            line-height: 1.5;
+            width: 100%;
+          }
+
+          .rewrite-text {
+            width: 100%;
+          }
         }
       }
     }

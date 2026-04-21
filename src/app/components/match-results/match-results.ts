@@ -67,13 +67,52 @@ export class MatchResults implements OnInit {
     return 'weak';
   });
 
-  // Score description
+  /** When the API summary is substantive, hide redundant band copy under the score. */
+  matchSummaryText = computed(() => {
+    const s = this.data()?.free_feedback?.summary;
+    return typeof s === 'string' && s.trim() ? s.trim() : '';
+  });
+
+  /** Shown only for short/legacy summaries so we do not duplicate the Match Summary card. */
   scoreDescription = computed(() => {
+    if (this.matchSummaryText().length > 50) return '';
     const s = this.data()?.free_feedback?.match_score ?? 0;
-    if (s >= 80) return 'Excellent match with strong alignment';
-    if (s >= 60) return 'Good match with some areas for improvement';
-    if (s >= 40) return 'Fair match with significant improvements needed';
-    return 'Weak match requiring major changes';
+    if (s >= 80) return 'Strong alignment on many JD signals.';
+    if (s >= 60) return 'Solid fit with clear gaps to close vs this JD.';
+    if (s >= 40) return 'Partial fit—prioritize the gaps list against this posting.';
+    return 'Large misalignment—treat the JD as the checklist for edits.';
+  });
+
+  /** Premium rewrites: structured pairs, or legacy shapes from older stored analyses. */
+  jobMatchRewrites = computed(() => {
+    const raw = this.data()?.premium_feedback?.suggested_rewrites;
+    if (!Array.isArray(raw)) return [];
+    const out: { original: string; suggestion: string }[] = [];
+    for (const rw of raw) {
+      if (rw && typeof rw === 'object') {
+        const original = typeof (rw as { original?: string }).original === 'string'
+          ? String((rw as { original: string }).original).trim()
+          : '';
+        const suggestion = typeof (rw as { suggestion?: string }).suggestion === 'string'
+          ? String((rw as { suggestion: string }).suggestion).trim()
+          : '';
+        if (original || suggestion) out.push({ original, suggestion });
+        continue;
+      }
+      if (typeof rw === 'string') {
+        const t = rw.trim();
+        if (t) out.push({ original: '', suggestion: t });
+      }
+    }
+    return out;
+  });
+
+  matchRecommendations = computed(() => {
+    const raw = this.data()?.premium_feedback?.recommendations;
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .map((r: unknown) => (typeof r === 'string' ? r.trim() : ''))
+      .filter(Boolean);
   });
 
   matchScoreAriaLabel = computed(() => {

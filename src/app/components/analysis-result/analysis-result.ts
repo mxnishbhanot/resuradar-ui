@@ -79,13 +79,6 @@ export class AnalysisResult implements OnInit {
     return 'Needs Improvement';
   });
 
-  scoreDescription = computed(() => {
-    const s = this.data()?.score ?? 0;
-    if (s >= 80) return 'Outstanding resume with strong impact and effectiveness';
-    if (s >= 60) return 'Good resume with potential for improvement in key areas';
-    return 'Resume needs significant improvements to stand out to employers';
-  });
-
   scoreAriaLabel = computed(() => {
     const s = this.data()?.score ?? 0;
     return `Score ${s} out of 100`;
@@ -94,6 +87,16 @@ export class AnalysisResult implements OnInit {
   scoreExplanation = computed(() => {
     const s = this.data()?.free_feedback?.score_explanation;
     return typeof s === 'string' && s.trim() ? s.trim() : '';
+  });
+
+  /** Shown only when API omits score_explanation (legacy); avoids duplicating or contradicting the model. */
+  scoreDescription = computed(() => {
+    const expl = this.scoreExplanation();
+    if (expl) return '';
+    const s = this.data()?.score ?? 0;
+    if (s >= 80) return 'Strong overall presentation with clear strengths.';
+    if (s >= 60) return 'Solid base with room to sharpen impact and clarity.';
+    return 'Focus on clarity, proof, and structure so employers see your value quickly.';
   });
 
   scoreFactors = computed(() => {
@@ -112,6 +115,38 @@ export class AnalysisResult implements OnInit {
           : 'medium',
       }))
       .filter((f) => f.name && f.note);
+  });
+
+  /** Premium rewrites: structured pairs, or legacy string[] from older stored analyses. */
+  resumeRewrites = computed(() => {
+    const raw = this.data()?.premium_feedback?.rewrites;
+    if (!Array.isArray(raw)) return [];
+    const out: { original: string; suggestion: string }[] = [];
+    for (const rw of raw) {
+      if (rw && typeof rw === 'object') {
+        const original = typeof (rw as { original?: string }).original === 'string'
+          ? String((rw as { original: string }).original).trim()
+          : '';
+        const suggestion = typeof (rw as { suggestion?: string }).suggestion === 'string'
+          ? String((rw as { suggestion: string }).suggestion).trim()
+          : '';
+        if (original || suggestion) out.push({ original, suggestion });
+        continue;
+      }
+      if (typeof rw === 'string') {
+        const t = rw.trim();
+        if (t) out.push({ original: '', suggestion: t });
+      }
+    }
+    return out;
+  });
+
+  keywordChips = computed(() => {
+    const raw = this.data()?.premium_feedback?.keywords;
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .map((k: unknown) => (typeof k === 'string' ? k.trim() : ''))
+      .filter(Boolean);
   });
 
   ngOnInit(): void {

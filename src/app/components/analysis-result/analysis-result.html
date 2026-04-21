@@ -39,7 +39,9 @@
             </div>
 
             <div class="score-label">{{ getScoreLabel() }}</div>
-            <div class="score-description">{{ getScoreDescription() }}</div>
+            @if (getScoreDescription()) {
+              <div class="score-description">{{ getScoreDescription() }}</div>
+            }
 
             <p class="score-disclaimer">
               Overall resume quality from AI—not a hiring prediction.
@@ -184,7 +186,7 @@
                 <mat-icon class="level-icon">workspace_premium</mat-icon>
               </div>
               <div class="level-info">
-                <span class="level-label">Professional Level</span>
+                <span class="level-label">How your resume reads</span>
                 <h2 class="level-value">
                   {{ data()?.premium_feedback?.professional_level }}
                 </h2>
@@ -277,11 +279,16 @@
             <mat-divider></mat-divider>
 
             <div class="card-content">
+              <p class="rewrite-disclaimer">
+                Any numbers in “After” examples are placeholders unless the same figure already appears on your resume.
+              </p>
               <div class="rewrites-list">
-                @for (rw of data()?.premium_feedback?.rewrites; track rw) {
-                  <div class="rewrite-item">
-                    <mat-icon class="quote-icon">format_quote</mat-icon>
-                    <p class="rewrite-text">{{ rw }}</p>
+                @for (rw of resumeRewrites(); track $index) {
+                  <div class="rewrite-item rewrite-item--pair">
+                    @if (rw.original) {
+                      <p class="original-text"><strong>Before:</strong> {{ rw.original }}</p>
+                    }
+                    <p class="rewrite-text"><strong>After:</strong> {{ rw.suggestion }}</p>
                   </div>
                 }
               </div>
@@ -290,6 +297,7 @@
 
 
           <!-- Recommended Keywords -->
+          @if (keywordChips().length) {
           <mat-card class="premium-card">
             <div class="card-header">
               <div class="icon-container">
@@ -302,7 +310,7 @@
 
             <div class="card-content">
               <mat-chip-listbox class="keywords-list">
-                @for (keyword of data()?.premium_feedback?.keywords; track keyword) {
+                @for (keyword of keywordChips(); track keyword) {
                   <mat-chip class="keyword-chip" variant="outlined">
                     {{ keyword }}
                   </mat-chip>
@@ -310,6 +318,7 @@
               </mat-chip-listbox>
             </div>
           </mat-card>
+          }
 
 
           <!-- Portfolio Tips -->

@@ -1120,7 +1120,7 @@
 
       &:hover {
         color: var(--footer-nav-hover-color);
-        background: var(--footer-nav-hover-bg);
+        // background: var(--footer-nav-hover-bg);
       }
 
       @media (prefers-reduced-motion: no-preference) {
@@ -1189,7 +1189,7 @@
 
         &:hover {
           color: var(--footer-nav-hover-color);
-          background: var(--footer-nav-hover-bg);
+          // background: var(--footer-nav-hover-bg);
         }
 
         &:focus-visible {

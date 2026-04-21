@@ -562,6 +562,13 @@
 // Premium Cards
 .premium-card {
   .card-content {
+    .rewrite-disclaimer {
+      font-size: 0.875rem;
+      color: $text-secondary;
+      margin: 0 0 $spacing-md;
+      line-height: 1.45;
+    }
+
     .fit-item {
       display: flex;
       justify-content: space-between;
@@ -626,6 +633,12 @@
 
         &:last-child {
           border-bottom: none;
+        }
+
+        &.rewrite-item--pair {
+          display: flex;
+          flex-direction: column;
+          gap: $spacing-sm;
         }
 
         .original-text,

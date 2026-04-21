@@ -112,7 +112,12 @@ export const mockUploadAnalysis = async (page: Page) => {
           },
           premium_feedback: {
             detailed_suggestions: ['Add measurable outcomes to recent roles'],
-            rewrites: ['Increased conversion by 20% through workflow optimization'],
+            rewrites: [
+              {
+                original: 'Worked on backend APIs',
+                suggestion: 'Built Node.js APIs with [latency or throughput metric] vs baseline',
+              },
+            ],
             portfolio_tips: ['Add a case study with screenshots'],
             keywords: ['Angular', 'Node.js', 'MongoDB'],
             professional_level: 'Mid-Level',
