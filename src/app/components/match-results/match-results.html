@@ -51,30 +51,6 @@
               aria-label="More about this score"
             >help_outline</mat-icon>
           </p>
-
-          <button
-            type="button"
-            mat-stroked-button
-            class="score-help-toggle"
-            (click)="toggleScoreHelp()"
-            [attr.aria-expanded]="showScoreHelp()"
-          >
-            <mat-icon>menu_book</mat-icon>
-            {{ showScoreHelp() ? 'Hide' : 'How we score' }}
-          </button>
-
-          @if (showScoreHelp()) {
-            <div class="score-help-panel">
-              <p>
-                The model produces one overall match score from your resume and the job description.
-                For detail, see:
-              </p>
-              <ul class="score-help-links">
-                <li><a href="#match-summary">Match Summary</a></li>
-                <li><a href="#match-gaps">Improvement Areas</a></li>
-              </ul>
-            </div>
-          }
         </div>
       </div>
 
@@ -220,7 +196,7 @@
           @for (key of ['technical_skills_fit','experience_fit','education_fit','soft_skills_fit']; track key) {
 
           <div class="fit-item">
-            <span>{{ key.replace('_',' ') | titlecase }}</span>
+            <span>{{ key.split('_').join(' ') | titlecase }}</span>
             <span class="fit-value">
               {{ data().premium_feedback.role_fit_breakdown[key] }}%
             </span>

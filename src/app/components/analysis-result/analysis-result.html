@@ -53,30 +53,6 @@
               >help_outline</mat-icon>
             </p>
 
-            <button
-              type="button"
-              mat-stroked-button
-              class="score-help-toggle"
-              (click)="toggleScoreHelp()"
-              [attr.aria-expanded]="showScoreHelp()"
-            >
-              <mat-icon>menu_book</mat-icon>
-              {{ showScoreHelp() ? 'Hide' : 'How we score' }}
-            </button>
-
-            @if (showScoreHelp()) {
-              <div class="score-help-panel">
-                <p>
-                  We do not use a fixed checklist formula. The model assigns one overall score, then explains it below.
-                  For specifics, jump to:
-                </p>
-                <ul class="score-help-links">
-                  <li><a href="#executive-summary">Executive Summary</a></li>
-                  <li><a href="#areas-for-improvement">Areas for Improvement</a></li>
-                </ul>
-              </div>
-            }
-
             @if (scoreExplanation()) {
               <p class="score-explanation">{{ scoreExplanation() }}</p>
             }

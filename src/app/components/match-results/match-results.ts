@@ -39,8 +39,6 @@ export class MatchResults implements OnInit {
   // Reactive analysis result
   data = signal<any>(null);
 
-  showScoreHelp = signal(false);
-
   // User from updated UserService (signal)
   user = this.userService.user;
 
@@ -138,10 +136,6 @@ export class MatchResults implements OnInit {
   // UI helpers
   getScoreClass() { return this.scoreClass(); }
   getScoreDescription() { return this.scoreDescription(); }
-
-  toggleScoreHelp(): void {
-    this.showScoreHelp.update((v) => !v);
-  }
 
   openUpgradeModal(): void {
     const config: MatDialogConfig = {

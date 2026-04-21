@@ -272,52 +272,6 @@
           flex-shrink: 0;
         }
       }
-
-      .score-help-toggle {
-        margin-top: $spacing-xs;
-        font-size: 0.8125rem;
-        line-height: 1.4;
-        display: inline-flex;
-        align-items: center;
-        gap: $spacing-xs;
-      }
-
-      .score-help-panel {
-        width: 100%;
-        text-align: left;
-        padding: $spacing-sm $spacing-md;
-        margin-top: $spacing-xs;
-        border-radius: $radius-md;
-        border: 1px solid $border-color;
-        background: $hover-bg;
-
-        p {
-          margin: 0 0 $spacing-sm;
-          font-size: 0.8125rem;
-          color: $text-secondary;
-          line-height: 1.45;
-        }
-
-        .score-help-links {
-          display: flex;
-          flex-direction: column;
-          gap: $spacing-xs;
-          margin: 0;
-          padding: 0;
-          list-style: none;
-
-          a {
-            color: $accent-color;
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-decoration: none;
-
-            &:hover {
-              text-decoration: underline;
-            }
-          }
-        }
-      }
     }
   }
 }

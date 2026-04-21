@@ -43,8 +43,6 @@ export class AnalysisResult implements OnInit {
   // Reactive analysis data
   data = signal<any>(null);
 
-  showScoreHelp = signal(false);
-
   // User from UserService (already a signal)
   user = this.userService.user;
 
@@ -167,10 +165,6 @@ export class AnalysisResult implements OnInit {
   getScoreClass() { return this.scoreClass(); }
   getScoreLabel() { return this.scoreLabel(); }
   getScoreDescription() { return this.scoreDescription(); }
-
-  toggleScoreHelp(): void {
-    this.showScoreHelp.update((v) => !v);
-  }
 
   openUpgradeModal() {
     const config: MatDialogConfig = {
