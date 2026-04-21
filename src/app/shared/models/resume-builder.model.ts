@@ -81,6 +81,8 @@ export interface TemplateLayout {
   globalScale: number;
   sectionGap: number;
   lineHeight: number;
+  /** Last page-count goal chosen in template studio (optional, persisted). */
+  targetPageCount?: 1 | 2;
 }
 
 export interface TemplateAppearance {
@@ -160,13 +162,17 @@ export function normalizeTemplateSettings(
   const sectionOrder = isValidSectionOrder(raw?.sectionOrder)
     ? [...raw.sectionOrder]
     : defaultSectionOrderForTemplate(t);
-  const L = raw?.layout || {};
+  const L: Partial<TemplateLayout> =
+    raw?.layout && typeof raw.layout === 'object' ? (raw.layout as Partial<TemplateLayout>) : {};
   const globalScale =
     typeof L.globalScale === 'number' && L.globalScale > 0 ? L.globalScale : 1;
   const sectionGap =
     typeof L.sectionGap === 'number' && L.sectionGap > 0 ? L.sectionGap : 1;
   const lineHeight =
     typeof L.lineHeight === 'number' && L.lineHeight > 0 ? L.lineHeight : 1;
+  const rawTarget = L.targetPageCount;
+  const targetPageCount =
+    rawTarget === 1 || rawTarget === 2 ? (rawTarget as 1 | 2) : undefined;
   return {
     sectionOrder,
     layout: {
@@ -174,6 +180,7 @@ export function normalizeTemplateSettings(
       globalScale: Math.min(1.25, Math.max(0.65, globalScale)),
       sectionGap: Math.min(1.5, Math.max(0.7, sectionGap)),
       lineHeight: Math.min(1.35, Math.max(0.95, lineHeight)),
+      ...(targetPageCount !== undefined ? { targetPageCount } : {}),
     },
     appearance: normalizeAppearance(raw?.appearance),
   };

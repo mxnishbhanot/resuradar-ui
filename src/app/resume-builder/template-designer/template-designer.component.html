@@ -14,11 +14,16 @@
         mat-flat-button
         type="button"
         class="toolbar-auto-adjust-btn"
-        (click)="autoAdjust()"
+        [matMenuTriggerFor]="fitMenu"
         [disabled]="isLoading()"
       >
-        Auto-adjust fit
+        Auto-fit
+        <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
       </button>
+      <mat-menu #fitMenu="matMenu">
+        <button mat-menu-item type="button" (click)="fitToPages(1)">Fit to 1 page</button>
+        <button mat-menu-item type="button" (click)="fitToPages(2)">Fit to 2 pages</button>
+      </mat-menu>
       <button mat-flat-button color="primary" type="button" (click)="downloadPdf()" [disabled]="isLoading() || !resumeId()">
         <mat-icon>download</mat-icon>
         Download PDF
@@ -145,8 +150,9 @@
         </div>
       </div>
       <p class="hint">
-        Dashed lines show approximate A4 page breaks (same margins as PDF export). Click a highlighted
-        region in the preview to jump to the matching builder tab.
+        Shaded bands, dashed lines, and page labels follow the same printable height as PDF export
+        (including overall scale). Click a highlighted region in the preview to jump to the matching
+        builder tab.
       </p>
     </aside>
 
@@ -161,10 +167,12 @@
           <div
             class="preview-paper"
             [style.--rr-studio-paper-width]="contentWidthMm + 'mm'"
+            [style.--rr-studio-page-step.px]="pageStepPx()"
           >
             <div class="page-overlay" [style.height.px]="overlayHeightPx()">
-              @for (y of pageLineTopsPx(); track y) {
-                <div class="page-line" [style.top.px]="y"></div>
+              @for (m of pageBreakMarks(); track m.topPx) {
+                <div class="page-line" [style.top.px]="m.topPx"></div>
+                <span class="page-line-label" [style.top.px]="m.topPx">Page {{ m.pageNum }}</span>
               }
             </div>
             @if (iframeUrl(); as src) {

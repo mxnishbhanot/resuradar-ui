@@ -227,6 +227,7 @@ mat-slider {
 }
 
 .page-overlay {
+  --rr-studio-page-step: 880px;
   position: absolute;
   left: 0;
   top: 0;
@@ -234,6 +235,13 @@ mat-slider {
   pointer-events: none;
   z-index: 2;
   border-radius: 4px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--text-primary) 7%, transparent) 0,
+    color-mix(in srgb, var(--text-primary) 7%, transparent) var(--rr-studio-page-step),
+    transparent var(--rr-studio-page-step),
+    transparent calc(2 * var(--rr-studio-page-step))
+  );
 }
 
 .page-line {
@@ -241,7 +249,21 @@ mat-slider {
   left: 0;
   right: 0;
   height: 0;
-  border-bottom: 1px dashed color-mix(in srgb, var(--text-primary) 22%, transparent);
+  border-bottom: 2px dashed color-mix(in srgb, var(--text-primary) 38%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--bg-primary) 55%, transparent);
+}
+
+.page-line-label {
+  position: absolute;
+  left: 6px;
+  transform: translateY(calc(-100% - 3px));
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-primary) 72%, transparent);
+  line-height: 1;
+  text-shadow: 0 0 6px var(--bg-primary);
 }
 
 .preview-iframe {

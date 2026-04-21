@@ -23,9 +23,14 @@ export const STANDARD_RESUME_COLORS = {
 export const PAGE_WIDTH_MM = 210;
 export const PAGE_HEIGHT_MM = 297;
 export const MARGIN_MM = 14;
-/** Printable content width inside Playwright margins (matches injected `body.rr-resume` max-width). */
-export const CONTENT_WIDTH_MM = PAGE_WIDTH_MM - 2 * MARGIN_MM;
-export const CONTENT_HEIGHT_MM = PAGE_HEIGHT_MM - 2 * MARGIN_MM;
+export const INNER_PAD_X_MM = 5;
+export const INNER_PAD_Y_MM = 5;
+export const PDF_MARGIN_X_MM = MARGIN_MM + INNER_PAD_X_MM;
+export const PDF_MARGIN_Y_MM = MARGIN_MM + INNER_PAD_Y_MM;
+
+/** Printable content box inside Playwright margins (matches injected `body.rr-resume` max-width). */
+export const CONTENT_WIDTH_MM = PAGE_WIDTH_MM - 2 * PDF_MARGIN_X_MM;
+export const CONTENT_HEIGHT_MM = PAGE_HEIGHT_MM - 2 * PDF_MARGIN_Y_MM;
 
 /** CSS length: 1mm ≈ 96/25.4 px at 96dpi */
 export function mmToPx(mm: number): number {

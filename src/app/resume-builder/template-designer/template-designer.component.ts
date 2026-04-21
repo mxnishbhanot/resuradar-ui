@@ -27,6 +27,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ColorChromeModule } from 'ngx-color/chrome';
 import type { ColorEvent } from 'ngx-color';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { firstValueFrom } from 'rxjs';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ToastService } from '../../core/services/toast';
@@ -35,7 +36,9 @@ import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { CONTENT_HEIGHT_MM, CONTENT_WIDTH_MM, mmToPx } from '../../shared/constants/print-spec';
 import {
   type BuilderTemplateId,
+  type ResumeBuilderState,
   type TemplateAppearance,
+  type TemplateLayout,
   type TemplateSectionKey,
   normalizeTemplateSettings,
 } from '../../shared/models/resume-builder.model';
@@ -150,15 +153,23 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     return a.headingColor ?? t.heading;
   });
 
-  pageLineTopsPx = computed(() => {
+  /** One PDF content column in iframe px (matches `zoom` on `body.rr-resume`). */
+  pageStepPx = computed(() => {
+    const scale = this.layoutScale();
+    const s = scale > 0 ? scale : 1;
+    return mmToPx(CONTENT_HEIGHT_MM) / s;
+  });
+
+  pageBreakMarks = computed(() => {
     const h = this.overlayHeightPx();
-    const ph = mmToPx(CONTENT_HEIGHT_MM);
+    const ph = this.pageStepPx();
     if (ph <= 0 || h <= 0) return [];
-    const lines: number[] = [];
-    for (let y = ph; y < h - 0.5; y += ph) {
-      lines.push(y);
+    const out: { topPx: number; pageNum: number }[] = [];
+    let pageNum = 2;
+    for (let y = ph; y < h - 0.5; y += ph, pageNum++) {
+      out.push({ topPx: y, pageNum });
     }
-    return lines;
+    return out;
   });
 
   constructor() {
@@ -228,10 +239,18 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     this.patchLayout({ lineHeight: v });
   }
 
-  private patchLayout(partial: { globalScale?: number; sectionGap?: number; lineHeight?: number }): void {
+  private patchLayout(
+    partial: {
+      globalScale?: number;
+      sectionGap?: number;
+      lineHeight?: number;
+      targetPageCount?: 1 | 2;
+    },
+  ): void {
     const t = this.tpl;
     const cur = this.store.snapshot.templateSettings;
-    const L = { ...cur?.layout, ...partial, layoutVersion: 1 as const };
+    const base = normalizeTemplateSettings(t, cur).layout!;
+    const L = { ...base, ...partial, layoutVersion: 1 as const };
     this.store.update({
       templateSettings: normalizeTemplateSettings(t, { ...cur, layout: L }),
     });
@@ -318,54 +337,139 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     });
   }
 
-  autoAdjust(): void {
+  /** User-facing entry: fit density to 1 or 2 PDF pages (persists `targetPageCount`). */
+  fitToPages(targetPages: 1 | 2): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    const maxPages = 2;
-    const pageH = mmToPx(CONTENT_HEIGHT_MM);
-
-    const tryMeasure = () => {
-      const frame = this.previewFrame()?.nativeElement;
-      const body = frame?.contentDocument?.body;
-      if (!body) return null;
-      let lo = 0.65;
-      let hi = 1.25;
-      for (let i = 0; i < 16; i++) {
-        const mid = (lo + hi) / 2;
-        body.style.zoom = String(mid);
-        const sh = body.scrollHeight;
-        const pages = Math.ceil(sh / pageH);
-        if (pages <= maxPages) lo = mid;
-        else hi = mid;
-      }
-      body.style.zoom = '';
-      return lo;
-    };
-
     this.isLoading.set(true);
-    this.store
-      .renderPreviewHtml(this.tpl, this.store.snapshot)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (html) => {
-          this.applyHtmlBlob(html);
-          setTimeout(() => {
-            const best = tryMeasure();
-            if (best != null) {
-              this.patchLayout({ globalScale: best });
-              this.toast.show('success', 'Auto-adjust', 'Scale updated to better fit pages.', 4000);
-            } else {
-              this.toast.show('error', 'Auto-adjust', 'Preview not ready yet.', 4000);
-            }
-            this.isLoading.set(false);
-            this.scheduleRefresh(0);
-          }, 300);
-        },
-        error: (err: { status?: number; error?: { message?: string } }) => {
-          this.isLoading.set(false);
-          if (err?.status === 403) this.openUpgrade(err.error?.message);
-          else this.toast.show('error', 'Auto-adjust', 'Could not load preview.', 5000);
-        },
-      });
+    void (async () => {
+      try {
+        await this.runFitToPages(targetPages);
+      } catch (e) {
+        console.error(e);
+        this.toast.show('error', 'Auto-fit', 'Something went wrong.', 5000);
+      } finally {
+        this.isLoading.set(false);
+        this.scheduleRefresh(0);
+      }
+    })();
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private buildStateForFit(
+    snap: ResumeBuilderState,
+    layoutPatch: Partial<TemplateLayout>,
+  ): ResumeBuilderState {
+    const t = this.tpl;
+    const cur = snap.templateSettings;
+    const baseLayout = normalizeTemplateSettings(t, cur).layout!;
+    return {
+      ...snap,
+      templateSettings: normalizeTemplateSettings(t, {
+        ...cur,
+        layout: { ...baseLayout, ...layoutPatch },
+      }),
+    };
+  }
+
+  private binarySearchBestScale(
+    frame: HTMLIFrameElement | undefined,
+    maxPages: number,
+  ): number | null {
+    const body = frame?.contentDocument?.body;
+    if (!body) return null;
+    let lo = 0.65;
+    let hi = 1.25;
+    for (let i = 0; i < 16; i++) {
+      const mid = (lo + hi) / 2;
+      body.style.zoom = String(mid);
+      const sh = Math.max(body.scrollHeight, 1);
+      const pageH = mmToPx(CONTENT_HEIGHT_MM) / mid;
+      const pages = Math.ceil(sh / pageH);
+      if (pages <= maxPages) lo = mid;
+      else hi = mid;
+    }
+    body.style.zoom = '';
+    return lo;
+  }
+
+  private peekPageCount(frame: HTMLIFrameElement | undefined, zoom: number): number | null {
+    const body = frame?.contentDocument?.body;
+    if (!body) return null;
+    body.style.zoom = String(zoom);
+    const sh = Math.max(body.scrollHeight, 1);
+    const pageH = mmToPx(CONTENT_HEIGHT_MM) / zoom;
+    const pages = Math.ceil(sh / pageH);
+    body.style.zoom = '';
+    return pages;
+  }
+
+  private async runFitToPages(targetPages: 1 | 2): Promise<void> {
+    const tpl = this.tpl;
+    const snap = this.store.snapshot;
+
+    let html: string;
+    try {
+      html = await firstValueFrom(
+        this.store.renderPreviewHtml(tpl, this.buildStateForFit(snap, { targetPageCount: targetPages })),
+      );
+    } catch (err: unknown) {
+      const e = err as { status?: number; error?: { message?: string } };
+      if (e?.status === 403) this.openUpgrade(e.error?.message);
+      else this.toast.show('error', 'Auto-fit', 'Could not load preview.', 5000);
+      throw err;
+    }
+
+    this.applyHtmlBlob(html);
+    await this.delay(400);
+
+    let frame = this.previewFrame()?.nativeElement;
+    let best = this.binarySearchBestScale(frame, targetPages);
+    if (best == null) {
+      this.toast.show('error', 'Auto-fit', 'Preview not ready yet.', 4000);
+      return;
+    }
+
+    let tightGap = false;
+    if (targetPages === 1) {
+      const pages = this.peekPageCount(frame, best);
+      if (pages != null && pages > 1 && best <= 0.651) {
+        const html2 = await firstValueFrom(
+          this.store.renderPreviewHtml(
+            tpl,
+            this.buildStateForFit(snap, {
+              targetPageCount: 1,
+              sectionGap: 0.7,
+              lineHeight: 0.95,
+            }),
+          ),
+        );
+        this.applyHtmlBlob(html2);
+        await this.delay(400);
+        frame = this.previewFrame()?.nativeElement;
+        const best2 = this.binarySearchBestScale(frame, 1);
+        if (best2 != null) {
+          best = best2;
+          tightGap = true;
+        }
+      }
+    }
+
+    this.patchLayout({
+      globalScale: best,
+      targetPageCount: targetPages,
+      ...(tightGap ? { sectionGap: 0.7, lineHeight: 0.95 } : {}),
+    });
+
+    const finalPages = this.peekPageCount(this.previewFrame()?.nativeElement, best);
+    let msg = 'Scale updated to match the selected page limit.';
+    if (targetPages === 1 && finalPages != null && finalPages > 1) {
+      msg =
+        'Tightened spacing and scale as far as allowed; very long content may still use more than one page.';
+    }
+    this.toast.show('success', 'Auto-fit', msg, 4500);
   }
 
   onIframeLoad(): void {
