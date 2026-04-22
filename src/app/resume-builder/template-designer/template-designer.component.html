@@ -231,7 +231,9 @@
         <div class="preview-stage" #stage>
           <div
             class="preview-paper"
-            [style.--rr-studio-paper-width]="contentWidthMm + 'mm'"
+            [style.--rr-studio-paper-width]="pageWidthMm + 'mm'"
+            [style.--rr-studio-paper-pad-x]="paperPadXMm + 'mm'"
+            [style.--rr-studio-paper-pad-y]="paperPadYMm + 'mm'"
             [style.--rr-studio-page-step.px]="pageStepPx()"
           >
             @if (totalPageCount() > 0) {

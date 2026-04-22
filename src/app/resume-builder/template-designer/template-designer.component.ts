@@ -1,6 +1,5 @@
 import {
   Component,
-  DestroyRef,
   ElementRef,
   OnDestroy,
   OnInit,
@@ -12,7 +11,6 @@ import {
   viewChild,
   PLATFORM_ID,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -27,13 +25,20 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ColorChromeModule } from 'ngx-color/chrome';
 import type { ColorEvent } from 'ngx-color';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ToastService } from '../../core/services/toast';
 import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-modal/quota-exhausted-modal';
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
-import { CONTENT_HEIGHT_MM, CONTENT_WIDTH_MM, mmToPx } from '../../shared/constants/print-spec';
+import {
+  CONTENT_HEIGHT_MM,
+  PAGE_WIDTH_MM,
+  PDF_MARGIN_X_MM,
+  PDF_MARGIN_Y_MM,
+  mmToPx,
+} from '../../shared/constants/print-spec';
 import {
   BUILDER_TEMPLATE_OPTIONS,
   coerceBuilderTemplateId,
@@ -99,7 +104,6 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private toast = inject(ToastService);
   private platformId = inject(PLATFORM_ID);
-  private destroyRef = inject(DestroyRef);
 
   private previewResizeObserver: ResizeObserver | null = null;
   /** Deferred flush so layout writes never run in the same turn as ResizeObserver delivery. */
@@ -107,8 +111,11 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
 
   previewFrame = viewChild<ElementRef<HTMLIFrameElement>>('previewFrame');
 
-  /** Matches PDF printable width (`print-spec` / Playwright margins). */
-  readonly contentWidthMm = CONTENT_WIDTH_MM;
+  /** Full A4 sheet width in preview chrome (matches Playwright `format: A4`). */
+  readonly pageWidthMm = PAGE_WIDTH_MM;
+  /** Inset around iframe = Playwright `margin` + same numbers as `print-spec.js`. */
+  readonly paperPadXMm = PDF_MARGIN_X_MM;
+  readonly paperPadYMm = PDF_MARGIN_Y_MM;
 
   resumeId = signal(this.data.resumeId);
   /** Current template id, sourced from store; accessed via `this.tpl` (property getter). */
@@ -126,6 +133,8 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
 
   private blobUrls: string[] = [];
   private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+  /** In-flight preview HTML request; superseded on each `runRefresh` so loading always settles. */
+  private previewHtmlSub: Subscription | null = null;
   private onWinMessage = (ev: MessageEvent) => this.handlePreviewMessage(ev);
 
   sectionOrder = computed(() => {
@@ -275,6 +284,8 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     this.previewResizeObserver = null;
     this.revokeBlobs();
     if (this.refreshTimer) clearTimeout(this.refreshTimer);
+    this.previewHtmlSub?.unsubscribe();
+    this.previewHtmlSub = null;
     if (isPlatformBrowser(this.platformId)) {
       window.removeEventListener('message', this.onWinMessage);
       window.removeEventListener('keydown', this.onKeyDown);
@@ -706,17 +717,22 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   }
 
   private runRefresh(): void {
+    this.previewHtmlSub?.unsubscribe();
+    this.previewHtmlSub = null;
     this.isLoading.set(true);
-    this.store
+    this.previewHtmlSub = this.store
       .renderPreviewHtml(this.tpl, this.store.snapshot)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        finalize(() => {
+          this.isLoading.set(false);
+          this.previewHtmlSub = null;
+        }),
+      )
       .subscribe({
         next: (html) => {
           this.applyHtmlBlob(html);
-          this.isLoading.set(false);
         },
         error: (err: { status?: number; error?: { message?: string } }) => {
-          this.isLoading.set(false);
           if (err?.status === 403) {
             this.openUpgrade(err.error?.message);
           } else {

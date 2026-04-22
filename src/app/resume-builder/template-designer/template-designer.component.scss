@@ -295,11 +295,16 @@ mat-slider {
 }
 
 .preview-paper {
-  --rr-studio-paper-width: 182mm;
+  /* Outer “sheet” = A4; padding simulates Playwright PDF margins (see print-spec). */
+  --rr-studio-paper-width: 210mm;
+  --rr-studio-paper-pad-x: 19mm;
+  --rr-studio-paper-pad-y: 19mm;
   position: relative;
+  box-sizing: border-box;
   width: var(--rr-studio-paper-width);
   max-width: 100%;
   flex-shrink: 0;
+  padding: var(--rr-studio-paper-pad-y) var(--rr-studio-paper-pad-x);
   border-radius: 6px;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-lg);
@@ -313,9 +318,10 @@ mat-slider {
 .page-overlay {
   --rr-studio-page-step: 880px;
   position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
+  /* Inset = content box: page breaks must align with iframe (padding simulates PDF margin only). */
+  top: var(--rr-studio-paper-pad-y);
+  left: var(--rr-studio-paper-pad-x);
+  right: var(--rr-studio-paper-pad-x);
   pointer-events: none;
   z-index: 2;
 }
