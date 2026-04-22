@@ -172,6 +172,19 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     return out;
   });
 
+  totalPageCount = computed(() => {
+    const h = this.overlayHeightPx();
+    const ph = this.pageStepPx();
+    if (ph <= 0 || h <= 0) return 0;
+    return Math.max(1, Math.ceil(h / ph));
+  });
+
+  activeFitTarget = computed(
+    () =>
+      normalizeTemplateSettings(this.tpl, this.store.state().templateSettings).layout!
+        .targetPageCount,
+  );
+
   constructor() {
     effect(() => {
       this.store.state();

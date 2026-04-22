@@ -21,8 +21,14 @@
         <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
       </button>
       <mat-menu #fitMenu="matMenu">
-        <button mat-menu-item type="button" (click)="fitToPages(1)">Fit to 1 page</button>
-        <button mat-menu-item type="button" (click)="fitToPages(2)">Fit to 2 pages</button>
+        <button mat-menu-item type="button" (click)="fitToPages(1)">
+          <mat-icon>{{ activeFitTarget() === 1 ? 'check' : 'crop_portrait' }}</mat-icon>
+          Fit to 1 page
+        </button>
+        <button mat-menu-item type="button" (click)="fitToPages(2)">
+          <mat-icon>{{ activeFitTarget() === 2 ? 'check' : 'auto_stories' }}</mat-icon>
+          Fit to 2 pages
+        </button>
       </mat-menu>
       <button mat-flat-button color="primary" type="button" (click)="downloadPdf()" [disabled]="isLoading() || !resumeId()">
         <mat-icon>download</mat-icon>
@@ -169,10 +175,13 @@
             [style.--rr-studio-paper-width]="contentWidthMm + 'mm'"
             [style.--rr-studio-page-step.px]="pageStepPx()"
           >
+            @if (totalPageCount() > 0) {
+              <div class="page-count-badge">{{ totalPageCount() }} page{{ totalPageCount() === 1 ? '' : 's' }}</div>
+            }
             <div class="page-overlay" [style.height.px]="overlayHeightPx()">
               @for (m of pageBreakMarks(); track m.topPx) {
-                <div class="page-line" [style.top.px]="m.topPx"></div>
-                <span class="page-line-label" [style.top.px]="m.topPx">Page {{ m.pageNum }}</span>
+                <div class="page-break" [style.top.px]="m.topPx"></div>
+                <span class="page-break-label" [style.top.px]="m.topPx">Page {{ m.pageNum }}</span>
               }
             </div>
             @if (iframeUrl(); as src) {
