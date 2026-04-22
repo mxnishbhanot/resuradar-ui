@@ -16,11 +16,14 @@
 
   <!-- LIST OF PROJECTS -->
   @if (projects().length > 0 && !showForm()) {
-  <div class="projects-list">
+  <div class="projects-list" cdkDropList (cdkDropListDropped)="onEntryDrop($event)">
 
     @for (proj of projects(); track proj.id) {
 
-    <div class="project-card">
+    <div class="project-card" cdkDrag>
+      <button type="button" mat-icon-button class="card-drag-handle" cdkDragHandle matTooltip="Drag to reorder">
+        <mat-icon>drag_indicator</mat-icon>
+      </button>
 
       <!-- Card Header -->
       <div class="card-header">
@@ -281,11 +284,14 @@
           Describe your contributions and measurable results.
         </p>
 
-        <div formArrayName="bullets" class="bullets-container">
+        <div formArrayName="bullets" class="bullets-container" cdkDropList (cdkDropListDropped)="onBulletDrop($event)">
 
           @for (bullet of bullets.controls; track $index) {
 
-          <div class="bullet-row">
+          <div class="bullet-row" cdkDrag>
+            <button type="button" mat-icon-button class="bullet-drag-handle" cdkDragHandle matTooltip="Drag to reorder">
+              <mat-icon>drag_indicator</mat-icon>
+            </button>
             <div class="bullet-number-badge">{{ $index + 1 }}</div>
 
             <div class="bullet-field-stack">

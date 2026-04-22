@@ -28,6 +28,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { TextFieldModule } from '@angular/cdk/text-field';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
 import { ThemeService } from '../../core/services/theme';
@@ -60,6 +61,7 @@ export interface EducationEntry {
     MatDatepickerModule,
     MatNativeDateModule,
     TextFieldModule,
+    DragDropModule,
     SelectionColorApplyComponent,
   ],
   templateUrl: './education.component.html',
@@ -159,6 +161,13 @@ export class EducationComponent {
     this.store.update({ educations: updated });
   }
 
+  onEntryDrop(event: CdkDragDrop<unknown>) {
+    if (event.previousIndex === event.currentIndex) return;
+    const next = [...this.educationEntries()];
+    moveItemInArray(next, event.previousIndex, event.currentIndex);
+    this.store.update({ educations: next });
+  }
+
   addBullet() {
     this.bullets.push(this.fb.control(''));
     afterNextRender(
@@ -172,6 +181,14 @@ export class EducationComponent {
 
   removeBullet(index: number) {
     this.bullets.removeAt(index);
+  }
+
+  onBulletDrop(event: CdkDragDrop<unknown>) {
+    if (event.previousIndex === event.currentIndex) return;
+    const vals = this.bullets.controls.map((c) => c.value);
+    moveItemInArray(vals, event.previousIndex, event.currentIndex);
+    while (this.bullets.length) this.bullets.removeAt(0);
+    for (const v of vals) this.bullets.push(this.fb.control(v));
   }
 
   saveEntry() {

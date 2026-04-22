@@ -29,6 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TextFieldModule, CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
@@ -53,6 +54,7 @@ export interface Experience {
     CommonModule,
     ReactiveFormsModule,
     TextFieldModule,
+    DragDropModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -154,6 +156,15 @@ export class ExperienceComponent {
     this.bullets.removeAt(i);
   }
 
+  onBulletDrop(event: CdkDragDrop<unknown>) {
+    if (event.previousIndex === event.currentIndex) return;
+    // FormArray has no reorder API — snapshot, re-seed, swap.
+    const vals = this.bullets.controls.map((c) => c.value);
+    moveItemInArray(vals, event.previousIndex, event.currentIndex);
+    while (this.bullets.length) this.bullets.removeAt(0);
+    for (const v of vals) this.bullets.push(this.fb.control(v));
+  }
+
   /** Editing an Experience */
   editExperience(index: number) {
     const exp = this.experiences()[index];
@@ -219,6 +230,13 @@ export class ExperienceComponent {
     this.store.update({ experiences: updated });
 
     this.cancelForm();
+  }
+
+  onEntryDrop(event: CdkDragDrop<unknown>) {
+    if (event.previousIndex === event.currentIndex) return;
+    const next = [...this.experiences()];
+    moveItemInArray(next, event.previousIndex, event.currentIndex);
+    this.store.update({ experiences: next });
   }
 
   /** Delete experience */

@@ -30,6 +30,7 @@ import { MatChipsModule, MatChipInputEvent } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
@@ -58,6 +59,7 @@ import { Project } from '../../shared/models/resume-builder.model';
     MatDatepickerModule,
     MatNativeDateModule,
     CdkTextareaAutosize,
+    DragDropModule,
     SelectionColorApplyComponent,
   ]
 })
@@ -158,6 +160,14 @@ export class ProjectsComponent {
 
   removeBullet(index: number) {
     this.bullets.removeAt(index);
+  }
+
+  onBulletDrop(event: CdkDragDrop<unknown>) {
+    if (event.previousIndex === event.currentIndex) return;
+    const vals = this.bullets.controls.map((c) => c.value);
+    moveItemInArray(vals, event.previousIndex, event.currentIndex);
+    while (this.bullets.length) this.bullets.removeAt(0);
+    for (const v of vals) this.bullets.push(this.fb.control(v));
   }
 
   addTech(event: MatChipInputEvent): void {
@@ -265,6 +275,13 @@ export class ProjectsComponent {
 
     this.store.update({ projects: updated });
     this.cancelForm();
+  }
+
+  onEntryDrop(event: CdkDragDrop<unknown>) {
+    if (event.previousIndex === event.currentIndex) return;
+    const next = [...this.projects()];
+    moveItemInArray(next, event.previousIndex, event.currentIndex);
+    this.store.update({ projects: next });
   }
 
   // ---------- DELETE ----------

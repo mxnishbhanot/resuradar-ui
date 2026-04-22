@@ -14,11 +14,14 @@
   <!-- EXPERIENCE LIST -->
   @if (experiences().length > 0 && !showForm()) {
 
-    <div class="experience-list">
+    <div class="experience-list" cdkDropList (cdkDropListDropped)="onEntryDrop($event)">
 
       @for (exp of experiences(); track exp.id) {
 
-        <div class="experience-card">
+        <div class="experience-card" cdkDrag>
+          <button type="button" mat-icon-button class="card-drag-handle" cdkDragHandle matTooltip="Drag to reorder">
+            <mat-icon>drag_indicator</mat-icon>
+          </button>
 
           <!-- CARD HEADER -->
           <div class="card-header">
@@ -218,11 +221,20 @@
             Start each point with an action verb.
           </p>
 
-          <div formArrayName="bullets">
+          <div formArrayName="bullets" cdkDropList (cdkDropListDropped)="onBulletDrop($event)">
 
             @for (b of bullets.controls; track $index) {
 
-              <div class="bullet-row">
+              <div class="bullet-row" cdkDrag>
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="bullet-drag-handle"
+                  cdkDragHandle
+                  matTooltip="Drag to reorder"
+                >
+                  <mat-icon>drag_indicator</mat-icon>
+                </button>
                 <div class="bullet-number-badge">{{ $index + 1 }}</div>
 
                 <div class="bullet-field-stack">

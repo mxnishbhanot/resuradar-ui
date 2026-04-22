@@ -11,6 +11,24 @@
     </div>
     <div class="toolbar-right">
       <button
+        mat-icon-button
+        type="button"
+        (click)="undo()"
+        [disabled]="!store.canUndo()"
+        matTooltip="Undo (Ctrl+Z)"
+      >
+        <mat-icon>undo</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        type="button"
+        (click)="redo()"
+        [disabled]="!store.canRedo()"
+        matTooltip="Redo (Ctrl+Shift+Z)"
+      >
+        <mat-icon>redo</mat-icon>
+      </button>
+      <button
         mat-flat-button
         type="button"
         class="toolbar-auto-adjust-btn"
@@ -39,6 +57,21 @@
 
   <div class="designer-body">
     <aside class="controls-panel">
+      <div class="panel-title">Template</div>
+      <div class="template-picker">
+        @for (opt of templateOptions; track opt.id) {
+          <button
+            type="button"
+            class="template-card"
+            [class.active]="currentTemplate() === opt.id"
+            (click)="selectTemplate(opt.id)"
+          >
+            <span class="template-card-name">{{ opt.name }}</span>
+            <span class="template-card-desc">{{ opt.description }}</span>
+          </button>
+        }
+      </div>
+
       <div class="panel-title">Section order</div>
       <ul
         class="section-list"
@@ -46,9 +79,18 @@
         (cdkDropListDropped)="onSectionDrop($event)"
       >
         @for (key of sectionOrder(); track key) {
-          <li class="section-item" cdkDrag>
+          <li class="section-item" cdkDrag [class.section-hidden]="isSectionHidden(key)">
             <mat-icon cdkDragHandle style="cursor: grab">drag_indicator</mat-icon>
-            {{ sectionLabel(key) }}
+            <span class="section-label">{{ sectionLabel(key) }}</span>
+            <button
+              mat-icon-button
+              type="button"
+              class="section-visibility-btn"
+              (click)="toggleSectionHidden(key)"
+              [matTooltip]="isSectionHidden(key) ? 'Show in PDF' : 'Hide from PDF'"
+            >
+              <mat-icon>{{ isSectionHidden(key) ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
           </li>
         }
       </ul>
@@ -61,14 +103,21 @@
         </mat-slider>
       </div>
       <div class="slider-row">
-        <label>Section spacing ({{ gapPct() }})</label>
-        <mat-slider min="0.7" max="1.5" step="0.02">
-          <input matSliderThumb [ngModel]="sectionGap()" (ngModelChange)="onGapChange($event)" />
-        </mat-slider>
+        <label>Section spacing</label>
+        <div class="density-presets">
+          @for (p of densityPresets; track p.id) {
+            <button
+              type="button"
+              class="density-chip"
+              [class.active]="activeDensityId() === p.id"
+              (click)="selectDensity(p.id)"
+            >{{ p.label }}</button>
+          }
+        </div>
       </div>
       <div class="slider-row">
         <label>Line height ({{ lineHeightPct() }})</label>
-        <mat-slider min="0.95" max="1.35" step="0.01">
+        <mat-slider min="0.95" max="1.10" step="0.01">
           <input matSliderThumb [ngModel]="lineHeight()" (ngModelChange)="onLineHeightChange($event)" />
         </mat-slider>
       </div>
@@ -163,6 +212,16 @@
     </aside>
 
     <div class="preview-panel">
+      @if (overflowing()) {
+        <div class="overflow-banner">
+          <mat-icon>warning_amber</mat-icon>
+          <span>
+            Content exceeds 2 pages ({{ totalPageCount() }} pages).
+            Try <button type="button" class="link-btn" (click)="fitToPages(2)">Auto-fit to 2 pages</button>
+            or trim content.
+          </span>
+        </div>
+      }
       @if (isLoading()) {
         <div class="loading-overlay">
           <mat-progress-spinner diameter="40" mode="indeterminate" />

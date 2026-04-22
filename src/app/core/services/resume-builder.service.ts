@@ -33,6 +33,18 @@ export class ResumeBuilderService {
 
   state = signal<ResumeBuilderState>(EMPTY_RESUME_STATE);
 
+  /** Undo/redo history. Capped to avoid unbounded memory. */
+  private static readonly HISTORY_LIMIT = 50;
+  /** Rapid edits within this window collapse into one undo frame. */
+  private static readonly HISTORY_COALESCE_MS = 500;
+  private readonly past = signal<ResumeBuilderState[]>([]);
+  private readonly future = signal<ResumeBuilderState[]>([]);
+  /** True while an undo/redo is applying, so we don't record the rewind itself. */
+  private historyFrozen = false;
+  private lastHistoryAt = 0;
+  canUndo = () => this.past().length > 0;
+  canRedo = () => this.future().length > 0;
+
   private autoSaveEnabled = true;
   private isDirty = false;
   private readonly autoSaveDebounced = new Subject<void>();
@@ -65,6 +77,75 @@ export class ResumeBuilderService {
     return this.state();
   }
 
+  /**
+   * Push the current state into the undo stack, dropping any pending redo.
+   * Coalesces rapid edits (typing): if called within HISTORY_COALESCE_MS of
+   * the last record, we skip — the already-recorded pre-edit state is still
+   * the correct undo target.
+   */
+  private recordHistory(): void {
+    if (this.historyFrozen) return;
+    const now = Date.now();
+    if (now - this.lastHistoryAt < ResumeBuilderService.HISTORY_COALESCE_MS) {
+      // Still close the redo branch: user is making forward progress.
+      if (this.future().length > 0) this.future.set([]);
+      return;
+    }
+    this.lastHistoryAt = now;
+    const current = this.state();
+    const past = this.past();
+    const next = past.length >= ResumeBuilderService.HISTORY_LIMIT
+      ? [...past.slice(1), current]
+      : [...past, current];
+    this.past.set(next);
+    if (this.future().length > 0) this.future.set([]);
+  }
+
+  /** Pop the last snapshot from `past`, push the current state to `future`. */
+  undo(): void {
+    const past = this.past();
+    if (past.length === 0) return;
+    const previous = past[past.length - 1];
+    const currentBefore = this.state();
+    this.past.set(past.slice(0, -1));
+    this.future.set([currentBefore, ...this.future()]);
+    this.historyFrozen = true;
+    try {
+      this.state.set(previous);
+      this.isDirty = true;
+      if (this.isBrowser()) this.saveToLocal();
+    } finally {
+      this.historyFrozen = false;
+      // Reset coalesce window so the next edit becomes its own undo frame.
+      this.lastHistoryAt = 0;
+    }
+  }
+
+  redo(): void {
+    const future = this.future();
+    if (future.length === 0) return;
+    const next = future[0];
+    const currentBefore = this.state();
+    this.future.set(future.slice(1));
+    this.past.set([...this.past(), currentBefore]);
+    this.historyFrozen = true;
+    try {
+      this.state.set(next);
+      this.isDirty = true;
+      if (this.isBrowser()) this.saveToLocal();
+    } finally {
+      this.historyFrozen = false;
+      this.lastHistoryAt = 0;
+    }
+  }
+
+  /** Clear history (called on load of a different resume or fresh start). */
+  private clearHistory(): void {
+    this.past.set([]);
+    this.future.set([]);
+    this.lastHistoryAt = 0;
+  }
+
   private listenToUrlResumeId() {
     if (!this.isBrowser()) return;
 
@@ -75,6 +156,7 @@ export class ResumeBuilderService {
       if (id && id !== currentId) {
         this.loadSpecificResume(id);
       } else if (!id && currentId) {
+        this.clearHistory();
         this.state.set(EMPTY_RESUME_STATE);
         this.saveToLocal();
       }
@@ -95,6 +177,7 @@ export class ResumeBuilderService {
 
         const theme = coerceBuilderTemplateId(res.resume.theme);
         const templateSettings = normalizeTemplateSettings(theme, res.resume.templateSettings);
+        this.clearHistory();
         this.state.set({
           _id: res.resume._id,
           personal: res.resume.personal || {},
@@ -118,9 +201,12 @@ export class ResumeBuilderService {
   }
 
   update(partial: Partial<ResumeBuilderState>) {
+    this.recordHistory();
     this.state.update((prev) => {
-      const merged = { ...prev, ...partial, theme: 'modern' as const };
-      const theme: BuilderTemplateId = 'modern';
+      const theme: BuilderTemplateId = coerceBuilderTemplateId(
+        partial.theme !== undefined ? partial.theme : prev.theme,
+      );
+      const merged = { ...prev, ...partial, theme };
       let rawTemplateSettings = merged.templateSettings;
       if (partial.colorScheme !== undefined && partial.templateSettings === undefined) {
         rawTemplateSettings = {
@@ -144,6 +230,8 @@ export class ResumeBuilderService {
 
   /** Replace in-memory state (e.g. parsed upload). Normalizes template settings and colorScheme. */
   replace(resume: Partial<ResumeBuilderState> & { _id?: string | null }) {
+    // A full replace is disruptive — clear history so undo can't jump back to unrelated state.
+    this.clearHistory();
     const theme = coerceBuilderTemplateId(resume.theme);
     const templateSettings = normalizeTemplateSettings(theme, resume.templateSettings);
     this.state.set({
@@ -165,6 +253,7 @@ export class ResumeBuilderService {
     if (!this.isBrowser()) return;
 
     this.clearLocal();
+    this.clearHistory();
     const email = this.googleAuth.user()?.email?.trim();
     this.state.set({
       ...EMPTY_RESUME_STATE,
@@ -355,6 +444,7 @@ export class ResumeBuilderService {
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {}
+    this.clearHistory();
     this.state.set(EMPTY_RESUME_STATE);
   }
 

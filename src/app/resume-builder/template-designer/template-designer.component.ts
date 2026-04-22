@@ -35,6 +35,8 @@ import { QuotaExhaustedModal } from '../../shared/components/quota-exhausted-mod
 import { UpgradePro } from '../../components/upgrade-pro/upgrade-pro';
 import { CONTENT_HEIGHT_MM, CONTENT_WIDTH_MM, mmToPx } from '../../shared/constants/print-spec';
 import {
+  BUILDER_TEMPLATE_OPTIONS,
+  coerceBuilderTemplateId,
   type BuilderTemplateId,
   type ResumeBuilderState,
   type TemplateAppearance,
@@ -43,6 +45,13 @@ import {
   normalizeTemplateSettings,
 } from '../../shared/models/resume-builder.model';
 import { STANDARD_RESUME_COLORS } from '../../shared/constants/print-spec';
+
+interface DensityPreset { id: 'compact' | 'normal' | 'comfortable'; label: string; gap: number; }
+const DENSITY_PRESETS: readonly DensityPreset[] = [
+  { id: 'compact',     label: 'Compact',     gap: 0.85 },
+  { id: 'normal',      label: 'Normal',      gap: 1.0  },
+  { id: 'comfortable', label: 'Comfortable', gap: 1.15 },
+];
 
 const SECTION_LABELS: Record<TemplateSectionKey, string> = {
   summary: 'Summary',
@@ -83,7 +92,7 @@ function mapFieldToTab(field: string | null | undefined): number | null {
   styleUrls: ['./template-designer.component.scss'],
 })
 export class TemplateDesignerComponent implements OnInit, OnDestroy {
-  private store = inject(ResumeBuilderService);
+  protected store = inject(ResumeBuilderService);
   private dialogRef = inject(MatDialogRef<TemplateDesignerComponent>);
   private data = inject<{ resumeId: string | null }>(MAT_DIALOG_DATA);
   private sanitizer = inject(DomSanitizer);
@@ -102,8 +111,15 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   readonly contentWidthMm = CONTENT_WIDTH_MM;
 
   resumeId = signal(this.data.resumeId);
-  /** Single standard layout — kept for API compatibility with `renderPreviewHtml` / `exportPdf`. */
-  private readonly tpl: BuilderTemplateId = 'modern';
+  /** Current template id, sourced from store; accessed via `this.tpl` (property getter). */
+  private get tpl(): BuilderTemplateId {
+    return coerceBuilderTemplateId(this.store.state().theme);
+  }
+  /** Template picker bindings. */
+  readonly templateOptions = BUILDER_TEMPLATE_OPTIONS;
+  currentTemplate = computed<BuilderTemplateId>(() =>
+    coerceBuilderTemplateId(this.store.state().theme),
+  );
   isLoading = signal(false);
   iframeUrl = signal<SafeResourceUrl | null>(null);
   overlayHeightPx = signal(0);
@@ -116,6 +132,36 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     const t = this.tpl;
     return normalizeTemplateSettings(t, this.store.state().templateSettings).sectionOrder!;
   });
+
+  hiddenSections = computed(() => {
+    const t = this.tpl;
+    return new Set(
+      normalizeTemplateSettings(t, this.store.state().templateSettings).hiddenSections ?? [],
+    );
+  });
+
+  isSectionHidden(key: TemplateSectionKey): boolean {
+    return this.hiddenSections().has(key);
+  }
+
+  selectTemplate(id: BuilderTemplateId): void {
+    if (id === this.currentTemplate()) return;
+    this.store.update({ theme: id });
+  }
+
+  toggleSectionHidden(key: TemplateSectionKey): void {
+    const t = this.tpl;
+    const cur = this.store.snapshot.templateSettings;
+    const set = new Set(normalizeTemplateSettings(t, cur).hiddenSections ?? []);
+    if (set.has(key)) set.delete(key);
+    else set.add(key);
+    this.store.update({
+      templateSettings: normalizeTemplateSettings(t, {
+        ...cur,
+        hiddenSections: Array.from(set),
+      }),
+    });
+  }
 
   layoutScale = computed(
     () =>
@@ -195,7 +241,29 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       window.addEventListener('message', this.onWinMessage);
+      window.addEventListener('keydown', this.onKeyDown);
     }
+  }
+
+  private onKeyDown = (ev: KeyboardEvent) => {
+    const meta = ev.ctrlKey || ev.metaKey;
+    if (!meta) return;
+    const key = ev.key.toLowerCase();
+    if (key === 'z' && !ev.shiftKey) {
+      ev.preventDefault();
+      this.undo();
+    } else if ((key === 'z' && ev.shiftKey) || key === 'y') {
+      ev.preventDefault();
+      this.redo();
+    }
+  };
+
+  undo(): void {
+    this.store.undo();
+  }
+
+  redo(): void {
+    this.store.redo();
   }
 
   ngOnDestroy(): void {
@@ -209,6 +277,7 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     if (this.refreshTimer) clearTimeout(this.refreshTimer);
     if (isPlatformBrowser(this.platformId)) {
       window.removeEventListener('message', this.onWinMessage);
+      window.removeEventListener('keydown', this.onKeyDown);
     }
   }
 
@@ -247,6 +316,21 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   onGapChange(v: number): void {
     this.patchLayout({ sectionGap: v });
   }
+
+  readonly densityPresets = DENSITY_PRESETS;
+  activeDensityId = computed<DensityPreset['id'] | null>(() => {
+    const g = this.sectionGap();
+    const hit = DENSITY_PRESETS.find((p) => Math.abs(p.gap - g) < 0.005);
+    return hit ? hit.id : null;
+  });
+
+  selectDensity(id: DensityPreset['id']): void {
+    const p = DENSITY_PRESETS.find((x) => x.id === id);
+    if (!p) return;
+    this.patchLayout({ sectionGap: p.gap });
+  }
+
+  overflowing = computed(() => this.totalPageCount() > 2);
 
   onLineHeightChange(v: number): void {
     this.patchLayout({ lineHeight: v });
@@ -371,6 +455,42 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  /**
+   * Block until the iframe document is ready to measure: fonts loaded, at
+   * least one layout frame produced, and (when wired up) the body dimensions
+   * stable for a frame. Without this, auto-fit runs against fallback-font
+   * metrics and the result drifts from the Playwright export (which always
+   * waits on networkidle + a settle).
+   */
+  private async waitForPreviewReady(
+    frame: HTMLIFrameElement | undefined,
+    timeoutMs = 1500,
+  ): Promise<void> {
+    if (!frame) return;
+    const win = frame.contentWindow;
+    const doc = frame.contentDocument;
+    if (!win || !doc) return;
+    const deadline = Date.now() + timeoutMs;
+    try {
+      await Promise.race([
+        doc.fonts?.ready ?? Promise.resolve(),
+        new Promise<void>((r) => setTimeout(r, timeoutMs)),
+      ]);
+    } catch {
+      /* cross-origin or torn doc */
+    }
+    // Two rAFs to guarantee layout after font-arrival style invalidation.
+    await new Promise<void>((r) => win.requestAnimationFrame(() => win.requestAnimationFrame(() => r())));
+    // Stability guard: wait until scrollHeight is steady across one frame or deadline.
+    let last = -1;
+    while (Date.now() < deadline) {
+      const h = doc.body?.scrollHeight ?? 0;
+      if (h === last) return;
+      last = h;
+      await new Promise<void>((r) => win.requestAnimationFrame(() => r()));
+    }
+  }
+
   private buildStateForFit(
     snap: ResumeBuilderState,
     layoutPatch: Partial<TemplateLayout>,
@@ -387,36 +507,74 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     };
   }
 
-  private binarySearchBestScale(
+  /**
+   * Deterministic auto-fit.
+   *
+   * In Chromium, CSS `zoom: s` scales layout linearly: at zoom s the body's
+   * scrollHeight = naturalPx * s, and a printed page (fixed physical height
+   * CONTENT_HEIGHT_MM) holds pageHeightPx_at_1 / s CSS pixels. So:
+   *
+   *     pages(s) = (naturalPx * s) / (pageHeightPx_at_1 / s) = naturalPx * s² / pageHeightPx_at_1
+   *
+   * Setting pages(s) ≤ targetPages yields:
+   *
+   *     s ≤ √(targetPages × pageHeightPx_at_1 / naturalPx)
+   *
+   * We take this closed-form scale, clamp to the allowed range, snap down to
+   * 0.01 granularity (avoids boundary oscillation), then verify once — falling
+   * back to a 0.01 step-down if a wrapping shift at the new scale bumps us
+   * over the target (e.g. a long line now wrapping to an extra line).
+   */
+  private computeBestScale(
     frame: HTMLIFrameElement | undefined,
-    maxPages: number,
+    targetPages: number,
   ): number | null {
     const body = frame?.contentDocument?.body;
     if (!body) return null;
-    let lo = 0.65;
-    let hi = 1.25;
-    for (let i = 0; i < 16; i++) {
-      const mid = (lo + hi) / 2;
-      body.style.zoom = String(mid);
-      const sh = Math.max(body.scrollHeight, 1);
-      const pageH = mmToPx(CONTENT_HEIGHT_MM) / mid;
-      const pages = Math.ceil(sh / pageH);
-      if (pages <= maxPages) lo = mid;
-      else hi = mid;
+    const ro = this.previewResizeObserver;
+    try { ro?.disconnect(); } catch { /* noop */ }
+    try {
+      const prevZoom = body.style.zoom;
+      body.style.zoom = '1';
+      const naturalPx = Math.max(body.scrollHeight, 1);
+      body.style.zoom = prevZoom;
+
+      const pageHeightPx = mmToPx(CONTENT_HEIGHT_MM);
+      const ideal = Math.sqrt((targetPages * pageHeightPx) / naturalPx);
+      let best = Math.floor(Math.min(1.25, Math.max(0.65, ideal)) * 100) / 100;
+      best = Math.max(0.65, best);
+
+      // Verify and step down if needed (bounded: worst case ~25 steps from 1.25→0.65).
+      for (let guard = 0; guard < 64; guard++) {
+        body.style.zoom = String(best);
+        const sh = Math.max(body.scrollHeight, 1);
+        const pageH = pageHeightPx / best;
+        const pages = Math.ceil(sh / pageH);
+        body.style.zoom = prevZoom;
+        if (pages <= targetPages || best <= 0.6501) break;
+        best = Math.max(0.65, Math.round((best - 0.01) * 100) / 100);
+      }
+      return best;
+    } finally {
+      try { ro?.observe(body); } catch { /* body detached */ }
     }
-    body.style.zoom = '';
-    return lo;
   }
 
   private peekPageCount(frame: HTMLIFrameElement | undefined, zoom: number): number | null {
     const body = frame?.contentDocument?.body;
     if (!body) return null;
-    body.style.zoom = String(zoom);
-    const sh = Math.max(body.scrollHeight, 1);
-    const pageH = mmToPx(CONTENT_HEIGHT_MM) / zoom;
-    const pages = Math.ceil(sh / pageH);
-    body.style.zoom = '';
-    return pages;
+    const ro = this.previewResizeObserver;
+    try { ro?.disconnect(); } catch { /* noop */ }
+    try {
+      body.style.zoom = String(zoom);
+      const sh = Math.max(body.scrollHeight, 1);
+      const pageH = mmToPx(CONTENT_HEIGHT_MM) / zoom;
+      const pages = Math.ceil(sh / pageH);
+      body.style.zoom = '';
+      return pages;
+    } finally {
+      try { ro?.observe(body); } catch { /* body detached */ }
+    }
   }
 
   private async runFitToPages(targetPages: 1 | 2): Promise<void> {
@@ -436,10 +594,9 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     }
 
     this.applyHtmlBlob(html);
-    await this.delay(400);
-
     let frame = this.previewFrame()?.nativeElement;
-    let best = this.binarySearchBestScale(frame, targetPages);
+    await this.waitForPreviewReady(frame);
+    let best = this.computeBestScale(frame, targetPages);
     if (best == null) {
       this.toast.show('error', 'Auto-fit', 'Preview not ready yet.', 4000);
       return;
@@ -460,9 +617,9 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
           ),
         );
         this.applyHtmlBlob(html2);
-        await this.delay(400);
         frame = this.previewFrame()?.nativeElement;
-        const best2 = this.binarySearchBestScale(frame, 1);
+        await this.waitForPreviewReady(frame);
+        const best2 = this.computeBestScale(frame, 1);
         if (best2 != null) {
           best = best2;
           tightGap = true;
@@ -528,13 +685,18 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
       }, 0);
     };
 
-    scheduleLayout();
+    // Install the ResizeObserver first so any font-arrival resize is caught.
     try {
       this.previewResizeObserver = new ResizeObserver(() => scheduleLayout());
       this.previewResizeObserver.observe(body);
     } catch {
       /* ResizeObserver unsupported */
     }
+    // Initial measurement must wait for fonts — otherwise the first overlay
+    // height is computed against fallback metrics and jumps once Carlito loads.
+    void this.waitForPreviewReady(frame).then(() => {
+      if (frame.isConnected) scheduleLayout();
+    });
   }
 
   private scheduleRefresh(ms = 320): void {

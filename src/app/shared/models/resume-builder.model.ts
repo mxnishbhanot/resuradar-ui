@@ -53,12 +53,31 @@ export interface SkillCategory {  // CHANGED: New interface for skills (categori
   skills: string[];
 }
 
-/** Single standard PDF layout (legacy DB values are coerced to this on load). */
-export type BuilderTemplateId = 'modern';
+/** Pluggable templates: shared HBS, per-template font stack + accents. */
+export type BuilderTemplateId = 'modern' | 'serif';
 
-export function coerceBuilderTemplateId(_raw: unknown): BuilderTemplateId {
-  return 'modern';
+const BUILDER_TEMPLATE_IDS: ReadonlySet<BuilderTemplateId> = new Set<BuilderTemplateId>([
+  'modern',
+  'serif',
+]);
+
+export function coerceBuilderTemplateId(raw: unknown): BuilderTemplateId {
+  return typeof raw === 'string' && BUILDER_TEMPLATE_IDS.has(raw as BuilderTemplateId)
+    ? (raw as BuilderTemplateId)
+    : 'modern';
 }
+
+export interface BuilderTemplateOption {
+  id: BuilderTemplateId;
+  name: string;
+  /** Short description shown under the template name in the picker. */
+  description: string;
+}
+
+export const BUILDER_TEMPLATE_OPTIONS: readonly BuilderTemplateOption[] = [
+  { id: 'modern', name: 'Modern', description: 'Sans-serif · Carlito' },
+  { id: 'serif',  name: 'Serif',  description: 'Serif · Source Serif 4' },
+];
 
 export type TemplateSectionKey =
   | 'summary'
@@ -130,6 +149,8 @@ export function normalizeAppearance(
 
 export interface TemplateSettings {
   sectionOrder?: TemplateSectionKey[];
+  /** Sections the user has chosen to hide; they are skipped at render time. */
+  hiddenSections?: TemplateSectionKey[];
   layout?: Partial<TemplateLayout>;
   appearance?: Partial<TemplateAppearance>;
 }
@@ -162,6 +183,15 @@ export function normalizeTemplateSettings(
   const sectionOrder = isValidSectionOrder(raw?.sectionOrder)
     ? [...raw.sectionOrder]
     : defaultSectionOrderForTemplate(t);
+  const hiddenSections: TemplateSectionKey[] = Array.isArray(raw?.hiddenSections)
+    ? Array.from(
+        new Set(
+          raw!.hiddenSections!.filter((k): k is TemplateSectionKey =>
+            SECTION_KEY_SET.has(k as TemplateSectionKey),
+          ),
+        ),
+      )
+    : [];
   const L: Partial<TemplateLayout> =
     raw?.layout && typeof raw.layout === 'object' ? (raw.layout as Partial<TemplateLayout>) : {};
   const globalScale =
@@ -175,6 +205,7 @@ export function normalizeTemplateSettings(
     rawTarget === 1 || rawTarget === 2 ? (rawTarget as 1 | 2) : undefined;
   return {
     sectionOrder,
+    hiddenSections,
     layout: {
       layoutVersion: 1,
       globalScale: Math.min(1.25, Math.max(0.65, globalScale)),
