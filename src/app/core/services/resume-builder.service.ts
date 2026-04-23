@@ -391,6 +391,16 @@ export class ResumeBuilderService {
     }, { responseType: 'text' as const });
   }
 
+  /** PDF-aligned page break positions (CSS px from body top) for template designer overlay. */
+  fetchPreviewPageBreaks(template: BuilderTemplateId, state: ResumeBuilderState) {
+    const resume = this.toResumePayload(state);
+    return this.http.post<{
+      breakYsPx: number[];
+      pageCount: number;
+      source: 'pdf' | 'geometric';
+    }>(`${this.runtimeEnv.getApiUrl()}/custom-resume/preview-page-breaks`, { template, resume });
+  }
+
   /** Mongo-backed HTML preview (GET). */
   getPreviewHtmlByResumeId(resumeId: string, template: BuilderTemplateId) {
     const params = new HttpParams().set('template', template);

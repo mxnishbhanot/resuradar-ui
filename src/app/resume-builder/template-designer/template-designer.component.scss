@@ -303,6 +303,8 @@ mat-slider {
   box-sizing: border-box;
   width: var(--rr-studio-paper-width);
   max-width: 100%;
+  /* Keep full A4 width so iframe text wraps like Playwright (1280px) + PDF export. */
+  min-width: var(--rr-studio-paper-width);
   flex-shrink: 0;
   padding: var(--rr-studio-paper-pad-y) var(--rr-studio-paper-pad-x);
   border-radius: 6px;

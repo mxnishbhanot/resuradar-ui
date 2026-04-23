@@ -25,7 +25,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ColorChromeModule } from 'ngx-color/chrome';
 import type { ColorEvent } from 'ngx-color';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { catchError, firstValueFrom, of, Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import { ResumeBuilderService } from '../../core/services/resume-builder.service';
@@ -135,7 +135,14 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   private refreshTimer: ReturnType<typeof setTimeout> | null = null;
   /** In-flight preview HTML request; superseded on each `runRefresh` so loading always settles. */
   private previewHtmlSub: Subscription | null = null;
+  /** Server-derived PDF page breaks (Playwright); superseded on each `runRefresh`. */
+  private pageBreaksSub: Subscription | null = null;
   private onWinMessage = (ev: MessageEvent) => this.handlePreviewMessage(ev);
+
+  /** When set, overlay uses these Y positions (px from iframe body top) instead of uniform steps. */
+  serverPageBreakYs = signal<number[] | null>(null);
+  /** Authoritative page count from PDF engine when `serverPageBreakYs` is loaded. */
+  serverPageCount = signal<number | null>(null);
 
   sectionOrder = computed(() => {
     const t = this.tpl;
@@ -219,6 +226,12 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     const h = this.overlayHeightPx();
     const ph = this.pageStepPx();
     if (ph <= 0 || h <= 0) return [];
+
+    const server = this.serverPageBreakYs();
+    if (server && server.length > 0) {
+      return server.map((topPx, i) => ({ topPx, pageNum: i + 2 }));
+    }
+
     const out: { topPx: number; pageNum: number }[] = [];
     let pageNum = 2;
     for (let y = ph; y < h - 0.5; y += ph, pageNum++) {
@@ -228,6 +241,10 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   });
 
   totalPageCount = computed(() => {
+    const fromPdf = this.serverPageCount();
+    if (fromPdf != null && fromPdf > 0) {
+      return fromPdf;
+    }
     const h = this.overlayHeightPx();
     const ph = this.pageStepPx();
     if (ph <= 0 || h <= 0) return 0;
@@ -286,6 +303,8 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
     if (this.refreshTimer) clearTimeout(this.refreshTimer);
     this.previewHtmlSub?.unsubscribe();
     this.previewHtmlSub = null;
+    this.pageBreaksSub?.unsubscribe();
+    this.pageBreaksSub = null;
     if (isPlatformBrowser(this.platformId)) {
       window.removeEventListener('message', this.onWinMessage);
       window.removeEventListener('keydown', this.onKeyDown);
@@ -719,9 +738,17 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
   private runRefresh(): void {
     this.previewHtmlSub?.unsubscribe();
     this.previewHtmlSub = null;
+    this.pageBreaksSub?.unsubscribe();
+    this.pageBreaksSub = null;
+    this.serverPageBreakYs.set(null);
+    this.serverPageCount.set(null);
+
+    const snap = this.store.snapshot;
+    const tpl = this.tpl;
+
     this.isLoading.set(true);
     this.previewHtmlSub = this.store
-      .renderPreviewHtml(this.tpl, this.store.snapshot)
+      .renderPreviewHtml(tpl, snap)
       .pipe(
         finalize(() => {
           this.isLoading.set(false);
@@ -739,6 +766,19 @@ export class TemplateDesignerComponent implements OnInit, OnDestroy {
             this.toast.show('error', 'Preview', 'Could not load HTML preview.', 6000);
           }
         },
+      });
+
+    this.pageBreaksSub = this.store
+      .fetchPreviewPageBreaks(tpl, snap)
+      .pipe(catchError(() => of(null)))
+      .subscribe((res) => {
+        if (res && Array.isArray(res.breakYsPx) && res.breakYsPx.length > 0 && res.pageCount > 0) {
+          this.serverPageBreakYs.set(res.breakYsPx);
+          this.serverPageCount.set(res.pageCount);
+        } else {
+          this.serverPageBreakYs.set(null);
+          this.serverPageCount.set(null);
+        }
       });
   }
 
