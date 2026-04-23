@@ -318,43 +318,52 @@ mat-slider {
 .page-overlay {
   --rr-studio-page-step: 880px;
   position: absolute;
-  /* Inset = content box: page breaks must align with iframe (padding simulates PDF margin only). */
+  /* Full sheet width; vertical origin still matches iframe (padding = PDF margin). */
   top: var(--rr-studio-paper-pad-y);
-  left: var(--rr-studio-paper-pad-x);
-  right: var(--rr-studio-paper-pad-x);
+  left: 0;
+  right: 0;
   pointer-events: none;
   z-index: 2;
 }
 
 .page-break {
   position: absolute;
-  left: -1px;
-  right: -1px;
-  height: 18px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  height: 26px;
+  padding: 0 12px;
   transform: translateY(-50%);
-  background: color-mix(in srgb, var(--bg-secondary) 94%, var(--border-color));
-  border-top: 1px solid color-mix(in srgb, var(--border-color) 92%, var(--text-primary));
-  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 92%, var(--text-primary));
-  box-shadow:
-    0 -6px 10px -6px rgba(0, 0, 0, 0.18),
-    0 6px 10px -6px rgba(0, 0, 0, 0.18);
+  /* Preview-only chrome: fixed “paper studio” tones (not app theme) so dark UI theme
+     never reads as a harsh black bar on the white sheet. */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.97) 0%,
+    rgba(248, 250, 252, 0.98) 45%,
+    rgba(248, 250, 252, 0.98) 55%,
+    rgba(255, 255, 255, 0.97) 100%
+  );
+  border-top: 1px solid rgba(15, 23, 42, 0.1);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.04);
 }
 
 .page-break-label {
-  position: absolute;
-  right: 10px;
-  transform: translateY(calc(-50% - 1px));
-  padding: 2px 8px;
+  flex: 0 0 auto;
+  padding: 3px 9px;
   border-radius: 999px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(15, 23, 42, 0.12);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: rgba(51, 65, 85, 0.92);
   line-height: 1;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .page-count-badge {
@@ -374,6 +383,8 @@ mat-slider {
 }
 
 .preview-iframe {
+  position: relative;
+  z-index: 0;
   display: block;
   width: 100%;
   min-height: 0;

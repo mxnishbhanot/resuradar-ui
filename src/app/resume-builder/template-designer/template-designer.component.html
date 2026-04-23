@@ -205,7 +205,7 @@
         </div>
       </div>
       <p class="hint">
-        Shaded bands, dashed lines, and page labels follow the same printable height as PDF export
+        Shaded gutters and page labels follow the same printable height as PDF export
         (including overall scale). Click a highlighted region in the preview to jump to the matching
         builder tab.
       </p>
@@ -241,8 +241,9 @@
             }
             <div class="page-overlay" [style.height.px]="overlayHeightPx()">
               @for (m of pageBreakMarks(); track m.topPx) {
-                <div class="page-break" [style.top.px]="m.topPx"></div>
-                <span class="page-break-label" [style.top.px]="m.topPx">Page {{ m.pageNum }}</span>
+                <div class="page-break" [style.top.px]="m.topPx">
+                  <span class="page-break-label">Page {{ m.pageNum }}</span>
+                </div>
               }
             </div>
             @if (iframeUrl(); as src) {
